@@ -6,30 +6,39 @@ package chat
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
+
+type MessageWebsocket struct {
+	Text   string `json:"text"`
+	ChatID int    `json:"chatid"`
+}
+
 type Hub struct {
 	// Registered clients.
 	clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	broadcast chan []byte
+	Broadcast chan []byte
 
 	// Register requests from the clients.
 	register chan *Client
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	Messages chan *MessageWebsocket
 }
 
-func newHub() *Hub {
+func NewHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
+		Broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
+		Messages:   make(chan *MessageWebsocket),
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
@@ -39,7 +48,7 @@ func (h *Hub) run() {
 				delete(h.clients, client)
 				close(client.send)
 			}
-		case message := <-h.broadcast:
+		case message := <-h.Broadcast:
 			for client := range h.clients {
 				select {
 				case client.send <- message:
@@ -48,6 +57,8 @@ func (h *Hub) run() {
 					delete(h.clients, client)
 				}
 			}
+			//case message := <-h.Messages:
+
 		}
 	}
 }

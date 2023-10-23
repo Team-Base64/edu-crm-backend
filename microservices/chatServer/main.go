@@ -6,22 +6,19 @@ import (
 	"net"
 	"net/http"
 	"sync"
-	"time"
 
 	chat "main/microservices/chatServer/gen_files"
 
 	conf "main/config"
 
+	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":8081")
-	if err != nil {
-		log.Println("cant listen port", err)
-	}
+	myRouter := mux.NewRouter()
 
 	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
 	//urlDB := "postgres://" + os.Getenv("TEST_POSTGRES_USER") + ":" + os.Getenv("TEST_POSTGRES_PASSWORD") + "@" + os.Getenv("TEST_DATABASE_HOST") + ":" + os.Getenv("DB_PORT") + "/" + os.Getenv("TEST_POSTGRES_DB")
@@ -36,41 +33,57 @@ func main() {
 	}
 	defer db.Close()
 
+	hub := chat.NewHub()
+	go hub.Run()
+	myRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { log.Println("main page") })
+	myRouter.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { chat.ServeWs(hub, w, r) })
+	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	// 	chat.ServeWs(hub, w, r)
+	// })
+
+	lis, err := net.Listen("tcp", ":8082")
+	if err != nil {
+		log.Println("cant listen grpc port", err)
+	}
 	server := grpc.NewServer()
-	chat.RegisterBotChatServer(server, NewChatManager(db))
+	chat.RegisterBotChatServer(server, NewChatManager(db, hub))
+	log.Println("starting grpc server at :8082")
+	go server.Serve(lis)
 
-	hub := newHub()
-	go hub.run()
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
-	})
+	err = http.ListenAndServe(":8081", myRouter)
+	log.Println("starting web server at :8081")
+	if err != nil {
+		log.Println("cant serve", err)
+	}
 
-	log.Println("starting server at :8081")
-	server.Serve(lis)
 }
 
 const sessKeyLen = 10
 
 type ChatManager struct {
 	chat.UnimplementedBotChatServer
-	db *pgxpool.Pool
-	mu sync.RWMutex
+	db  *pgxpool.Pool
+	mu  sync.RWMutex
+	hub *chat.Hub
 }
 
-func NewChatManager(db *pgxpool.Pool) *ChatManager {
+func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 	return &ChatManager{
-		mu: sync.RWMutex{},
-		db: db,
+		mu:  sync.RWMutex{},
+		db:  db,
+		hub: hub,
 	}
 }
 
 func (sm *ChatManager) Recieve(ctx context.Context, in *chat.Message) (*chat.Status, error) {
 	log.Println("call Receive ", in)
-	_, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
-	if err != nil {
-		log.Println(err)
-		return &chat.Status{IsSuccessful: false}, nil
-	}
+	sm.hub.Broadcast <- []byte(in.Text)
+	//sm.hub.Broadcast <- in
+	// _, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return &chat.Status{IsSuccessful: false}, nil
+	// }
 
 	return &chat.Status{IsSuccessful: true}, nil
 }
