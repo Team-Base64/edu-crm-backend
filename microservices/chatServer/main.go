@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net"
 	"net/http"
@@ -77,7 +78,12 @@ func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 
 func (sm *ChatManager) Recieve(ctx context.Context, in *chat.Message) (*chat.Status, error) {
 	log.Println("call Receive ", in)
-	sm.hub.Broadcast <- []byte(in.Text)
+	req, err := json.Marshal(in)
+	if err != nil {
+		log.Println(err)
+		return &chat.Status{IsSuccessful: false}, nil
+	}
+	sm.hub.Broadcast <- []byte(req)
 	//sm.hub.Broadcast <- in
 	// _, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
 	// if err != nil {
