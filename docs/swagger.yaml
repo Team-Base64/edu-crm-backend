@@ -1,0 +1,302 @@
+basePath: /api
+definitions:
+  model.Chat:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/model.MessageChat'
+        type: array
+    type: object
+  model.Chats:
+    properties:
+      chats:
+        items:
+          $ref: '#/definitions/model.Chat'
+        type: array
+    type: object
+  model.CreateMessage:
+    properties:
+      chatid:
+        type: integer
+      isAuthorTeacher:
+        type: boolean
+      text:
+        type: string
+    type: object
+  model.CreateStudentDB:
+    properties:
+      name:
+        type: string
+    type: object
+  model.Error:
+    properties:
+      error: {}
+    type: object
+  model.MessageChat:
+    properties:
+      attaches:
+        items:
+          type: string
+        type: array
+      isAuthorTeacher:
+        type: boolean
+      text:
+        type: string
+      time:
+        type: string
+    type: object
+  model.Response:
+    properties:
+      body: {}
+    type: object
+  model.TeacherDB:
+    properties:
+      id:
+        type: integer
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      tgAccount:
+        type: string
+      tgBotLink:
+        type: string
+      vkAccount:
+        type: string
+      vkBotLink:
+        type: string
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: TCRA back server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: TCRA API
+  version: "1.0"
+paths:
+  /addstudent:
+    post:
+      consumes:
+      - application/json
+      description: Add student
+      operationId: addStudent
+      parameters:
+      - description: Student params
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateStudentDB'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Add student
+  /chats/{teacherID}:
+    get:
+      consumes:
+      - application/json
+      description: Get chats messages of teacher
+      operationId: getChats
+      parameters:
+      - description: The category of products
+        in: path
+        name: teacherID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Chats'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get chats messages of teacher
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: gets teacher's info
+      operationId: getTeacher
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TeacherDB'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get teacher's info
+    post:
+      consumes:
+      - application/json
+      description: changes teacher's parameters
+      operationId: changeUserParameters
+      parameters:
+      - description: Teacher params
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.TeacherDB'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: changes teacher's parameters
+  /recieve:
+    post:
+      consumes:
+      - application/json
+      description: Recieve Message
+      operationId: recieveMessage
+      parameters:
+      - description: Message
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Recieve Message
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create teacher
+      operationId: createTeacher
+      parameters:
+      - description: Teacher params
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.TeacherDB'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create teacher
+  /send:
+    post:
+      consumes:
+      - application/json
+      description: Send Message
+      operationId: sendMessage
+      parameters:
+      - description: Message
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Send Message
+swagger: "2.0"
