@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"context"
 	"main/domain/model"
 	rep "main/repository"
 
@@ -51,17 +50,17 @@ func (api *Usecase) AddStudent(params *model.CreateStudentDB) error {
 }
 
 func (api *Usecase) SendMessage(in *model.CreateMessage) error {
-	_, err := api.chatManager.Recieve(
-		context.Background(),
-		&chat.Message{
-			Text:   in.Text,
-			ChatID: int32(in.ChatID),
-		})
-	if err != nil {
-		return err
-	}
+	// _, err := api.chatManager.Recieve(
+	// 	context.Background(),
+	// 	&chat.Message{
+	// 		Text:   in.Text,
+	// 		ChatID: int32(in.ChatID),
+	// 	})
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = api.store.AddMessage(&model.CreateMessage{Text: in.Text, ChatID: in.ChatID, IsAuthorTeacher: true})
+	err := api.store.AddMessage(&model.CreateMessage{Text: in.Text, ChatID: in.ChatID, IsAuthorTeacher: true})
 	return err
 }
 

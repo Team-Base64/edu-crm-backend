@@ -11,22 +11,24 @@ type MessageWebsocket struct {
 // }
 
 type Hub struct {
-	clients     map[*Client]bool
-	Broadcast   chan *MessageWebsocket
-	register    chan *Client
-	unregister  chan *Client
-	chats       map[int32]*Client // соединение по id чата
-	clientChats map[*Client][]int32
+	clients         map[*Client]bool
+	Broadcast       chan *MessageWebsocket
+	MessagesToTGBot chan *MessageWebsocket
+	register        chan *Client
+	unregister      chan *Client
+	chats           map[int32]*Client // соединение по id чата
+	clientChats     map[*Client][]int32
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Broadcast:   make(chan *MessageWebsocket),
-		register:    make(chan *Client),
-		unregister:  make(chan *Client),
-		clientChats: make(map[*Client][]int32),
-		clients:     make(map[*Client]bool),
-		chats:       make(map[int32]*Client),
+		Broadcast:       make(chan *MessageWebsocket),
+		MessagesToTGBot: make(chan *MessageWebsocket),
+		register:        make(chan *Client),
+		unregister:      make(chan *Client),
+		clientChats:     make(map[*Client][]int32),
+		clients:         make(map[*Client]bool),
+		chats:           make(map[int32]*Client),
 		//Messages:   make(chan *MessageWebsocket),
 	}
 }

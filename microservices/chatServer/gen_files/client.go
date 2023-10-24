@@ -75,6 +75,7 @@ func (c *Client) readPump() {
 		c.hub.chats[req.ChatID] = c
 		c.hub.clientChats[c] = append(c.hub.clientChats[c], req.ChatID)
 		c.hub.Broadcast <- &req
+		c.hub.MessagesToTGBot <- &req
 	}
 }
 

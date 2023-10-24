@@ -23,7 +23,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BotChat_Recieve_FullMethodName = "/chat.BotChat/Recieve"
+	BotChat_StartChat_FullMethodName = "/chat.BotChat/StartChat"
 )
 
 // BotChatClient is the client API for BotChat service.
@@ -33,7 +33,8 @@ type BotChatClient interface {
 	// From server to bot
 	// rpc Send (Message) returns (Status) {}
 	// From api to bot
-	Recieve(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Status, error)
+	// rpc Recieve (Message) returns (Status) {}
+	StartChat(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatClient, error)
 }
 
 type botChatClient struct {
@@ -44,13 +45,35 @@ func NewBotChatClient(cc grpc.ClientConnInterface) BotChatClient {
 	return &botChatClient{cc}
 }
 
-func (c *botChatClient) Recieve(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Status, error) {
-	out := new(Status)
-	err := c.cc.Invoke(ctx, BotChat_Recieve_FullMethodName, in, out, opts...)
+func (c *botChatClient) StartChat(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatClient, error) {
+	stream, err := c.cc.NewStream(ctx, &BotChat_ServiceDesc.Streams[0], BotChat_StartChat_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &botChatStartChatClient{stream}
+	return x, nil
+}
+
+type BotChat_StartChatClient interface {
+	Send(*Message) error
+	Recv() (*Message, error)
+	grpc.ClientStream
+}
+
+type botChatStartChatClient struct {
+	grpc.ClientStream
+}
+
+func (x *botChatStartChatClient) Send(m *Message) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *botChatStartChatClient) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // BotChatServer is the server API for BotChat service.
@@ -60,7 +83,8 @@ type BotChatServer interface {
 	// From server to bot
 	// rpc Send (Message) returns (Status) {}
 	// From api to bot
-	Recieve(context.Context, *Message) (*Status, error)
+	// rpc Recieve (Message) returns (Status) {}
+	StartChat(BotChat_StartChatServer) error
 	mustEmbedUnimplementedBotChatServer()
 }
 
@@ -68,8 +92,8 @@ type BotChatServer interface {
 type UnimplementedBotChatServer struct {
 }
 
-func (UnimplementedBotChatServer) Recieve(context.Context, *Message) (*Status, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Recieve not implemented")
+func (UnimplementedBotChatServer) StartChat(BotChat_StartChatServer) error {
+	return status.Errorf(codes.Unimplemented, "method StartChat not implemented")
 }
 func (UnimplementedBotChatServer) mustEmbedUnimplementedBotChatServer() {}
 
@@ -84,22 +108,30 @@ func RegisterBotChatServer(s grpc.ServiceRegistrar, srv BotChatServer) {
 	s.RegisterService(&BotChat_ServiceDesc, srv)
 }
 
-func _BotChat_Recieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Message)
-	if err := dec(in); err != nil {
+func _BotChat_StartChat_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BotChatServer).StartChat(&botChatStartChatServer{stream})
+}
+
+type BotChat_StartChatServer interface {
+	Send(*Message) error
+	Recv() (*Message, error)
+	grpc.ServerStream
+}
+
+type botChatStartChatServer struct {
+	grpc.ServerStream
+}
+
+func (x *botChatStartChatServer) Send(m *Message) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *botChatStartChatServer) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(BotChatServer).Recieve(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BotChat_Recieve_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BotChatServer).Recieve(ctx, req.(*Message))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 // BotChat_ServiceDesc is the grpc.ServiceDesc for BotChat service.
@@ -108,12 +140,14 @@ func _BotChat_Recieve_Handler(srv interface{}, ctx context.Context, dec func(int
 var BotChat_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "chat.BotChat",
 	HandlerType: (*BotChatServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "Recieve",
-			Handler:    _BotChat_Recieve_Handler,
+			StreamName:    "StartChat",
+			Handler:       _BotChat_StartChat_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "microservices/chatServer/gen_files/chat.proto",
 }
