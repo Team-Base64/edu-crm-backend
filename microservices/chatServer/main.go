@@ -7,7 +7,9 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
+	"main/domain/model"
 	chat "main/microservices/chatServer/gen_files"
 
 	conf "main/config"
@@ -77,13 +79,42 @@ func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 	}
 }
 
+// func (sm *ChatManager) Recieve(ctx context.Context, in *chat.Message) (*chat.Status, error) {
+// 	log.Println("call Receive ", in)
+// 	// req, err := json.Marshal(in)
+// 	// if err != nil {
+// 	// 	log.Println(err)
+// 	// 	return &chat.Status{IsSuccessful: false}, nil
+// 	// }
+// 	//sm.hub.Broadcast <- []byte(req)
+// 	mes := chat.MessageWebsocket{Text: in.Text, ChatID: in.ChatID}
+// 	log.Println(mes)
+// 	sm.hub.Broadcast <- &mes
+// 	// _, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
+// 	// if err != nil {
+// 	// 	log.Println(err)
+// 	// 	return &chat.Status{IsSuccessful: false}, nil
+// 	// }
+
+// 	return &chat.Status{IsSuccessful: true}, nil
+// }
+
+func (sm *ChatManager) AddMessage(in *model.CreateMessage) error {
+	_, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $5);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (sm *ChatManager) StartChatTG(ch chat.BotChat_StartChatTGServer) error {
 	log.Println("start chat tg")
 	go func() {
 		for {
 			// отправка из вебсокета в бота
 			mes2 := <-sm.hub.MessagesToTGBot
-			resp := chat.Message{Text: mes2.Text, ChatID: 1}
+			mockChatID := 1
+			resp := chat.Message{Text: mes2.Text, ChatID: int32(mockChatID)}
 			if err := ch.Send(&resp); err != nil {
 				log.Println(err)
 				if err.Error() == "rpc error: code = Canceled desc = context canceled" {
@@ -93,6 +124,7 @@ func (sm *ChatManager) StartChatTG(ch chat.BotChat_StartChatTGServer) error {
 				}
 				continue
 			}
+			sm.AddMessage(&model.CreateMessage{Text: resp.Text, ChatID: int(resp.ChatID), IsAuthorTeacher: true})
 		}
 	}()
 	for {
@@ -113,6 +145,7 @@ func (sm *ChatManager) StartChatTG(ch chat.BotChat_StartChatTGServer) error {
 		log.Println(req)
 		mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID, Channel: "chat"}
 		sm.hub.Broadcast <- &mes
+		sm.AddMessage(&model.CreateMessage{Text: mes.Text, ChatID: int(mes.ChatID), IsAuthorTeacher: false})
 	}
 }
 
@@ -132,6 +165,7 @@ func (sm *ChatManager) StartChatVK(ch chat.BotChat_StartChatVKServer) error {
 				}
 				continue
 			}
+			sm.AddMessage(&model.CreateMessage{Text: resp.Text, ChatID: int(resp.ChatID), IsAuthorTeacher: true})
 		}
 	}()
 	for {
@@ -152,5 +186,6 @@ func (sm *ChatManager) StartChatVK(ch chat.BotChat_StartChatVKServer) error {
 		log.Println(req)
 		mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID, Channel: "chat"}
 		sm.hub.Broadcast <- &mes
+		sm.AddMessage(&model.CreateMessage{Text: mes.Text, ChatID: int(mes.ChatID), IsAuthorTeacher: false})
 	}
 }
