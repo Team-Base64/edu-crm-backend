@@ -153,48 +153,47 @@ func (api *Handler) AddStudent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&model.Response{})
 }
 
-// SendMessage godoc
-// @Summary Send Message
-// @Description Send Message
-// @ID sendMessage
-// @Accept  json
-// @Produce  json
-// @Param user body model.CreateMessage true "Message"
-// @Success 200 {object} model.Response "OK"
-// @Failure 400 {object} model.Error "Bad request - Problem with the request"
-// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// @Router /send [post]
-func (api *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var req model.CreateMessage
-	err := decoder.Decode(&req)
-	if err != nil {
-		ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
-		return
-	}
-
-	err = api.usecase.SendMessage(&req)
-	if err != nil {
-		log.Println("err", err)
-		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
-		return
-	}
-	json.NewEncoder(w).Encode(&model.Response{})
-}
-
 // GetChats godoc
-// @Summary Get chats messages of teacher
-// @Description Get chats messages of teacher
+// @Summary Get chats of teacher
+// @Description Get chats of teacher
 // @ID getChats
 // @Accept  json
 // @Produce  json
-// @Param teacherID path string true "The category of products"
 // @Success 200 {object} model.Chats
 // @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// @Router /chats/{teacherID} [get]
+// @Router /chats [get]
 func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
+	// s := strings.Split(r.URL.Path, "/")
+	// idS := s[len(s)-1]
+	// id, err := strconv.Atoi(idS)
+	// if err != nil {
+	// 	log.Println("error: ", err)
+	// 	ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
+	// 	return
+	// }
+	mockTeacherID := 2
+	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
+	if err != nil {
+		log.Println("err", err)
+		ReturnErrorJSON(w, baseErrors.ErrUnauthorized401, 500)
+		return
+	}
+	json.NewEncoder(w).Encode(chats)
+}
+
+// GetChat godoc
+// @Summary Get chat by id
+// @Description Get chats messages by chat id
+// @ID getChat
+// @Accept  json
+// @Produce  json
+// @Param chatID path string true "Chat id"
+// @Success 200 {object} model.Chat
+// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
+// @Router /chats/{chatID} [get]
+func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 	idS := s[len(s)-1]
 	id, err := strconv.Atoi(idS)
@@ -204,62 +203,11 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	chats, err := api.usecase.GetChatsByTeacherID(id)
+	chats, err := api.usecase.GetChatByID(id)
 	if err != nil {
 		log.Println("err", err)
 		ReturnErrorJSON(w, baseErrors.ErrUnauthorized401, 500)
 		return
 	}
 	json.NewEncoder(w).Encode(chats)
-}
-
-// // RecieveMessage godoc
-// // @Summary  RecieveMessage
-// // @Description  RecieveMessage
-// // @ID recieveMessage
-// // @Accept  json
-// // @Produce  json
-// // @Success 200 {object} model.TeacherDB
-// // @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
-// // @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// // @Router /receive [post]
-// func (api *Handler) RecieveMessage(w http.ResponseWriter, r *http.Request) {
-
-// 	teacher, err := api.usecase.GetTeacher(1)
-// 	if err != nil {
-// 		log.Println("err", err)
-// 		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
-// 		return
-// 	}
-// 	json.NewEncoder(w).Encode(teacher)
-// }
-
-// RecieveMessage godoc
-// @Summary Recieve Message
-// @Description Recieve Message
-// @ID recieveMessage
-// @Accept  json
-// @Produce  json
-// @Param user body model.CreateMessage true "Message"
-// @Success 200 {object} model.Response "OK"
-// @Failure 400 {object} model.Error "Bad request - Problem with the request"
-// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// @Router /recieve [post]
-func (api *Handler) ReceiveMessage(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var req model.CreateMessage
-	err := decoder.Decode(&req)
-	if err != nil {
-		ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
-		return
-	}
-
-	err = api.usecase.RecieveMessage(&req)
-	if err != nil {
-		log.Println("err", err)
-		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
-		return
-	}
-	json.NewEncoder(w).Encode(&model.Response{})
 }

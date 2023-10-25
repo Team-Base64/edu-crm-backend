@@ -74,26 +74,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/chats/{teacherID}": {
+        "/chat/{chatID}": {
             "get": {
-                "description": "Get chats messages of teacher",
+                "description": "Get chats messages by chat id",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get chats messages of teacher",
-                "operationId": "getChats",
+                "summary": "Get chat by id",
+                "operationId": "getChat",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "The category of products",
-                        "name": "teacherID",
+                        "description": "Chat id",
+                        "name": "chatID",
                         "in": "path",
                         "required": true
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Chat"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/chats": {
+            "get": {
+                "description": "Get chats of teacher",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get chats of teacher",
+                "operationId": "getChats",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -197,56 +230,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/recieve": {
-            "post": {
-                "description": "Recieve Message",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Recieve Message",
-                "operationId": "recieveMessage",
-                "parameters": [
-                    {
-                        "description": "Message",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.CreateMessage"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Problem with the request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/register": {
             "post": {
                 "description": "Create teacher",
@@ -290,56 +273,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/send": {
-            "post": {
-                "description": "Send Message",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Send Message",
-                "operationId": "sendMessage",
-                "parameters": [
-                    {
-                        "description": "Message",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.CreateMessage"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Problem with the request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -360,22 +293,8 @@ const docTemplate = `{
                 "chats": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Chat"
+                        "type": "integer"
                     }
-                }
-            }
-        },
-        "model.CreateMessage": {
-            "type": "object",
-            "properties": {
-                "chatid": {
-                    "type": "integer"
-                },
-                "isAuthorTeacher": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
                 }
             }
         },

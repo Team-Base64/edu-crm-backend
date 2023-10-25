@@ -131,7 +131,8 @@ func (us *Store) GetChatFromDB(id int) (*model.Chat, error) {
 }
 
 func (us *Store) GetChatsByID(idTeacher int) (*model.Chats, error) {
-	chats := []*model.Chat{}
+	//chats := []*model.Chat{}
+	chats := []*model.ChatInfo{}
 	rows, err := us.db.Query(context.Background(), `SELECT id FROM chats WHERE teacherID = $1`, idTeacher)
 	if err != nil {
 		return nil, err
@@ -144,11 +145,12 @@ func (us *Store) GetChatsByID(idTeacher int) (*model.Chats, error) {
 			return nil, err
 		}
 		//chatsIDs = append(chatsIDs, &dat)
-		chat, err := us.GetChatFromDB(tmpID)
-		if err != nil {
-			return nil, err
-		}
-		chats = append(chats, chat)
+		// chat, err := us.GetChatFromDB(tmpID)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		tmpChat := &model.ChatInfo{ChatID: tmpID}
+		chats = append(chats, tmpChat)
 	}
 
 	return &model.Chats{Chats: chats}, nil

@@ -15,8 +15,7 @@ type UsecaseInterface interface {
 	ChangeTeacher(params *model.TeacherDB) error
 	GetChatsByTeacherID(id int) (model.Chats, error)
 	AddStudent(params *model.CreateStudentDB) error
-	SendMessage(in *model.CreateMessage) error
-	RecieveMessage(in *model.CreateMessage) error
+	GetChatByID(id int) (model.Chat, error)
 }
 
 type Usecase struct {
@@ -49,27 +48,12 @@ func (api *Usecase) AddStudent(params *model.CreateStudentDB) error {
 	return api.store.AddStudent(&model.StudentDB{InviteHash: newUUID.String(), Name: params.Name})
 }
 
-func (api *Usecase) SendMessage(in *model.CreateMessage) error {
-	// _, err := api.chatManager.Recieve(
-	// 	context.Background(),
-	// 	&chat.Message{
-	// 		Text:   in.Text,
-	// 		ChatID: int32(in.ChatID),
-	// 	})
-	// if err != nil {
-	// 	return err
-	// }
-
-	err := api.store.AddMessage(&model.CreateMessage{Text: in.Text, ChatID: in.ChatID, IsAuthorTeacher: true})
-	return err
-}
-
-func (api *Usecase) RecieveMessage(in *model.CreateMessage) error {
-	err := api.store.AddMessage(in)
-	return err
-}
-
 func (api *Usecase) GetChatsByTeacherID(id int) (model.Chats, error) {
 	chats, err := api.store.GetChatsByID(id)
 	return *chats, err
+}
+
+func (api *Usecase) GetChatByID(id int) (model.Chat, error) {
+	chat, err := api.store.GetChatFromDB(id)
+	return *chat, err
 }

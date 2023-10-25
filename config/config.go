@@ -8,7 +8,8 @@ var PathSignUp = BasePath + "/register"
 var PathProfile = BasePath + "/profile"
 var PathAddStudent = BasePath + "/addstudent"
 var PathSend = BasePath + "/send"
-var PathChats = BasePath + "/chats/{teacherID}"
+var PathChats = BasePath + "/chats"
+var PathChatByID = BasePath + "/chats/{id}"
 
 var Headers = map[string]string{
 	//"Access-Control-Allow-Origin":      "http://89.208.198.137:8081",

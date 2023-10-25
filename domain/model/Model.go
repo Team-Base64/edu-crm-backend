@@ -58,8 +58,15 @@ type Chat struct {
 	Messages []*MessageChat `json:"messages,omitempty"`
 }
 
+type ChatInfo struct {
+	ChatID int `json:"chatid,omitempty"`
+}
+
+//	type Chats struct {
+//		Chats []*Chat `json:"chats,omitempty"`
+//	}
 type Chats struct {
-	Chats []*Chat `json:"chats,omitempty"`
+	Chats []*ChatInfo `json:"chats,omitempty"`
 }
 
 type MessageDB struct {

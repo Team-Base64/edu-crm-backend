@@ -76,9 +76,9 @@ func main() {
 	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacher).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathProfile, Handler.ChangeProfile).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathAddStudent, Handler.AddStudent).Methods(http.MethodPost, http.MethodOptions)
-	myRouter.HandleFunc(conf.PathSend, Handler.SendMessage).Methods(http.MethodPost, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathChatByID, Handler.GetChat).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)

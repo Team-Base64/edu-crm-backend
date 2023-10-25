@@ -79,26 +79,6 @@ func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 	}
 }
 
-// func (sm *ChatManager) Recieve(ctx context.Context, in *chat.Message) (*chat.Status, error) {
-// 	log.Println("call Receive ", in)
-// 	// req, err := json.Marshal(in)
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// 	return &chat.Status{IsSuccessful: false}, nil
-// 	// }
-// 	//sm.hub.Broadcast <- []byte(req)
-// 	mes := chat.MessageWebsocket{Text: in.Text, ChatID: in.ChatID}
-// 	log.Println(mes)
-// 	sm.hub.Broadcast <- &mes
-// 	// _, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// 	return &chat.Status{IsSuccessful: false}, nil
-// 	// }
-
-// 	return &chat.Status{IsSuccessful: true}, nil
-// }
-
 func (sm *ChatManager) AddMessage(in *model.CreateMessage) error {
 	_, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $5);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
 	if err != nil {
