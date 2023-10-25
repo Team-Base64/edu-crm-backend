@@ -6,13 +6,12 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
 	"main/domain/model"
 	chat "main/microservices/chatServer/gen_files"
-
-	conf "main/config"
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -23,7 +22,8 @@ import (
 func main() {
 	myRouter := mux.NewRouter()
 
-	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	// urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	urlDB := os.Getenv("URL_DB")
 	//urlDB := "postgres://" + os.Getenv("TEST_POSTGRES_USER") + ":" + os.Getenv("TEST_POSTGRES_PASSWORD") + "@" + os.Getenv("TEST_DATABASE_HOST") + ":" + os.Getenv("DB_PORT") + "/" + os.Getenv("TEST_POSTGRES_DB")
 	config, _ := pgxpool.ParseConfig(urlDB)
 	config.MaxConns = 70
