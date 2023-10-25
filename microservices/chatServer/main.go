@@ -77,28 +77,8 @@ func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 	}
 }
 
-// func (sm *ChatManager) Recieve(ctx context.Context, in *chat.Message) (*chat.Status, error) {
-// 	log.Println("call Receive ", in)
-// 	// req, err := json.Marshal(in)
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// 	return &chat.Status{IsSuccessful: false}, nil
-// 	// }
-// 	//sm.hub.Broadcast <- []byte(req)
-// 	mes := chat.MessageWebsocket{Text: in.Text, ChatID: in.ChatID}
-// 	log.Println(mes)
-// 	sm.hub.Broadcast <- &mes
-// 	// _, err := sm.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, false, time.Now().Format("2006.01.02 15:04:05"))
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// 	return &chat.Status{IsSuccessful: false}, nil
-// 	// }
-
-// 	return &chat.Status{IsSuccessful: true}, nil
-// }
-
-func (sm *ChatManager) StartChat(ch chat.BotChat_StartChatServer) error {
-	log.Println("start chat")
+func (sm *ChatManager) StartChatTG(ch chat.BotChat_StartChatTGServer) error {
+	log.Println("start chat tg")
 	go func() {
 		for {
 			// отправка из вебсокета в бота
@@ -130,17 +110,47 @@ func (sm *ChatManager) StartChat(ch chat.BotChat_StartChatServer) error {
 			}
 			continue
 		}
-
 		log.Println(req)
 		mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID, Channel: "chat"}
 		sm.hub.Broadcast <- &mes
+	}
+}
 
-		// if f > 0 {
-		// 	resp := chat.Message{Text: "aaa", ChatID: 1}
-		// 	if err := ch.Send(&resp); err != nil {
-		// 		log.Println(err)
-		// 	}
-		// 	f--
-		// }
+func (sm *ChatManager) StartChatVK(ch chat.BotChat_StartChatVKServer) error {
+	log.Println("start chat vk")
+	go func() {
+		for {
+			// отправка из вебсокета в бота
+			mes2 := <-sm.hub.MessagesToVKBot
+			resp := chat.Message{Text: mes2.Text, ChatID: 1}
+			if err := ch.Send(&resp); err != nil {
+				log.Println(err)
+				if err.Error() == "rpc error: code = Canceled desc = context canceled" {
+					log.Println("breaking grpc stream")
+					break
+					//return nil
+				}
+				continue
+			}
+		}
+	}()
+	for {
+		//приём сообщений от бота
+		req, err := ch.Recv()
+		if err == io.EOF {
+			log.Println("exit")
+			return nil
+		}
+		if err != nil {
+			log.Printf("receive error %v", err)
+			if err.Error() == "rpc error: code = Canceled desc = context canceled" {
+				log.Println("breaking grpc stream")
+				return nil
+			}
+			continue
+		}
+		log.Println(req)
+		mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID, Channel: "chat"}
+		sm.hub.Broadcast <- &mes
 	}
 }

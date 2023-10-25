@@ -17,5 +17,6 @@ bool isSuccessful = 1;
 }
 
 service BotChat {
-rpc StartChat(stream Message) returns (stream Message);
+rpc StartChatTG(stream Message) returns (stream Message);
+rpc StartChatVK(stream Message) returns (stream Message);
 }

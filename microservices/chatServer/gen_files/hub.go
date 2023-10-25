@@ -15,6 +15,7 @@ type Hub struct {
 	clients         map[*Client]bool
 	Broadcast       chan *MessageWebsocket
 	MessagesToTGBot chan *MessageWebsocket
+	MessagesToVKBot chan *MessageWebsocket
 	register        chan *Client
 	unregister      chan *Client
 	chats           map[int32]*Client // соединение по id чата
@@ -25,6 +26,7 @@ func NewHub() *Hub {
 	return &Hub{
 		Broadcast:       make(chan *MessageWebsocket),
 		MessagesToTGBot: make(chan *MessageWebsocket, 100),
+		MessagesToVKBot: make(chan *MessageWebsocket, 100),
 		register:        make(chan *Client),
 		unregister:      make(chan *Client),
 		clientChats:     make(map[*Client][]int32),

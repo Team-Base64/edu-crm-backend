@@ -23,18 +23,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BotChat_StartChat_FullMethodName = "/chat.BotChat/StartChat"
+	BotChat_StartChatTG_FullMethodName = "/chat.BotChat/StartChatTG"
+	BotChat_StartChatVK_FullMethodName = "/chat.BotChat/StartChatVK"
 )
 
 // BotChatClient is the client API for BotChat service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BotChatClient interface {
-	// From server to bot
-	// rpc Send (Message) returns (Status) {}
-	// From api to bot
-	// rpc Recieve (Message) returns (Status) {}
-	StartChat(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatClient, error)
+	StartChatTG(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatTGClient, error)
+	StartChatVK(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatVKClient, error)
 }
 
 type botChatClient struct {
@@ -45,30 +43,61 @@ func NewBotChatClient(cc grpc.ClientConnInterface) BotChatClient {
 	return &botChatClient{cc}
 }
 
-func (c *botChatClient) StartChat(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatClient, error) {
-	stream, err := c.cc.NewStream(ctx, &BotChat_ServiceDesc.Streams[0], BotChat_StartChat_FullMethodName, opts...)
+func (c *botChatClient) StartChatTG(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatTGClient, error) {
+	stream, err := c.cc.NewStream(ctx, &BotChat_ServiceDesc.Streams[0], BotChat_StartChatTG_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &botChatStartChatClient{stream}
+	x := &botChatStartChatTGClient{stream}
 	return x, nil
 }
 
-type BotChat_StartChatClient interface {
+type BotChat_StartChatTGClient interface {
 	Send(*Message) error
 	Recv() (*Message, error)
 	grpc.ClientStream
 }
 
-type botChatStartChatClient struct {
+type botChatStartChatTGClient struct {
 	grpc.ClientStream
 }
 
-func (x *botChatStartChatClient) Send(m *Message) error {
+func (x *botChatStartChatTGClient) Send(m *Message) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *botChatStartChatClient) Recv() (*Message, error) {
+func (x *botChatStartChatTGClient) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *botChatClient) StartChatVK(ctx context.Context, opts ...grpc.CallOption) (BotChat_StartChatVKClient, error) {
+	stream, err := c.cc.NewStream(ctx, &BotChat_ServiceDesc.Streams[1], BotChat_StartChatVK_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &botChatStartChatVKClient{stream}
+	return x, nil
+}
+
+type BotChat_StartChatVKClient interface {
+	Send(*Message) error
+	Recv() (*Message, error)
+	grpc.ClientStream
+}
+
+type botChatStartChatVKClient struct {
+	grpc.ClientStream
+}
+
+func (x *botChatStartChatVKClient) Send(m *Message) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *botChatStartChatVKClient) Recv() (*Message, error) {
 	m := new(Message)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -80,11 +109,8 @@ func (x *botChatStartChatClient) Recv() (*Message, error) {
 // All implementations must embed UnimplementedBotChatServer
 // for forward compatibility
 type BotChatServer interface {
-	// From server to bot
-	// rpc Send (Message) returns (Status) {}
-	// From api to bot
-	// rpc Recieve (Message) returns (Status) {}
-	StartChat(BotChat_StartChatServer) error
+	StartChatTG(BotChat_StartChatTGServer) error
+	StartChatVK(BotChat_StartChatVKServer) error
 	mustEmbedUnimplementedBotChatServer()
 }
 
@@ -92,8 +118,11 @@ type BotChatServer interface {
 type UnimplementedBotChatServer struct {
 }
 
-func (UnimplementedBotChatServer) StartChat(BotChat_StartChatServer) error {
-	return status.Errorf(codes.Unimplemented, "method StartChat not implemented")
+func (UnimplementedBotChatServer) StartChatTG(BotChat_StartChatTGServer) error {
+	return status.Errorf(codes.Unimplemented, "method StartChatTG not implemented")
+}
+func (UnimplementedBotChatServer) StartChatVK(BotChat_StartChatVKServer) error {
+	return status.Errorf(codes.Unimplemented, "method StartChatVK not implemented")
 }
 func (UnimplementedBotChatServer) mustEmbedUnimplementedBotChatServer() {}
 
@@ -108,25 +137,51 @@ func RegisterBotChatServer(s grpc.ServiceRegistrar, srv BotChatServer) {
 	s.RegisterService(&BotChat_ServiceDesc, srv)
 }
 
-func _BotChat_StartChat_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(BotChatServer).StartChat(&botChatStartChatServer{stream})
+func _BotChat_StartChatTG_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BotChatServer).StartChatTG(&botChatStartChatTGServer{stream})
 }
 
-type BotChat_StartChatServer interface {
+type BotChat_StartChatTGServer interface {
 	Send(*Message) error
 	Recv() (*Message, error)
 	grpc.ServerStream
 }
 
-type botChatStartChatServer struct {
+type botChatStartChatTGServer struct {
 	grpc.ServerStream
 }
 
-func (x *botChatStartChatServer) Send(m *Message) error {
+func (x *botChatStartChatTGServer) Send(m *Message) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *botChatStartChatServer) Recv() (*Message, error) {
+func (x *botChatStartChatTGServer) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _BotChat_StartChatVK_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BotChatServer).StartChatVK(&botChatStartChatVKServer{stream})
+}
+
+type BotChat_StartChatVKServer interface {
+	Send(*Message) error
+	Recv() (*Message, error)
+	grpc.ServerStream
+}
+
+type botChatStartChatVKServer struct {
+	grpc.ServerStream
+}
+
+func (x *botChatStartChatVKServer) Send(m *Message) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *botChatStartChatVKServer) Recv() (*Message, error) {
 	m := new(Message)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -143,8 +198,14 @@ var BotChat_ServiceDesc = grpc.ServiceDesc{
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "StartChat",
-			Handler:       _BotChat_StartChat_Handler,
+			StreamName:    "StartChatTG",
+			Handler:       _BotChat_StartChatTG_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "StartChatVK",
+			Handler:       _BotChat_StartChatVK_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
