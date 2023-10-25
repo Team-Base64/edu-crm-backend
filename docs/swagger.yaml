@@ -7,11 +7,16 @@ definitions:
           $ref: '#/definitions/model.MessageChat'
         type: array
     type: object
+  model.ChatInfo:
+    properties:
+      chatid:
+        type: integer
+    type: object
   model.Chats:
     properties:
       chats:
         items:
-          type: integer
+          $ref: '#/definitions/model.ChatInfo'
         type: array
     type: object
   model.CreateStudentDB:
@@ -107,7 +112,30 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Add student
-  /chat/{chatID}:
+  /chats:
+    get:
+      consumes:
+      - application/json
+      description: Get chats of teacher
+      operationId: getChats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Chats'
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get chats of teacher
+  /chats/{chatID}:
     get:
       consumes:
       - application/json
@@ -136,29 +164,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get chat by id
-  /chats:
-    get:
-      consumes:
-      - application/json
-      description: Get chats of teacher
-      operationId: getChats
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Chats'
-        "401":
-          description: Unauthorized - Access token is missing or invalid
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Internal Server Error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Get chats of teacher
   /profile:
     get:
       consumes:

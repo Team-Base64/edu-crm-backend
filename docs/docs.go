@@ -74,7 +74,40 @@ const docTemplate = `{
                 }
             }
         },
-        "/chat/{chatID}": {
+        "/chats": {
+            "get": {
+                "description": "Get chats of teacher",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get chats of teacher",
+                "operationId": "getChats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Chats"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/chats/{chatID}": {
             "get": {
                 "description": "Get chats messages by chat id",
                 "consumes": [
@@ -99,39 +132,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Chat"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/chats": {
-            "get": {
-                "description": "Get chats of teacher",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get chats of teacher",
-                "operationId": "getChats",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Chats"
                         }
                     },
                     "401": {
@@ -287,13 +287,21 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ChatInfo": {
+            "type": "object",
+            "properties": {
+                "chatid": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Chats": {
             "type": "object",
             "properties": {
                 "chats": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "$ref": "#/definitions/model.ChatInfo"
                     }
                 }
             }

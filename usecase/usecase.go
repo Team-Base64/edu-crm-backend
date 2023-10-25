@@ -4,8 +4,6 @@ import (
 	"main/domain/model"
 	rep "main/repository"
 
-	chat "main/microservices/chatServer/gen_files"
-
 	"github.com/google/uuid"
 )
 
@@ -19,14 +17,12 @@ type UsecaseInterface interface {
 }
 
 type Usecase struct {
-	chatManager chat.BotChatClient
-	store       rep.StoreInterface
+	store rep.StoreInterface
 }
 
-func NewUsecase(us rep.StoreInterface, cm chat.BotChatClient) UsecaseInterface {
+func NewUsecase(us rep.StoreInterface) UsecaseInterface {
 	return &Usecase{
-		chatManager: cm,
-		store:       us,
+		store: us,
 	}
 }
 

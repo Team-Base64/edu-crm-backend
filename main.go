@@ -13,11 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	conf "main/config"
-	chat "main/microservices/chatServer/gen_files"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 	//bot "main/microservices/auth/gen_files"
@@ -34,10 +31,6 @@ func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-var (
-	chatManager chat.BotChatClient
-)
-
 func main() {
 	myRouter := mux.NewRouter()
 	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
@@ -53,22 +46,9 @@ func main() {
 	}
 	defer db.Close()
 
-	grcpConnChat, err := grpc.Dial(
-		"127.0.0.1:50051",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Println("cant connect to grpc chatServer")
-	} else {
-		log.Println("connected to grpc chatServer")
-	}
-	defer grcpConnChat.Close()
-
-	chatManager = chat.NewBotChatClient(grcpConnChat)
-
 	Store := repository.NewStore(db)
 
-	Usecase := usecase.NewUsecase(Store, chatManager)
+	Usecase := usecase.NewUsecase(Store)
 
 	Handler := delivery.NewHandler(Usecase)
 
