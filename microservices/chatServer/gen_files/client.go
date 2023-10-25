@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package chat
 
 import (
@@ -61,21 +57,32 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		var req MessageWebsocket
+		var req *MessageWebsocket
 		err = json.Unmarshal(message, &req)
 		if err != nil {
 			log.Println(err)
 			return
 		}
 
-		log.Println(req)
+		//log.Println(req)
 		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		//c.hub.Broadcast <- message
 		//c.hub.Broadcast <- &MessageWebsocket{Text: req.Text, ChatID: req.ChatID}
 		c.hub.chats[req.ChatID] = c
+		//log.Println(1)
 		c.hub.clientChats[c] = append(c.hub.clientChats[c], req.ChatID)
-		c.hub.Broadcast <- &req
-		c.hub.MessagesToTGBot <- &req
+		//log.Println(2)
+		//c.hub.Broadcast <- &req
+		// try {
+		// 	c.hub.MessagesToTGBot <- req
+		// 	fmt.Println(result)
+		//   } catch (e ) {
+		// 	fmt.Println("Делить на ноль нельзя")
+		//   }
+
+		//c.hub.MessagesToTGBot <- req
+		c.hub.MessagesToTGBot <- req
+		//log.Println(3)
 	}
 }
 

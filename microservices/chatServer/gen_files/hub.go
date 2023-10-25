@@ -1,8 +1,9 @@
 package chat
 
 type MessageWebsocket struct {
-	Text   string `json:"text"`
-	ChatID int32  `json:"chatid"`
+	Text    string `json:"text"`
+	ChatID  int32  `json:"chatid"`
+	Channel string `json:"channel,omitempty"`
 }
 
 // type Connection struct {
@@ -23,7 +24,7 @@ type Hub struct {
 func NewHub() *Hub {
 	return &Hub{
 		Broadcast:       make(chan *MessageWebsocket),
-		MessagesToTGBot: make(chan *MessageWebsocket),
+		MessagesToTGBot: make(chan *MessageWebsocket, 100),
 		register:        make(chan *Client),
 		unregister:      make(chan *Client),
 		clientChats:     make(map[*Client][]int32),

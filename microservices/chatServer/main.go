@@ -99,6 +99,22 @@ func NewChatManager(db *pgxpool.Pool, hub *chat.Hub) *ChatManager {
 
 func (sm *ChatManager) StartChat(ch chat.BotChat_StartChatServer) error {
 	log.Println("start chat")
+	go func() {
+		for {
+			// отправка из вебсокета в бота
+			mes2 := <-sm.hub.MessagesToTGBot
+			resp := chat.Message{Text: mes2.Text, ChatID: 1}
+			if err := ch.Send(&resp); err != nil {
+				log.Println(err)
+				if err.Error() == "rpc error: code = Canceled desc = context canceled" {
+					log.Println("breaking grpc stream")
+					break
+					//return nil
+				}
+				continue
+			}
+		}
+	}()
 	for {
 		//приём сообщений от бота
 		req, err := ch.Recv()
@@ -116,16 +132,9 @@ func (sm *ChatManager) StartChat(ch chat.BotChat_StartChatServer) error {
 		}
 
 		log.Println(req)
-		// 	mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID}
-		// 	log.Println(mes)
-		// 	sm.hub.Broadcast <- &mes
+		mes := chat.MessageWebsocket{Text: req.Text, ChatID: req.ChatID, Channel: "chat"}
+		sm.hub.Broadcast <- &mes
 
-		// отправка из вебсокета в бота
-		mes := <-sm.hub.MessagesToTGBot
-		resp := chat.Message{Text: mes.Text, ChatID: mes.ChatID}
-		if err := ch.Send(&resp); err != nil {
-			log.Println(err)
-		}
 		// if f > 0 {
 		// 	resp := chat.Message{Text: "aaa", ChatID: 1}
 		// 	if err := ch.Send(&resp); err != nil {
