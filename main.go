@@ -17,16 +17,15 @@ import (
 	conf "main/config"
 
 	httpSwagger "github.com/swaggo/http-swagger"
-	//bot "main/microservices/auth/gen_files"
 )
 
 func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI, r.Method)
 
-		// for header := range conf.Headers {
-		// 	w.Header().Set(header, conf.Headers[header])
-		// }
+		for header := range conf.Headers {
+			w.Header().Set(header, conf.Headers[header])
+		}
 		next.ServeHTTP(w, r)
 	})
 }

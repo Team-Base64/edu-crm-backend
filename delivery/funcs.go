@@ -172,7 +172,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 	// 	ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
 	// 	return
 	// }
-	mockTeacherID := 2
+	mockTeacherID := 1
 	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println("err", err)

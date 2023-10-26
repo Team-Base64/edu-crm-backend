@@ -81,7 +81,7 @@ func (us *Store) CreateChat(in *model.ChatDB) error {
 }
 
 func (us *Store) AddMessage(in *model.CreateMessage) error {
-	_, err := us.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $5);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
+	_, err := us.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
 	if err != nil {
 		return err
 	}
