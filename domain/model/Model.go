@@ -44,14 +44,17 @@ type ChatDB struct {
 type CreateMessage struct {
 	ChatID          int    `json:"chatid,omitempty"`
 	Text            string `json:"text"`
-	IsAuthorTeacher bool   `json:"isAuthorTeacher"`
+	IsAuthorTeacher bool   `json:"ismine"`
 }
 
 type MessageChat struct {
+	ID              int        `json:"id"`
 	Text            string     `json:"text"`
-	IsAuthorTeacher bool       `json:"isAuthorTeacher"`
-	Attaches        *[]string  `json:"attaches"`
+	IsAuthorTeacher bool       `json:"ismine"`
+	ChatID          int        `json:"chatid"`
+	Attaches        *[]string  `json:"attaches,omitempty"`
 	Time            *time.Time `json:"time"`
+	IsRead          bool       `json:"isread"`
 }
 
 type Chat struct {
@@ -59,7 +62,12 @@ type Chat struct {
 }
 
 type ChatInfo struct {
-	ChatID int `json:"chatid,omitempty"`
+	ChatID          int        `json:"chatid"`
+	Name            string     `json:"name"`
+	Img             string     `json:"cover"`
+	IsRead          bool       `json:"isread"`
+	LastMessageText string     `json:"lastmessagetext"`
+	LastMessageDate *time.Time `json:"lastmessagedate"`
 }
 
 //	type Chats struct {
@@ -76,4 +84,5 @@ type MessageDB struct {
 	IsAuthorTeacher bool       `json:"isAuthorTeacher"`
 	Attaches        *[]string  `json:"attaches,omitempty"`
 	Time            *time.Time `json:"time"`
+	IsRead          bool       `json:"isread"`
 }

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"main/domain/model"
-	"time"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,10 +15,11 @@ type StoreInterface interface {
 	AddStudent(in *model.StudentDB) error
 	UpdateStudent(in *model.StudentDB) error
 	CreateChat(in *model.ChatDB) error
-	AddMessage(in *model.CreateMessage) error
+	//AddMessage(in *model.CreateMessage) error
 	//GetChatID(in *model.ChatDB) (int, error)
 	GetChatFromDB(id int) (*model.Chat, error)
 	GetChatsByID(idTeacher int) (*model.Chats, error)
+	GetLastMesByChatID(id int) (*model.MessageDB, error)
 }
 
 type Store struct {
@@ -80,13 +80,13 @@ func (us *Store) CreateChat(in *model.ChatDB) error {
 	return nil
 }
 
-func (us *Store) AddMessage(in *model.CreateMessage) error {
-	_, err := us.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// func (us *Store) AddMessage(in *model.CreateMessage) error {
+// 	_, err := us.db.Query(context.Background(), `INSERT INTO messages (chatID, text, isAuthorTeacher, time) VALUES ($1, $2, $3, $4);`, in.ChatID, in.Text, in.IsAuthorTeacher, time.Now().Format("2006.01.02 15:04:05"))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
 // func (us *Store) GetChatID(in *model.ChatDB) (int, error) {
 // 	id := 0
@@ -112,22 +112,39 @@ func (us *Store) GetChatFromDB(id int) (*model.Chat, error) {
 	// 	return nil, err
 	// }
 	messages := []*model.MessageChat{}
-	rows, err := us.db.Query(context.Background(), `SELECT text, isAuthorTeacher, attaches, time FROM messages WHERE chatID  = $1`, id)
+	rows, err := us.db.Query(context.Background(), `SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages WHERE chatID  = $1`, id)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		dat := model.MessageChat{}
-		err := rows.Scan(&dat.Text, &dat.IsAuthorTeacher, &dat.Attaches, &dat.Time)
+		err := rows.Scan(&dat.ID, &dat.Text, &dat.IsAuthorTeacher, &dat.Attaches, &dat.Time, &dat.IsRead)
 		if err != nil {
 			return nil, err
 		}
+		dat.ChatID = id
 		//mes := model.MessageChat{Text: dat.Text, IsAuthorTeacher: dat.IsAuthorTeacher, }
 		messages = append(messages, &dat)
 	}
 
 	return &model.Chat{Messages: messages}, nil
+}
+
+func (us *Store) GetLastMesByChatID(id int) (*model.MessageDB, error) {
+	mes := &model.MessageDB{}
+	rows, err := us.db.Query(context.Background(), `SELECT text, isAuthorTeacher, attaches, time, isRead FROM messages WHERE chatID  = $1 ORDER BY id DESC LIMIT 1`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&mes.Text, &mes.IsAuthorTeacher, &mes.Attaches, &mes.Time, &mes.IsRead)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return mes, nil
 }
 
 func (us *Store) GetChatsByID(idTeacher int) (*model.Chats, error) {
@@ -144,12 +161,16 @@ func (us *Store) GetChatsByID(idTeacher int) (*model.Chats, error) {
 		if err != nil {
 			return nil, err
 		}
+		lastMes, err := us.GetLastMesByChatID(tmpID)
+		if err != nil {
+			return nil, err
+		}
 		//chatsIDs = append(chatsIDs, &dat)
 		// chat, err := us.GetChatFromDB(tmpID)
 		// if err != nil {
 		// 	return nil, err
 		// }
-		tmpChat := &model.ChatInfo{ChatID: tmpID}
+		tmpChat := &model.ChatInfo{ChatID: tmpID, Name: "tmpName", Img: "tmpImg", IsRead: lastMes.IsRead, LastMessageText: lastMes.Text, LastMessageDate: lastMes.Time}
 		chats = append(chats, tmpChat)
 	}
 

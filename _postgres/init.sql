@@ -34,5 +34,6 @@ CREATE TABLE messages
     text        TEXT NOT NULL,
     isAuthorTeacher    BOOLEAN     NOT NULL,
     attaches    VARCHAR[],
-    time TIMESTAMP NOT NULL
+    time TIMESTAMP NOT NULL,
+    isRead BOOLEAN NOT NULL DEFAULT FALSE
 );

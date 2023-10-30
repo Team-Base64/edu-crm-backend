@@ -292,6 +292,21 @@ const docTemplate = `{
             "properties": {
                 "chatid": {
                     "type": "integer"
+                },
+                "cover": {
+                    "type": "string"
+                },
+                "isread": {
+                    "type": "boolean"
+                },
+                "lastmessagedate": {
+                    "type": "string"
+                },
+                "lastmessagetext": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -329,7 +344,16 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "isAuthorTeacher": {
+                "chatid": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ismine": {
+                    "type": "boolean"
+                },
+                "isread": {
                     "type": "boolean"
                 },
                 "text": {
