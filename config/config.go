@@ -12,6 +12,8 @@ var PathSignUp = BasePath + "/register"
 var PathChats = BasePath + "/chats"
 var PathChatByID = BasePath + "/chats/{id}"
 
+var PathClasses = BasePath + "/classes"
+
 var Headers = map[string]string{
 	"Access-Control-Allow-Origin":      "http://127.0.0.1:8001",
 	"Access-Control-Allow-Credentials": "true",

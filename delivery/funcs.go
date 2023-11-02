@@ -150,3 +150,25 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(msgs)
 }
+
+// GetClasses godoc
+// @Summary Get teacher`s classes
+// @Description Get teacher`s classes
+// @ID getClasses
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} model.Classes
+// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
+// @Router /class [get]
+func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
+	mockTeacherID := 1
+
+	classes, err := api.usecase.GetClassesByTeacherID(mockTeacherID)
+	if err != nil {
+		log.Println("usecase: ", err)
+		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
+		return
+	}
+	json.NewEncoder(w).Encode(classes)
+}
