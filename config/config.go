@@ -1,5 +1,7 @@
 package BaseConfig
 
+var UrlDB = "URL_DB"
+
 var Port = ":8080"
 var BasePath = "/api"
 var PathDocs = BasePath + "/docs"
