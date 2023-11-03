@@ -7,6 +7,9 @@ RUN go mod download
 
 COPY ./ ./
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init -g delivery/funcs.go
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o /backend main.go
 
 FROM scratch
