@@ -13,6 +13,7 @@ type UsecaseInterface interface {
 	GetChatsByTeacherID(id int) (*model.ChatPreviewList, error)
 	GetChatByID(id int) (*model.Chat, error)
 	GetClassesByTeacherID(id int) (*model.Classes, error)
+	GetClassByID(id int) (*model.Class, error)
 }
 
 type Usecase struct {
@@ -63,4 +64,13 @@ func (api *Usecase) GetClassesByTeacherID(id int) (*model.Classes, error) {
 		return nil, e.StacktraceError(err)
 	}
 	return classes, nil
+}
+
+func (api *Usecase) GetClassByID(id int) (*model.Class, error) {
+	class, err := api.store.GetClassByID(id)
+	if err != nil {
+		log.Println("store: ", err)
+		return nil, err
+	}
+	return class, nil
 }

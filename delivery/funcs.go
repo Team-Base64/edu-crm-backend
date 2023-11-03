@@ -172,3 +172,31 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(classes)
 }
+
+// GetClasses godoc
+// @Summary Get class by id
+// @Description Get class by id
+// @ID getClass
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} model.Class
+// @Failure 400 {object} model.Error "Bad request - Problem with the request"
+// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
+// @Router /class/{classID} [get]
+func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	classID, err := strconv.Atoi(path[len(path)-1])
+	if err != nil {
+		log.Println("id conv: ", err)
+		ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
+	}
+
+	class, err := api.usecase.GetClassByID(classID)
+	if err != nil {
+		log.Println("usecase: ", err)
+		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
+		return
+	}
+	json.NewEncoder(w).Encode(class)
+}

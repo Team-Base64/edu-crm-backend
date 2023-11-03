@@ -18,6 +18,7 @@ type StoreInterface interface {
 	GetChatByID(id int) (*model.Chat, error)
 	GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error)
 	GetClassesByID(teacherID int) (*model.Classes, error)
+	GetClassByID(id int) (*model.Class, error)
 }
 
 type Store struct {
@@ -167,4 +168,21 @@ func (us *Store) GetClassesByID(teacherID int) (*model.Classes, error) {
 	}
 
 	return &model.Classes{Classes: classes}, nil
+}
+
+func (us *Store) GetClassByID(id int) (*model.Class, error) {
+	row := us.db.QueryRow(
+		context.Background(),
+		`SELECT title, description, inviteToken FROM classes WHERE id = $1`,
+		id,
+	)
+	class := model.Class{}
+	err := row.Scan(&class.Title, &class.Description, &class.InviteToken)
+	if err != nil {
+		log.Println("scan: ", err)
+		return nil, err
+	}
+
+	class.ID = id
+	return &class, nil
 }
