@@ -7,9 +7,10 @@ var BasePath = "/api"
 var PathDocs = BasePath + "/docs"
 
 var PathProfile = BasePath + "/profile"
+var PathSignUp = BasePath + "/register"
 
 var PathChats = BasePath + "/chats"
-var PathChatByID = PathChats + "/{id}"
+var PathChatByID = BasePath + "/chats/{id}"
 
 var Headers = map[string]string{
 	"Access-Control-Allow-Origin":      "http://127.0.0.1:8001",

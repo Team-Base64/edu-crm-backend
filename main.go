@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 
 	"main/delivery"
 	"main/repository"
@@ -36,7 +35,10 @@ func main() {
 	log.SetFlags(log.LstdFlags)
 
 	myRouter := mux.NewRouter()
-	config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
+	//config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
+	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	config, _ := pgxpool.ParseConfig(urlDB)
+
 	config.MaxConns = 70
 	db, err := pgxpool.New(context.Background(), config.ConnString())
 
@@ -53,7 +55,7 @@ func main() {
 
 	Handler := delivery.NewHandler(Usecase)
 
-	myRouter.HandleFunc(conf.PathProfile, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathSignUp, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacherProfile).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)

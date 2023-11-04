@@ -55,7 +55,7 @@ func ReturnErrorJSON(w http.ResponseWriter, err error, errCode int) {
 // @Success 200 {object} model.Response "OK"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
-// @Router /profile [post]
+// @Router /register [post]
 func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req model.TeacherSignUp
@@ -110,7 +110,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrUnauthorized401, 500)
+		ReturnErrorJSON(w, e.ErrServerError500, 500)
 		return
 	}
 

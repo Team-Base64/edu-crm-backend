@@ -1,8 +1,9 @@
 package model
 
 type TeacherSignUp struct {
-	Login string `json:"login"`
-	Name  string `json:"name"`
+	Login    string `json:"login"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 type TeacherProfile struct {
