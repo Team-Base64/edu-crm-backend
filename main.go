@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"main/delivery"
 	"main/repository"
@@ -35,9 +36,9 @@ func main() {
 	log.SetFlags(log.LstdFlags)
 
 	myRouter := mux.NewRouter()
-	//config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
-	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
-	config, _ := pgxpool.ParseConfig(urlDB)
+	config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
+	// urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	// config, _ := pgxpool.ParseConfig(urlDB)
 
 	config.MaxConns = 70
 	db, err := pgxpool.New(context.Background(), config.ConnString())

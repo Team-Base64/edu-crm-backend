@@ -31,8 +31,8 @@ func NewStore(db *pgxpool.Pool) StoreInterface {
 func (us *Store) AddTeacher(in *model.TeacherSignUp) error {
 	_, err := us.db.Query(
 		context.Background(),
-		`INSERT INTO teachers (login, name) VALUES ($1, $2);`,
-		in.Login, in.Name,
+		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3);`,
+		in.Login, in.Name, in.Password,
 	)
 	if err != nil {
 		return e.StacktraceError(err)
