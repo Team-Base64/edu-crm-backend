@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,6 +12,8 @@ import (
 
 	e "main/domain/errors"
 	uc "main/usecase"
+
+	"github.com/jackc/pgx/v5"
 )
 
 var mockTeacherID = 1
@@ -143,9 +146,8 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 	msgs, err := api.usecase.GetChatByID(id)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		code, err := e.CheckBaseError(err)
-		if code > 0 {
-			ReturnErrorJSON(w, err, code)
+		if errors.Is(err, pgx.ErrNoRows) {
+			ReturnErrorJSON(w, e.ErrNotFound404, 404)
 		} else {
 			ReturnErrorJSON(w, e.ErrServerError500, 500)
 		}

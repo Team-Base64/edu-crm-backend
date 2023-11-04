@@ -65,6 +65,17 @@ func (us *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 
 func (us *Store) GetChatByID(id int) (*model.Chat, error) {
 	messages := []*model.Message{}
+
+	row := us.db.QueryRow(
+		context.Background(),
+		`SELECT 1 FROM chats WHERE id = $1`,
+		id,
+	)
+	err := row.Scan(nil)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
 	rows, err := us.db.Query(
 		context.Background(),
 		`SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages
@@ -87,9 +98,6 @@ func (us *Store) GetChatByID(id int) (*model.Chat, error) {
 		}
 
 		messages = append(messages, &dat)
-	}
-	if len(messages) == 0 {
-		return nil, e.StacktraceError(e.ErrNotFound404)
 	}
 	return &model.Chat{Messages: messages}, nil
 }
