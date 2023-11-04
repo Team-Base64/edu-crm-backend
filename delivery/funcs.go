@@ -158,16 +158,16 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} model.Classes
-// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// @Router /class [get]
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /classes [get]
 func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 	mockTeacherID := 1
 
 	classes, err := api.usecase.GetClassesByTeacherID(mockTeacherID)
 	if err != nil {
-		log.Println("usecase: ", err)
-		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrServerError500, 500)
 		return
 	}
 	json.NewEncoder(w).Encode(classes)
@@ -179,23 +179,29 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 // @ID getClass
 // @Accept  json
 // @Produce  json
+// @Param classID path string true "Class id"
 // @Success 200 {object} model.Class
-// @Failure 400 {object} model.Error "Bad request - Problem with the request"
-// @Failure 401 {object} model.Error "Unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "Internal Server Error - Request is valid but operation failed at server side"
-// @Router /class/{classID} [get]
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /classes/{classID} [get]
 func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
 	classID, err := strconv.Atoi(path[len(path)-1])
 	if err != nil {
-		log.Println("id conv: ", err)
-		ReturnErrorJSON(w, baseErrors.ErrBadRequest400, 400)
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
 	}
 
 	class, err := api.usecase.GetClassByID(classID)
 	if err != nil {
-		log.Println("usecase: ", err)
-		ReturnErrorJSON(w, baseErrors.ErrServerError500, 500)
+		log.Println(e.StacktraceError(err))
+		if errors.Is(err, pgx.ErrNoRows) {
+			ReturnErrorJSON(w, e.ErrNotFound404, 404)
+		} else {
+			ReturnErrorJSON(w, e.ErrServerError500, 500)
+		}
 		return
 	}
 	json.NewEncoder(w).Encode(class)

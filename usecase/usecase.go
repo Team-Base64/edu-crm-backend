@@ -69,7 +69,6 @@ func (api *Usecase) GetClassesByTeacherID(id int) (*model.Classes, error) {
 func (api *Usecase) GetClassByID(id int) (*model.Class, error) {
 	class, err := api.store.GetClassByID(id)
 	if err != nil {
-		log.Println("store: ", err)
 		return nil, err
 	}
 	return class, nil

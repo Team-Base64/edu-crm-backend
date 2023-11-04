@@ -179,8 +179,7 @@ func (us *Store) GetClassByID(id int) (*model.Class, error) {
 	class := model.Class{}
 	err := row.Scan(&class.Title, &class.Description, &class.InviteToken)
 	if err != nil {
-		log.Println("scan: ", err)
-		return nil, err
+		return nil, e.StacktraceError(err)
 	}
 
 	class.ID = id
