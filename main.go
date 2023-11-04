@@ -4,26 +4,25 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 
 	"main/delivery"
-	_ "main/docs"
 	"main/repository"
 	"main/usecase"
 
+	conf "main/config"
+	_ "main/docs"
+	e "main/domain/errors"
+
 	"github.com/gorilla/mux"
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	conf "main/config"
-
+	_ "github.com/jackc/pgx/v4/stdlib"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI, r.Method)
-
 		for header := range conf.Headers {
 			w.Header().Set(header, conf.Headers[header])
 		}
@@ -33,8 +32,13 @@ func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags)
+
 	myRouter := mux.NewRouter()
-	config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
+	//config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
+	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	config, _ := pgxpool.ParseConfig(urlDB)
+
 	config.MaxConns = 70
 	db, err := pgxpool.New(context.Background(), config.ConnString())
 
@@ -52,9 +56,7 @@ func main() {
 	Handler := delivery.NewHandler(Usecase)
 
 	myRouter.HandleFunc(conf.PathSignUp, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
-	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacher).Methods(http.MethodGet, http.MethodOptions)
-	myRouter.HandleFunc(conf.PathProfile, Handler.ChangeProfile).Methods(http.MethodPost, http.MethodOptions)
-	myRouter.HandleFunc(conf.PathAddStudent, Handler.AddStudent).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacherProfile).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathChatByID, Handler.GetChat).Methods(http.MethodGet, http.MethodOptions)
@@ -64,6 +66,6 @@ func main() {
 
 	err = http.ListenAndServe(conf.Port, myRouter)
 	if err != nil {
-		log.Println("cant serve", err)
+		log.Println(e.StacktraceError(err))
 	}
 }

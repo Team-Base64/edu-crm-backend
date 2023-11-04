@@ -33,7 +33,6 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.3.1
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/jackc/pgx/v5 v5.4.3

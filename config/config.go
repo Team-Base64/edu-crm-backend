@@ -6,10 +6,9 @@ var Port = ":8080"
 var BasePath = "/api"
 var PathDocs = BasePath + "/docs"
 
-var PathSignUp = BasePath + "/register"
 var PathProfile = BasePath + "/profile"
-var PathAddStudent = BasePath + "/addstudent"
-var PathSend = BasePath + "/send"
+var PathSignUp = BasePath + "/register"
+
 var PathChats = BasePath + "/chats"
 var PathChatByID = BasePath + "/chats/{id}"
 

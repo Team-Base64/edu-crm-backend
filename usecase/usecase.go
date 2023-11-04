@@ -2,18 +2,16 @@ package usecase
 
 import (
 	"main/domain/model"
-	rep "main/repository"
 
-	"github.com/google/uuid"
+	e "main/domain/errors"
+	rep "main/repository"
 )
 
 type UsecaseInterface interface {
-	CreateTeacher(params *model.TeacherDB) error
-	GetTeacher(id int) (*model.TeacherDB, error)
-	ChangeTeacher(params *model.TeacherDB) error
-	GetChatsByTeacherID(id int) (model.Chats, error)
-	AddStudent(params *model.CreateStudentDB) error
-	GetChatByID(id int) (model.Chat, error)
+	CreateTeacher(params *model.TeacherSignUp) error
+	GetTeacherProfile(id int) (*model.TeacherProfile, error)
+	GetChatsByTeacherID(id int) (*model.ChatsPreview, error)
+	GetChatByID(id int) (*model.Chat, error)
 }
 
 type Usecase struct {
@@ -26,30 +24,30 @@ func NewUsecase(us rep.StoreInterface) UsecaseInterface {
 	}
 }
 
-func (api *Usecase) CreateTeacher(params *model.TeacherDB) error {
+func (api *Usecase) CreateTeacher(params *model.TeacherSignUp) error {
 	return api.store.AddTeacher(params)
 }
 
-func (api *Usecase) GetTeacher(id int) (*model.TeacherDB, error) {
-	return api.store.GetTeacher(id)
+func (api *Usecase) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
+	chat, err := api.store.GetTeacherProfile(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return chat, nil
 }
 
-func (api *Usecase) ChangeTeacher(params *model.TeacherDB) error {
-	return api.store.UpdateTeacher(params)
+func (api *Usecase) GetChatsByTeacherID(id int) (*model.ChatsPreview, error) {
+	chat, err := api.store.GetChatsByTeacherID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return chat, nil
 }
 
-func (api *Usecase) AddStudent(params *model.CreateStudentDB) error {
-	newUUID := uuid.New()
-	api.store.CreateChat(&model.ChatDB{TeacherID: 1, StudentHash: newUUID.String()})
-	return api.store.AddStudent(&model.StudentDB{InviteHash: newUUID.String(), Name: params.Name})
-}
-
-func (api *Usecase) GetChatsByTeacherID(id int) (model.Chats, error) {
-	chats, err := api.store.GetChatsByID(id)
-	return *chats, err
-}
-
-func (api *Usecase) GetChatByID(id int) (model.Chat, error) {
-	chat, err := api.store.GetChatFromDB(id)
-	return *chat, err
+func (api *Usecase) GetChatByID(id int) (*model.Chat, error) {
+	chat, err := api.store.GetChatByID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return chat, nil
 }
