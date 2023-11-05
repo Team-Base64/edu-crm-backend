@@ -206,3 +206,34 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(class)
 }
+
+// CreateClass godoc
+// @Summary Create class
+// @Description Create class
+// @ID createClass
+// @Accept  json
+// @Produce  json
+// @Param class body model.ClassCreate true "Class for creating"
+// @Success 200 {object} model.ClassCreateResponse
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /classes [post]
+func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var newClass model.ClassCreate
+	err := decoder.Decode(&newClass)
+	if err != nil {
+		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
+		return
+	}
+
+	res, err := api.usecase.CreateClass(mockTeacherID, &newClass)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		return
+	}
+	json.NewEncoder(w).Encode(res)
+}

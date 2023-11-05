@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"main/domain/model"
+	"math/rand"
 
 	e "main/domain/errors"
 	rep "main/repository"
@@ -14,15 +15,22 @@ type UsecaseInterface interface {
 	GetChatByID(id int) (*model.Chat, error)
 	GetClassesByTeacherID(id int) (*model.ClassesInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
+	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
 }
 
 type Usecase struct {
-	store rep.StoreInterface
+	store    rep.StoreInterface
+	letters  []rune
+	tokenLen int
+	bufToken []rune
 }
 
-func NewUsecase(s rep.StoreInterface) UsecaseInterface {
+func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int) UsecaseInterface {
 	return &Usecase{
-		store: s,
+		store:    s,
+		letters:  []rune(lettes),
+		tokenLen: tokenLen,
+		bufToken: make([]rune, tokenLen),
 	}
 }
 
@@ -72,4 +80,23 @@ func (api *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
 		return nil, err
 	}
 	return class, nil
+}
+
+func (api *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error) {
+	for i := range api.bufToken {
+		api.bufToken[i] = api.letters[rand.Intn(len(api.letters))]
+	}
+	inviteToken := string(api.bufToken)
+
+	id, err := api.store.AddClass(teacherID, inviteToken, newClass)
+	if err != nil {
+		return nil, err
+	}
+
+	res := model.ClassCreateResponse{
+		ID:          id,
+		InviteToken: inviteToken,
+	}
+
+	return &res, nil
 }

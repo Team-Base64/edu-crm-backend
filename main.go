@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"main/delivery"
 	"main/repository"
@@ -54,7 +55,19 @@ func main() {
 
 	Store := repository.NewStore(db)
 
-	Usecase := usecase.NewUsecase(Store)
+	tokenLen, err := strconv.Atoi(os.Getenv(conf.TokenLenght))
+	if err != nil {
+		log.Fatalln("could not get token length from env")
+	}
+	tokenLetters, exist := os.LookupEnv(conf.TokenLetters)
+	if !exist || len(tokenLetters) == 0 {
+		log.Fatalln("could not get token letters from env")
+	}
+	Usecase := usecase.NewUsecase(
+		Store,
+		tokenLetters,
+		tokenLen,
+	)
 
 	Handler := delivery.NewHandler(Usecase)
 
@@ -66,6 +79,7 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathClasses, Handler.GetTeacherClasses).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathClassByID, Handler.GetClass).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathClasses, Handler.CreateClass).Methods(http.MethodPost, http.MethodOptions)
 
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)

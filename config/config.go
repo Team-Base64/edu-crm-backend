@@ -1,6 +1,8 @@
 package BaseConfig
 
 var UrlDB = "URL_DB"
+var TokenLetters = "TOKEN_LETTERS"
+var TokenLenght = "TOKEN_LENGTH"
 
 var Port = ":8080"
 var BasePath = "/api"

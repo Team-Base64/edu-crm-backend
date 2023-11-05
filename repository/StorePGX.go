@@ -19,6 +19,7 @@ type StoreInterface interface {
 	GetChatsByTeacherID(idTeacher int) (*model.ChatPreviewList, error)
 	GetClassesByID(teacherID int) (*model.ClassesInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
+	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 }
 
 type Store struct {
@@ -183,4 +184,19 @@ func (us *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 
 	class.ID = id
 	return &class, nil
+}
+
+func (us *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
+	var id int
+
+	row := us.db.QueryRow(
+		`INSERT INTO classes (teacherID, title, description, inviteToken) VALUES ($1, $2, $3, $4) RETURNING id;`,
+		teacherID, newClass.Title, newClass.Description, inviteToken,
+	)
+	err := row.Scan(&id)
+	if err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return int(id), nil
 }
