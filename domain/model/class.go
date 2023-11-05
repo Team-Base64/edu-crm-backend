@@ -1,20 +1,12 @@
 package model
 
-type ClassDB struct {
-	ID          int
-	TeacherID   int
-	Title       string
-	Description string
-	InviteToken string
-}
-
-type Class struct {
+type ClassInfo struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description,omitempty"`
-	InviteToken string `json:"inviteToken,omitempty"`
+	InviteToken string `json:"inviteToken"`
 }
 
-type Classes struct {
-	Classes []*Class `json:"classes,omitempty"`
+type ClassesInfo struct {
+	Classes []*ClassInfo `json:"classes,omitempty"`
 }

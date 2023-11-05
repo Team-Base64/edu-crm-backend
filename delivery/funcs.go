@@ -157,7 +157,7 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 // @ID getClasses
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.Classes
+// @Success 200 {object} model.ClassesInfo
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [get]
@@ -180,7 +180,7 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.Class
+// @Success 200 {object} model.ClassInfo
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"

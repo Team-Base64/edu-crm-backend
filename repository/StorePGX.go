@@ -16,9 +16,9 @@ type StoreInterface interface {
 	AddTeacher(in *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetChatByID(id int) (*model.Chat, error)
-	GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error)
-	GetClassesByID(teacherID int) (*model.Classes, error)
-	GetClassByID(id int) (*model.Class, error)
+	GetChatsByTeacherID(idTeacher int) (*model.ChatPreviewList, error)
+	GetClassesByID(teacherID int) (*model.ClassesInfo, error)
+	GetClassByID(id int) (*model.ClassInfo, error)
 }
 
 type Store struct {
@@ -147,8 +147,8 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	return &model.ChatPreviewList{Chats: chats}, nil
 }
 
-func (us *Store) GetClassesByID(teacherID int) (*model.Classes, error) {
-	classes := []*model.Class{}
+func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
+	classes := []*model.ClassInfo{}
 	rows, err := us.db.Query(
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1`,
 		teacherID,
@@ -159,7 +159,7 @@ func (us *Store) GetClassesByID(teacherID int) (*model.Classes, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		tmpClass := model.Class{}
+		tmpClass := model.ClassInfo{}
 		err := rows.Scan(&tmpClass.ID, &tmpClass.Title, &tmpClass.Description, &tmpClass.InviteToken)
 		if err != nil {
 			return nil, e.StacktraceError(err)
@@ -167,15 +167,15 @@ func (us *Store) GetClassesByID(teacherID int) (*model.Classes, error) {
 		classes = append(classes, &tmpClass)
 	}
 
-	return &model.Classes{Classes: classes}, nil
+	return &model.ClassesInfo{Classes: classes}, nil
 }
 
-func (us *Store) GetClassByID(id int) (*model.Class, error) {
+func (us *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	row := us.db.QueryRow(
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1`,
 		id,
 	)
-	class := model.Class{}
+	class := model.ClassInfo{}
 	err := row.Scan(&class.Title, &class.Description, &class.InviteToken)
 	if err != nil {
 		return nil, e.StacktraceError(err)

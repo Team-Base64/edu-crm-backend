@@ -12,8 +12,8 @@ type UsecaseInterface interface {
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetChatsByTeacherID(id int) (*model.ChatPreviewList, error)
 	GetChatByID(id int) (*model.Chat, error)
-	GetClassesByTeacherID(id int) (*model.Classes, error)
-	GetClassByID(id int) (*model.Class, error)
+	GetClassesByTeacherID(id int) (*model.ClassesInfo, error)
+	GetClassByID(id int) (*model.ClassInfo, error)
 }
 
 type Usecase struct {
@@ -58,7 +58,7 @@ func (uc *Usecase) GetChatByID(id int) (*model.Chat, error) {
 	return chat, nil
 }
 
-func (api *Usecase) GetClassesByTeacherID(id int) (*model.Classes, error) {
+func (api *Usecase) GetClassesByTeacherID(id int) (*model.ClassesInfo, error) {
 	classes, err := api.store.GetClassesByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
@@ -66,7 +66,7 @@ func (api *Usecase) GetClassesByTeacherID(id int) (*model.Classes, error) {
 	return classes, nil
 }
 
-func (api *Usecase) GetClassByID(id int) (*model.Class, error) {
+func (api *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
 	class, err := api.store.GetClassByID(id)
 	if err != nil {
 		return nil, err
