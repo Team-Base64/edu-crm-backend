@@ -172,7 +172,6 @@ func (us *Store) GetClassesByID(teacherID int) (*model.Classes, error) {
 
 func (us *Store) GetClassByID(id int) (*model.Class, error) {
 	row := us.db.QueryRow(
-		context.Background(),
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1`,
 		id,
 	)
