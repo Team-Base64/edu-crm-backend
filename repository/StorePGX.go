@@ -20,6 +20,7 @@ type StoreInterface interface {
 	GetClassesByID(teacherID int) (*model.ClassesInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
+	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
 }
 
 type Store struct {
@@ -151,7 +152,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
 	classes := []*model.ClassInfo{}
 	rows, err := us.db.Query(
-		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1`,
+		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
 	)
 	if err != nil {
@@ -173,7 +174,7 @@ func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
 
 func (us *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	row := us.db.QueryRow(
-		`SELECT title, description, inviteToken FROM classes WHERE id = $1`,
+		`SELECT title, description, inviteToken FROM classes WHERE id = $1;`,
 		id,
 	)
 	class := model.ClassInfo{}
@@ -190,7 +191,9 @@ func (us *Store) AddClass(teacherID int, inviteToken string, newClass *model.Cla
 	var id int
 
 	row := us.db.QueryRow(
-		`INSERT INTO classes (teacherID, title, description, inviteToken) VALUES ($1, $2, $3, $4) RETURNING id;`,
+		`INSERT INTO classes (teacherID, title, description, inviteToken)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id;`,
 		teacherID, newClass.Title, newClass.Description, inviteToken,
 	)
 	err := row.Scan(&id)
@@ -199,4 +202,39 @@ func (us *Store) AddClass(teacherID int, inviteToken string, newClass *model.Cla
 	}
 
 	return int(id), nil
+}
+
+func (us *Store) GetStudentsFromClass(classID int) (*model.StudentsFromClass, error) {
+	tmp := 1
+	row := us.db.QueryRow(
+		`SELECT 1 FROM classes WHERE id = $1`,
+		classID,
+	)
+	err := row.Scan(&tmp)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	rows, err := us.db.Query(
+		`SELECT s.id, s.name, s.socialType FROM students s
+		 JOIN classes_students cs ON s.id = cs.studentID
+		 WHERE cs.classID = $1;`,
+		classID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	students := []*model.Student{}
+
+	for rows.Next() {
+		tmpStudent := model.Student{}
+		err := rows.Scan(&tmpStudent.ID, &tmpStudent.Name, &tmpStudent.SocialType)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+		students = append(students, &tmpStudent)
+	}
+
+	return &model.StudentsFromClass{Students: students}, nil
 }

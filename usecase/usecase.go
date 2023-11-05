@@ -16,6 +16,7 @@ type UsecaseInterface interface {
 	GetClassesByTeacherID(id int) (*model.ClassesInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
+	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
 }
 
 type Usecase struct {
@@ -77,7 +78,7 @@ func (api *Usecase) GetClassesByTeacherID(id int) (*model.ClassesInfo, error) {
 func (api *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
 	class, err := api.store.GetClassByID(id)
 	if err != nil {
-		return nil, err
+		return nil, e.StacktraceError(err)
 	}
 	return class, nil
 }
@@ -90,7 +91,7 @@ func (api *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*mo
 
 	id, err := api.store.AddClass(teacherID, inviteToken, newClass)
 	if err != nil {
-		return nil, err
+		return nil, e.StacktraceError(err)
 	}
 
 	res := model.ClassCreateResponse{
@@ -99,4 +100,12 @@ func (api *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*mo
 	}
 
 	return &res, nil
+}
+
+func (api *Usecase) GetStudentsFromClass(classID int) (*model.StudentsFromClass, error) {
+	students, err := api.store.GetStudentsFromClass(classID)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return students, nil
 }
