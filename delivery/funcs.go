@@ -167,7 +167,7 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 	classes, err := api.usecase.GetClassesByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		ReturnErrorJSON(w, err)
 		return
 	}
 	json.NewEncoder(w).Encode(classes)
@@ -191,17 +191,13 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 	classID, err := strconv.Atoi(path[len(path)-1])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
+		ReturnErrorJSON(w, e.ErrBadRequest400)
 	}
 
 	class, err := api.usecase.GetClassByID(classID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		if errors.Is(err, pgx.ErrNoRows) {
-			ReturnErrorJSON(w, e.ErrNotFound404, 404)
-		} else {
-			ReturnErrorJSON(w, e.ErrServerError500, 500)
-		}
+		ReturnErrorJSON(w, err)
 		return
 	}
 	json.NewEncoder(w).Encode(class)
@@ -225,14 +221,14 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 	var newClass model.ClassCreate
 	err := decoder.Decode(&newClass)
 	if err != nil {
-		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
+		ReturnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	res, err := api.usecase.CreateClass(mockTeacherID, &newClass)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		ReturnErrorJSON(w, err)
 		return
 	}
 	json.NewEncoder(w).Encode(res)
