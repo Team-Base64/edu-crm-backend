@@ -7,5 +7,5 @@ type Student struct {
 }
 
 type StudentsFromClass struct {
-	Students []*Student
+	Students []*Student `json:"students"`
 }
