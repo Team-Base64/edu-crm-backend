@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -15,9 +14,11 @@ import (
 	e "main/domain/errors"
 
 	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v5/pgxpool"
+
+	"database/sql"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -36,19 +37,21 @@ func main() {
 	log.SetFlags(log.LstdFlags)
 
 	myRouter := mux.NewRouter()
-	config, _ := pgxpool.ParseConfig(os.Getenv(conf.UrlDB))
-	// urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
-	// config, _ := pgxpool.ParseConfig(urlDB)
 
-	config.MaxConns = 70
-	db, err := pgxpool.New(context.Background(), config.ConnString())
+	//urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	//db, err := sql.Open("pgx", urlDB)
 
+	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Println("could not connect to database")
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Println("unable to reach database ", err)
 	} else {
 		log.Println("database is reachable")
 	}
-	defer db.Close()
 
 	Store := repository.NewStore(db)
 

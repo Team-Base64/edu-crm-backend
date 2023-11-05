@@ -1,14 +1,13 @@
 package repository
 
 import (
-	"context"
-
 	"main/domain/model"
 
 	e "main/domain/errors"
 
+	"database/sql"
+
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type StoreInterface interface {
@@ -19,18 +18,17 @@ type StoreInterface interface {
 }
 
 type Store struct {
-	db *pgxpool.Pool
+	db *sql.DB
 }
 
-func NewStore(db *pgxpool.Pool) StoreInterface {
+func NewStore(db *sql.DB) StoreInterface {
 	return &Store{
 		db: db,
 	}
 }
 
 func (us *Store) AddTeacher(in *model.TeacherSignUp) error {
-	_, err := us.db.Query(
-		context.Background(),
+	_, err := us.db.Exec(
 		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3);`,
 		in.Login, in.Name, in.Password,
 	)
@@ -44,7 +42,6 @@ func (us *Store) AddTeacher(in *model.TeacherSignUp) error {
 func (us *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 	teacher := &model.TeacherProfile{}
 	rows, err := us.db.Query(
-		context.Background(),
 		`SELECT name FROM teachers WHERE id = $1`,
 		id,
 	)
@@ -65,19 +62,17 @@ func (us *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 
 func (us *Store) GetChatByID(id int) (*model.Chat, error) {
 	messages := []*model.Message{}
-
+	tmp := 1
 	row := us.db.QueryRow(
-		context.Background(),
 		`SELECT 1 FROM chats WHERE id = $1`,
 		id,
 	)
-	err := row.Scan(nil)
+	err := row.Scan(&tmp)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
 	rows, err := us.db.Query(
-		context.Background(),
 		`SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages
 		 WHERE chatID = $1`,
 		id,
@@ -106,7 +101,6 @@ func (us *Store) GetChatsByTeacherID(idTeacher int) (*model.ChatsPreview, error)
 	chats := []*model.ChatPreview{}
 
 	rows, err := us.db.Query(
-		context.Background(),
 		`SELECT id FROM chats WHERE teacherID = $1`,
 		idTeacher,
 	)
@@ -129,7 +123,6 @@ func (us *Store) GetChatsByTeacherID(idTeacher int) (*model.ChatsPreview, error)
 		}
 
 		row := us.db.QueryRow(
-			context.Background(),
 			`SELECT text, time, isRead FROM messages
 			 WHERE chatID = $1
 			 ORDER BY id DESC
