@@ -17,6 +17,7 @@ var PathChatByID = BasePath + "/chats/{id}"
 var PathClasses = BasePath + "/classes"
 var PathClassByID = BasePath + "/classes/{id}"
 var PathClassStudents = BasePath + "/classes/{id}/students"
+var PathClassFeed = BasePath + "/classes/{id}/feed"
 
 var Headers = map[string]string{
 	"Access-Control-Allow-Origin":      "http://127.0.0.1:8001",

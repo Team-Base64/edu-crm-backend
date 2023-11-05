@@ -21,6 +21,7 @@ type StoreInterface interface {
 	GetClassByID(id int) (*model.ClassInfo, error)
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
+	GetClassFeed(classID int) (*model.Feed, error)
 }
 
 type Store struct {
@@ -150,7 +151,6 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 }
 
 func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
-	classes := []*model.ClassInfo{}
 	rows, err := us.db.Query(
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
@@ -160,6 +160,7 @@ func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
 	}
 	defer rows.Close()
 
+	classes := []*model.ClassInfo{}
 	for rows.Next() {
 		tmpClass := model.ClassInfo{}
 		err := rows.Scan(&tmpClass.ID, &tmpClass.Title, &tmpClass.Description, &tmpClass.InviteToken)
@@ -205,7 +206,7 @@ func (us *Store) AddClass(teacherID int, inviteToken string, newClass *model.Cla
 }
 
 func (us *Store) GetStudentsFromClass(classID int) (*model.StudentsFromClass, error) {
-	tmp := 1
+	var tmp int
 	row := us.db.QueryRow(
 		`SELECT 1 FROM classes WHERE id = $1`,
 		classID,
@@ -237,4 +238,44 @@ func (us *Store) GetStudentsFromClass(classID int) (*model.StudentsFromClass, er
 	}
 
 	return &model.StudentsFromClass{Students: students}, nil
+}
+
+func (us *Store) GetClassFeed(classID int) (*model.Feed, error) {
+	var tmp int
+	row := us.db.QueryRow(
+		`SELECT 1 FROM classes WHERE id = $1`,
+		classID,
+	)
+	err := row.Scan(&tmp)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	rows, err := us.db.Query(
+		`SELECT id, text, attaches, time FROM posts WHERE classID = $1;`,
+		classID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	posts := []*model.Post{}
+	for rows.Next() {
+		tmpPost := model.Post{}
+		tmpAttaches := pgtype.TextArray{}
+		err := rows.Scan(&tmpPost.ID, &tmpPost.Text, &tmpAttaches, &tmpPost.Time)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+
+		tmpPost.Attaches = make([]string, len(tmpAttaches.Elements))
+		for idx, el := range tmpAttaches.Elements {
+			tmpPost.Attaches[idx] = el.String
+		}
+
+		posts = append(posts, &tmpPost)
+	}
+
+	return &model.Feed{Posts: posts}, nil
 }

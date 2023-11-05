@@ -17,6 +17,7 @@ type UsecaseInterface interface {
 	GetClassByID(id int) (*model.ClassInfo, error)
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
 	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
+	GetClassFeed(classID int) (*model.Feed, error)
 }
 
 type Usecase struct {
@@ -108,4 +109,12 @@ func (api *Usecase) GetStudentsFromClass(classID int) (*model.StudentsFromClass,
 		return nil, e.StacktraceError(err)
 	}
 	return students, nil
+}
+
+func (api *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
+	feed, err := api.store.GetClassFeed(classID)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return feed, nil
 }

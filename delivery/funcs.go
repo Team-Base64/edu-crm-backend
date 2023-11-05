@@ -262,6 +262,38 @@ func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request)
 		ReturnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(students)
 
+	json.NewEncoder(w).Encode(students)
+}
+
+// GetClassFeed godoc
+// @Summary Get class feed
+// @Description Get posts from class by class id
+// @ID getClassFeed
+// @Accept  json
+// @Produce  json
+// @Param classID path string true "Class id"
+// @Success 200 {object} model.Feed
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /classes/{classID}/feed [get]
+func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	chatId, err := strconv.Atoi(path[len(path)-2])
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	feed, err := api.usecase.GetClassFeed(chatId)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(feed)
 }
