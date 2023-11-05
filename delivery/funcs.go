@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,8 +11,6 @@ import (
 
 	e "main/domain/errors"
 	uc "main/usecase"
-
-	"github.com/jackc/pgx/v5"
 )
 
 var mockTeacherID = 1
@@ -43,9 +40,10 @@ func NewHandler(uc uc.UsecaseInterface) *Handler {
 	}
 }
 
-func ReturnErrorJSON(w http.ResponseWriter, err error, errCode int) {
+func ReturnErrorJSON(w http.ResponseWriter, err error) {
+	errCode, errText := e.CheckError(err)
 	w.WriteHeader(errCode)
-	json.NewEncoder(w).Encode(&model.Error{Error: err.Error()})
+	json.NewEncoder(w).Encode(&model.Error{Error: errText})
 }
 
 // CreateTeacher godoc
@@ -64,14 +62,14 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	var req model.TeacherSignUp
 	err := decoder.Decode(&req)
 	if err != nil {
-		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
+		ReturnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	err = api.usecase.CreateTeacher(&req)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		ReturnErrorJSON(w, err)
 		return
 	}
 
@@ -92,7 +90,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 	teacher, err := api.usecase.GetTeacherProfile(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		ReturnErrorJSON(w, err)
 		return
 	}
 
@@ -113,7 +111,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrServerError500, 500)
+		ReturnErrorJSON(w, err)
 		return
 	}
 
@@ -139,18 +137,14 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idS)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400, 400)
+		ReturnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	msgs, err := api.usecase.GetChatByID(id)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		if errors.Is(err, pgx.ErrNoRows) {
-			ReturnErrorJSON(w, e.ErrNotFound404, 404)
-		} else {
-			ReturnErrorJSON(w, e.ErrServerError500, 500)
-		}
+		ReturnErrorJSON(w, err)
 		return
 	}
 

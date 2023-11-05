@@ -1,6 +1,7 @@
 package BaseErrors
 
 import (
+	"database/sql"
 	"errors"
 	"runtime"
 	"strconv"
@@ -22,4 +23,33 @@ func StacktraceError(err error) error {
 		err,
 		errors.New("				at "+file+":"+strconv.Itoa(line)),
 	)
+}
+
+func CheckError(err error) (int, string) {
+	if errors.Is(err, ErrBadRequest400) {
+		return 400, ErrBadRequest400.Error()
+	}
+
+	if errors.Is(err, ErrUnauthorized401) {
+		return 401, ErrUnauthorized401.Error()
+	}
+
+	if errors.Is(err, ErrForbidden403) {
+		return 403, ErrForbidden403.Error()
+	}
+
+	if errors.Is(err, ErrNotFound404) ||
+		errors.Is(err, sql.ErrNoRows) {
+		return 404, ErrNotFound404.Error()
+	}
+
+	if errors.Is(err, ErrConflict409) {
+		return 409, ErrConflict409.Error()
+	}
+
+	if errors.Is(err, ErrBadRequest400) {
+		return 400, ErrBadRequest400.Error()
+	}
+
+	return 500, ErrServerError500.Error()
 }

@@ -43,15 +43,14 @@ func main() {
 
 	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
 	if err != nil {
-		log.Println("could not connect to database")
+		log.Fatalln("could not connect to database")
 	}
 	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		log.Println("unable to reach database ", err)
-	} else {
-		log.Println("database is reachable")
+		log.Fatalln("unable to reach database ", err)
 	}
+	log.Println("database is reachable")
 
 	Store := repository.NewStore(db)
 
