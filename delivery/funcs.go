@@ -56,7 +56,7 @@ func ReturnErrorJSON(w http.ResponseWriter, err error) {
 // @Success 200 {object} model.Response "OK"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
-// @Router /sadasdasd [post]
+// @Router /register [post]
 func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req model.TeacherSignUp
