@@ -60,14 +60,12 @@ func ReturnErrorJSON(w http.ResponseWriter, err error) {
 func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req model.TeacherSignUp
-	err := decoder.Decode(&req)
-	if err != nil {
+	if err := decoder.Decode(&req); err != nil {
 		ReturnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
-	err = api.usecase.CreateTeacher(&req)
-	if err != nil {
+	if err := api.usecase.CreateTeacher(&req); err != nil {
 		log.Println(e.StacktraceError(err))
 		ReturnErrorJSON(w, err)
 		return
@@ -162,8 +160,6 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [get]
 func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
-	mockTeacherID := 1
-
 	classes, err := api.usecase.GetClassesByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -219,8 +215,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var newClass model.ClassCreate
-	err := decoder.Decode(&newClass)
-	if err != nil {
+	if err := decoder.Decode(&newClass); err != nil {
 		ReturnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
