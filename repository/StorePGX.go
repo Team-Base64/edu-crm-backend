@@ -22,6 +22,8 @@ type StoreInterface interface {
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error)
+	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 }
 
 type Store struct {
@@ -278,4 +280,61 @@ func (us *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	}
 
 	return &model.Feed{Posts: posts}, nil
+}
+
+func (us *Store) GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error) {
+	var tmp int
+	row := us.db.QueryRow(
+		`SELECT 1 FROM classes WHERE id = $1`,
+		classID,
+	)
+	err := row.Scan(&tmp)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	rows, err := us.db.Query(
+		`SELECT id, title, description, createTime, deadlineTime, file
+		 FROM homeworks
+		 WHERE classID = $1;`,
+		classID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	hws := []*model.HomeworkFromClass{}
+	for rows.Next() {
+		tmpHw := model.HomeworkFromClass{}
+		err := rows.Scan(
+			&tmpHw.ID, &tmpHw.Title, &tmpHw.Description,
+			&tmpHw.CreateTime, &tmpHw.DeadlineTime, &tmpHw.File,
+		)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+		hws = append(hws, &tmpHw)
+	}
+
+	return &model.HomeworksFromClass{Homeworks: hws}, nil
+}
+
+func (us *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
+	row := us.db.QueryRow(
+		`SELECT classID, title, description, createTime, deadlineTime, file
+		 FROM homeworks
+		 WHERE id = $1;`,
+		id,
+	)
+	hw := model.HomeworkByID{}
+	err := row.Scan(
+		&hw.ClassID, &hw.Title, &hw.Description,
+		&hw.CreateTime, &hw.DeadlineTime, &hw.File,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return &hw, nil
 }

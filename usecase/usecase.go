@@ -18,6 +18,8 @@ type UsecaseInterface interface {
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
 	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error)
+	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 }
 
 type Usecase struct {
@@ -117,4 +119,20 @@ func (api *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
 		return nil, e.StacktraceError(err)
 	}
 	return feed, nil
+}
+
+func (api *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error) {
+	hws, err := api.store.GetHomeworksByClassID(classID)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return hws, nil
+}
+
+func (api *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
+	hw, err := api.store.GetHomeworkByID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return hw, nil
 }
