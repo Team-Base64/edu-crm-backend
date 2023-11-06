@@ -41,9 +41,6 @@ func main() {
 
 	myRouter := mux.NewRouter()
 
-	//urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
-	//db, err := pgx.Connect(context.Background(), urlDB)
-
 	db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Fatalln("could not connect to database")
@@ -67,8 +64,7 @@ func main() {
 	}
 
 	grcpConnChat, err := grpc.Dial(
-		//"chat:8082", так будет в докере
-		"127.0.0.1:8082",
+		os.Getenv(conf.ChatGrpcUrl),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -78,13 +74,13 @@ func main() {
 	}
 	defer grcpConnChat.Close()
 
-	var chatManager ctrl.BotChatClient = ctrl.NewBotChatClient(grcpConnChat)
+	ChatService := ctrl.NewChatService(ctrl.NewBotChatClient(grcpConnChat))
 
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
 		tokenLen,
-		chatManager,
+		ChatService,
 	)
 
 	Handler := delivery.NewHandler(Usecase)
