@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	ctrl "main/controller"
 	"main/delivery"
 	"main/repository"
 	"main/usecase"
@@ -16,6 +17,8 @@ import (
 	e "main/domain/errors"
 
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/jackc/pgx/v5"
 
@@ -39,7 +42,7 @@ func main() {
 	myRouter := mux.NewRouter()
 
 	//urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
-	//db, err := sql.Open("pgx", urlDB)
+	//db, err := pgx.Connect(context.Background(), urlDB)
 
 	db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
 	if err != nil {
@@ -63,12 +66,25 @@ func main() {
 		log.Fatalln("could not get token letters from env")
 	}
 
-	// TODO Нужно создать grpc клиента и отдать в usecase
+	grcpConnChat, err := grpc.Dial(
+		//"chat:8082", так будет в докере
+		"127.0.0.1:8082",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Println("cant connect to grpc chat")
+	} else {
+		log.Println("connected to grpc chat service")
+	}
+	defer grcpConnChat.Close()
+
+	var chatManager ctrl.BotChatClient = ctrl.NewBotChatClient(grcpConnChat)
+
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
 		tokenLen,
-		// grpcClient,
+		chatManager,
 	)
 
 	Handler := delivery.NewHandler(Usecase)

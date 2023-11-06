@@ -1,22 +1,52 @@
-package controller
+package chat
 
-import "main/domain/model"
+//пока не смог подключить
 
-type ChatServiceInterface interface {
-	BroadcastMsg(msg *model.ClassBroudcastMessage) error
-}
+// import (
+// 	context "context"
+// )
 
-// TODO Сюда идет grpc клиент, который получается после генерации proto файла
-// type ChatService struct{
-// 	client GrpcClientFromGeneration
+// type ChatServiceInterface interface {
+// 	BroadcastMsg(ctx context.Context, msg *BroadcastMessage) (Nothing, error)
 // }
 
-// func NewChatService(c *GrpcClientFromGeneration) ChatServiceInterface {
+// // TODO Сюда идет grpc клиент, который получается после генерации proto файла
+// // type ChatService struct{
+// // 	client GrpcClientFromGeneration
+// // }
+
+// // func NewChatService(c *GrpcClientFromGeneration) ChatServiceInterface {
+// // 	return &ChatService{
+// // 		client: c,
+// // 	}
+// // }
+
+// // func (cs *ChatService) BroadcastMsg(msg *model.ClassBroudcastMessage) error {
+// // 	return nil
+// // }
+
+// type ChatService struct {
+// 	client BotChatClient
+// 	//ChatServiceInterface
+// }
+
+// func NewChatService(c BotChatClient) *ChatService {
 // 	return &ChatService{
 // 		client: c,
 // 	}
 // }
 
-// func (cs *ChatService) BroadcastMsg(msg *model.ClassBroudcastMessage) error {
+// func (cs *ChatService) BroadcastMsg(ctx context.Context, msg *BroadcastMessage) (Nothing, error) {
+// 	_, err := cs.client.BroadcastMsg(
+// 		context.Background(),
+// 		&BroadcastMessage{
+// 			ClassID:        int32(msg.ClassID),
+// 			Title:          msg.Title,
+// 			Description:    msg.Description + "\n + Дедлайн: " + msg.DeadlineTime.String(),
+// 			AttachmentURLs: msg.Attaches,
+// 		})
+// 	if err != nil {
+// 		return err
+// 	}
 // 	return nil
 // }

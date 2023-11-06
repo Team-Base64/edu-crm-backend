@@ -4,10 +4,10 @@ definitions:
     properties:
       messages:
         items:
-          $ref: '#/definitions/model.MessageChat'
+          $ref: '#/definitions/model.Message'
         type: array
     type: object
-  model.ChatInfo:
+  model.ChatPreview:
     properties:
       chatid:
         type: integer
@@ -22,30 +22,121 @@ definitions:
       name:
         type: string
     type: object
-  model.Chats:
+  model.ChatPreviewList:
     properties:
       chats:
         items:
-          $ref: '#/definitions/model.ChatInfo'
+          $ref: '#/definitions/model.ChatPreview'
         type: array
     type: object
-  model.CreateStudentDB:
+  model.ClassCreate:
     properties:
-      name:
+      description:
         type: string
+      title:
+        type: string
+    type: object
+  model.ClassCreateResponse:
+    properties:
+      id:
+        type: integer
+      inviteToken:
+        type: string
+    type: object
+  model.ClassInfo:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      inviteToken:
+        type: string
+      title:
+        type: string
+    type: object
+  model.ClassInfoList:
+    properties:
+      classes:
+        items:
+          $ref: '#/definitions/model.ClassInfo'
+        type: array
     type: object
   model.Error:
     properties:
       error: {}
     type: object
-  model.MessageChat:
+  model.Feed:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/model.Post'
+        type: array
+    type: object
+  model.HomeworkByID:
+    properties:
+      classID:
+        type: integer
+      createTime:
+        type: string
+      deadlineTime:
+        type: string
+      description:
+        type: string
+      file:
+        type: string
+      title:
+        type: string
+    type: object
+  model.HomeworkCreate:
+    properties:
+      classID:
+        type: integer
+      deadlineTime:
+        type: string
+      description:
+        type: string
+      file:
+        type: string
+      title:
+        type: string
+    type: object
+  model.HomeworkCreateResponse:
+    properties:
+      createTime:
+        type: string
+      id:
+        type: integer
+    type: object
+  model.HomeworkFromClass:
+    properties:
+      createTime:
+        type: string
+      deadlineTime:
+        type: string
+      description:
+        type: string
+      file:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  model.HomeworkListFromClass:
+    properties:
+      homeworks:
+        items:
+          $ref: '#/definitions/model.HomeworkFromClass'
+        type: array
+    type: object
+  model.Message:
     properties:
       attaches:
         items:
           type: string
         type: array
-      chatid:
-        type: integer
+      createTime:
+        type: string
       id:
         type: integer
       ismine:
@@ -54,6 +145,33 @@ definitions:
         type: boolean
       text:
         type: string
+    type: object
+  model.Post:
+    properties:
+      attaches:
+        items:
+          type: string
+        type: array
+      createTime:
+        type: string
+      id:
+        type: integer
+      text:
+        type: string
+    type: object
+  model.PostCreate:
+    properties:
+      attaches:
+        items:
+          type: string
+        type: array
+      text:
+        type: string
+    type: object
+  model.PostCreateResponse:
+    properties:
+      id:
+        type: integer
       time:
         type: string
     type: object
@@ -61,23 +179,89 @@ definitions:
     properties:
       body: {}
     type: object
-  model.TeacherDB:
+  model.SolutionByID:
+    properties:
+      createTime:
+        type: string
+      file:
+        type: string
+      hwID:
+        type: integer
+      studentID:
+        type: integer
+      text:
+        type: string
+    type: object
+  model.SolutionForHw:
+    properties:
+      createTime:
+        type: string
+      file:
+        type: string
+      id:
+        type: integer
+      studentID:
+        type: integer
+      text:
+        type: string
+    type: object
+  model.SolutionFromClass:
+    properties:
+      createTime:
+        type: string
+      file:
+        type: string
+      hwID:
+        type: integer
+      id:
+        type: integer
+      studentID:
+        type: integer
+      text:
+        type: string
+    type: object
+  model.SolutionListForHw:
+    properties:
+      solutions:
+        items:
+          $ref: '#/definitions/model.SolutionForHw'
+        type: array
+    type: object
+  model.SolutionListFromClass:
+    properties:
+      solutions:
+        items:
+          $ref: '#/definitions/model.SolutionFromClass'
+        type: array
+    type: object
+  model.Student:
     properties:
       id:
         type: integer
+      name:
+        type: string
+      socialType:
+        type: string
+    type: object
+  model.StudentListFromClass:
+    properties:
+      students:
+        items:
+          $ref: '#/definitions/model.Student'
+        type: array
+    type: object
+  model.TeacherProfile:
+    properties:
+      name:
+        type: string
+    type: object
+  model.TeacherSignUp:
+    properties:
       login:
         type: string
       name:
         type: string
       password:
-        type: string
-      tgAccount:
-        type: string
-      tgBotLink:
-        type: string
-      vkAccount:
-        type: string
-      vkBotLink:
         type: string
     type: object
 host: 127.0.0.1:8080
@@ -94,40 +278,6 @@ info:
   title: TCRA API
   version: "1.0"
 paths:
-  /addstudent:
-    post:
-      consumes:
-      - application/json
-      description: Add student
-      operationId: addStudent
-      parameters:
-      - description: Student params
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.CreateStudentDB'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "400":
-          description: Bad request - Problem with the request
-          schema:
-            $ref: '#/definitions/model.Error'
-        "401":
-          description: Unauthorized - Access token is missing or invalid
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Internal Server Error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Add student
   /chats:
     get:
       consumes:
@@ -140,13 +290,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Chats'
+            $ref: '#/definitions/model.ChatPreviewList'
         "401":
-          description: Unauthorized - Access token is missing or invalid
+          description: unauthorized - Access token is missing or invalid
           schema:
             $ref: '#/definitions/model.Error'
         "500":
-          description: Internal Server Error - Request is valid but operation failed
+          description: internal server error - Request is valid but operation failed
             at server side
           schema:
             $ref: '#/definitions/model.Error'
@@ -170,16 +320,423 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Chat'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
         "401":
-          description: Unauthorized - Access token is missing or invalid
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
           schema:
             $ref: '#/definitions/model.Error'
         "500":
-          description: Internal Server Error - Request is valid but operation failed
+          description: internal server error - Request is valid but operation failed
             at server side
           schema:
             $ref: '#/definitions/model.Error'
-      summary: Get chat by id
+      summary: Get chat messages by id
+  /classes:
+    get:
+      consumes:
+      - application/json
+      description: Get teacher`s classes
+      operationId: getClasses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ClassInfoList'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get teacher`s classes
+    post:
+      consumes:
+      - application/json
+      description: Create class
+      operationId: createClass
+      parameters:
+      - description: Class for creating
+        in: body
+        name: class
+        required: true
+        schema:
+          $ref: '#/definitions/model.ClassCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ClassCreateResponse'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create class
+  /classes/{classID}:
+    get:
+      consumes:
+      - application/json
+      description: Get class by id
+      operationId: getClass
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ClassInfo'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get class by id
+  /classes/{classID}/feed:
+    get:
+      consumes:
+      - application/json
+      description: Get posts from class by class id
+      operationId: getClassFeed
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Feed'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get class feed
+    post:
+      consumes:
+      - application/json
+      description: Create post
+      operationId: createPost
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      - description: Post for creating
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/model.PostCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PostCreateResponse'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create post
+  /classes/{classID}/homeworks:
+    get:
+      consumes:
+      - application/json
+      description: Get homeworks from class by class id
+      operationId: getHomeworksFromClass
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.HomeworkListFromClass'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get class homeworks
+  /classes/{classID}/solutions:
+    get:
+      consumes:
+      - application/json
+      description: Get solutions from class by class id
+      operationId: getSolutionsFromClass
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SolutionListFromClass'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get solutions from class
+  /classes/{classID}/students:
+    get:
+      consumes:
+      - application/json
+      description: Get students from class by class id
+      operationId: getStudentsFromClass
+      parameters:
+      - description: Class id
+        in: path
+        name: classID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StudentListFromClass'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get students from class
+  /homeworks:
+    post:
+      consumes:
+      - application/json
+      description: Create homework
+      operationId: createHomework
+      parameters:
+      - description: Homework for creating
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/model.HomeworkCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.HomeworkCreateResponse'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create homework
+  /homeworks/{hwID}:
+    get:
+      consumes:
+      - application/json
+      description: Get homework by id
+      operationId: getHomework
+      parameters:
+      - description: Homework id
+        in: path
+        name: hwID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.HomeworkByID'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get homework
+  /homeworks/{hwID}/solutions:
+    get:
+      consumes:
+      - application/json
+      description: Get solutions for homework by homework id
+      operationId: getSolutionsForHomework
+      parameters:
+      - description: Homework id
+        in: path
+        name: hwID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SolutionListForHw'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get solutions for homework
   /profile:
     get:
       consumes:
@@ -192,50 +749,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.TeacherDB'
+            $ref: '#/definitions/model.TeacherProfile'
         "401":
-          description: Unauthorized - Access token is missing or invalid
+          description: unauthorized - Access token is missing or invalid
           schema:
             $ref: '#/definitions/model.Error'
         "500":
-          description: Internal Server Error - Request is valid but operation failed
+          description: internal server error - Request is valid but operation failed
             at server side
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get teacher's info
-    post:
-      consumes:
-      - application/json
-      description: changes teacher's parameters
-      operationId: changeUserParameters
-      parameters:
-      - description: Teacher params
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.TeacherDB'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "400":
-          description: Bad request - Problem with the request
-          schema:
-            $ref: '#/definitions/model.Error'
-        "401":
-          description: Unauthorized - Access token is missing or invalid
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Internal Server Error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: changes teacher's parameters
   /register:
     post:
       consumes:
@@ -248,7 +772,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.TeacherDB'
+          $ref: '#/definitions/model.TeacherSignUp'
       produces:
       - application/json
       responses:
@@ -257,13 +781,50 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
         "401":
-          description: Unauthorized - Access token is missing or invalid
+          description: unauthorized - Access token is missing or invalid
           schema:
             $ref: '#/definitions/model.Error'
         "500":
-          description: Internal Server Error - Request is valid but operation failed
+          description: internal server error - Request is valid but operation failed
             at server side
           schema:
             $ref: '#/definitions/model.Error'
       summary: Create teacher
+  /solutions/{solID}:
+    get:
+      consumes:
+      - application/json
+      description: Get solution by id
+      operationId: getSolution
+      parameters:
+      - description: Solution id
+        in: path
+        name: solID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SolutionByID'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get solution
 swagger: "2.0"
