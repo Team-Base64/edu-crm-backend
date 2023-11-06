@@ -23,3 +23,16 @@ type HomeworkByID struct {
 	DeadlineTime time.Time `json:"deadlineTime"`
 	File         string    `json:"file"`
 }
+
+type HomeworkCreate struct {
+	ClassID      int       `json:"classID"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	DeadlineTime time.Time `json:"deadlineTime"`
+	File         string    `json:"file"`
+}
+
+type HomeworkCreateResponse struct {
+	ID         int       `json:"id"`
+	CreateTime time.Time `json:"createTime"`
+}

@@ -298,6 +298,46 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(feed)
 }
 
+// CreatePost godoc
+// @Summary Create post
+// @Description Create post
+// @ID createPost
+// @Accept  json
+// @Produce  json
+// @Param classID path string true "Class id"
+// @Param post body model.PostCreate true "Post for creating"
+// @Success 200 {object} model.PostCreateResponse
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /classes/{classID}/feed [post]
+func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	classID, err := strconv.Atoi(path[len(path)-2])
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var newPost model.PostCreate
+	if err := decoder.Decode(&newPost); err != nil {
+		ReturnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	res, err := api.usecase.CreatePost(classID, &newPost)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
 // GetHomeworksFromClass godoc
 // @Summary Get class homeworks
 // @Description Get homeworks from class by class id
@@ -360,6 +400,37 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(hw)
+}
+
+// CreateHomework godoc
+// @Summary Create homework
+// @Description Create homework
+// @ID createHomework
+// @Accept  json
+// @Produce  json
+// @Param post body model.HomeworkCreate true "Homework for creating"
+// @Success 200 {object} model.HomeworkCreateResponse
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /homeworks [post]
+func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var newHw model.HomeworkCreate
+	if err := decoder.Decode(&newHw); err != nil {
+		ReturnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	res, err := api.usecase.CreateHomework(&newHw)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(res)
 }
 
 // GetSolutionsFromClass godoc

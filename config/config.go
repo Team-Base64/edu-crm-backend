@@ -21,7 +21,8 @@ var PathClassFeed = BasePath + "/classes/{id}/feed"
 var PathClassHomeworks = BasePath + "/classes/{id}/homeworks"
 var PathClassSolutions = BasePath + "/classes/{id}/solutions"
 
-var PathHomework = BasePath + "/homeworks/{id}"
+var PathHomework = BasePath + "/homeworks"
+var PathHomeworkByID = BasePath + "/homeworks/{id}"
 var PathHomeworkSolutions = BasePath + "/homeworks/{id}/solutions"
 
 var PathSolution = BasePath + "/solutions/{id}"

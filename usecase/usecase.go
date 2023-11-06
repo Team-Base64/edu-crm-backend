@@ -3,6 +3,7 @@ package usecase
 import (
 	"main/domain/model"
 	"math/rand"
+	"time"
 
 	e "main/domain/errors"
 	rep "main/repository"
@@ -18,8 +19,10 @@ type UsecaseInterface interface {
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
 	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
+	CreatePost(classID int, newPost *model.PostCreate) (*model.PostCreateResponse, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
+	CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkCreateResponse, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -132,6 +135,25 @@ func (uc *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
 	return feed, nil
 }
 
+func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.PostCreateResponse, error) {
+	if err := uc.store.CheckClassExistence(classID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	createTime := time.Now()
+	id, err := uc.store.AddPost(classID, createTime, newPost)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	// TODO отравить на сервис чата броудкаст, если не успешно, то удалить пост из базы
+
+	res := model.PostCreateResponse{
+		ID:   id,
+		Time: createTime,
+	}
+	return &res, nil
+}
+
 func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
@@ -150,6 +172,25 @@ func (uc *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 		return nil, e.StacktraceError(err)
 	}
 	return hw, nil
+}
+
+func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkCreateResponse, error) {
+	if err := uc.store.CheckClassExistence(newHw.ClassID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	createTime := time.Now()
+	id, err := uc.store.AddHomework(createTime, newHw)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	// TODO отравить на сервис чата броудкаст, если не успешно, то удалить пост из базы
+
+	res := model.HomeworkCreateResponse{
+		ID:         id,
+		CreateTime: createTime,
+	}
+	return &res, nil
 }
 
 func (uc *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {

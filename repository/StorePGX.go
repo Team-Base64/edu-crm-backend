@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"main/domain/model"
+	"time"
 
 	e "main/domain/errors"
 
@@ -22,8 +23,10 @@ type StoreInterface interface {
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
+	AddPost(classID int, time time.Time, newPost *model.PostCreate) (int, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
+	AddHomework(time time.Time, newHw *model.HomeworkCreate) (int, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -314,6 +317,23 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	return &model.Feed{Posts: posts}, nil
 }
 
+func (s *Store) AddPost(classID int, time time.Time, newPost *model.PostCreate) (int, error) {
+	row := s.db.QueryRow(
+		context.Background(),
+		`INSERT INTO posts (classID, text, attaches, time)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id;`,
+		classID, newPost.Text, newPost.Attaches, time,
+	)
+
+	var id int
+	if err := row.Scan(&id); err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return int(id), nil
+}
+
 func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
 	rows, err := s.db.Query(
 		context.Background(),
@@ -362,6 +382,23 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	}
 
 	return &hw, nil
+}
+
+func (s *Store) AddHomework(time time.Time, newHw *model.HomeworkCreate) (int, error) {
+	row := s.db.QueryRow(
+		context.Background(),
+		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime, file)
+		 VALUES ($1, $2, $3, $4, $5, $6)
+		 RETURNING id;`,
+		newHw.ClassID, newHw.Title, newHw.Description, time, newHw.DeadlineTime, newHw.File,
+	)
+
+	var id int
+	if err := row.Scan(&id); err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return int(id), nil
 }
 
 func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
