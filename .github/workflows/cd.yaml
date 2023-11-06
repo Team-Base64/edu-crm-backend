@@ -43,6 +43,6 @@ jobs:
             cd ${{ secrets.TARGET_DOCKER_COMPOSE }}
             echo "${{ secrets.BACKEND_ENV }}" > ${{ env.ENV_FILE }}
             sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ env.ENV_FILE }}
-            docker-compose pull --parallel ${{ env.CONTAINER }}
+            docker compose pull --parallel ${{ env.CONTAINER }}
             docker compose up -d --no-deps --force-recreate ${{ env.CONTAINER }}
             docker system prune -af --volumes
