@@ -10,7 +10,7 @@ import (
 type UsecaseInterface interface {
 	CreateTeacher(params *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
-	GetChatsByTeacherID(id int) (*model.ChatsPreview, error)
+	GetChatsByTeacherID(id int) (*model.ChatPreviewList, error)
 	GetChatByID(id int) (*model.Chat, error)
 }
 
@@ -18,34 +18,38 @@ type Usecase struct {
 	store rep.StoreInterface
 }
 
-func NewUsecase(us rep.StoreInterface) UsecaseInterface {
+func NewUsecase(s rep.StoreInterface) UsecaseInterface {
 	return &Usecase{
-		store: us,
+		store: s,
 	}
 }
 
-func (api *Usecase) CreateTeacher(params *model.TeacherSignUp) error {
-	return api.store.AddTeacher(params)
+func (uc *Usecase) CreateTeacher(params *model.TeacherSignUp) error {
+	return uc.store.AddTeacher(params)
 }
 
-func (api *Usecase) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
-	chat, err := api.store.GetTeacherProfile(id)
+func (uc *Usecase) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
+	chat, err := uc.store.GetTeacherProfile(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return chat, nil
 }
 
-func (api *Usecase) GetChatsByTeacherID(id int) (*model.ChatsPreview, error) {
-	chat, err := api.store.GetChatsByTeacherID(id)
+func (uc *Usecase) GetChatsByTeacherID(id int) (*model.ChatPreviewList, error) {
+	chat, err := uc.store.GetChatsByTeacherID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return chat, nil
 }
 
-func (api *Usecase) GetChatByID(id int) (*model.Chat, error) {
-	chat, err := api.store.GetChatByID(id)
+func (uc *Usecase) GetChatByID(id int) (*model.Chat, error) {
+	if err := uc.store.CheckChatExistence(id); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	chat, err := uc.store.GetChatByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}

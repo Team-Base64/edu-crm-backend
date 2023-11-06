@@ -7,14 +7,16 @@ import (
 
 	"database/sql"
 
+	"github.com/jackc/pgtype"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type StoreInterface interface {
+	CheckChatExistence(id int) error
 	AddTeacher(in *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetChatByID(id int) (*model.Chat, error)
-	GetChatsByTeacherID(idTeacher int) (*model.ChatsPreview, error)
+	GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error)
 }
 
 type Store struct {
@@ -27,8 +29,20 @@ func NewStore(db *sql.DB) StoreInterface {
 	}
 }
 
-func (us *Store) AddTeacher(in *model.TeacherSignUp) error {
-	_, err := us.db.Exec(
+func (s *Store) CheckChatExistence(id int) error {
+	var tmp int
+	row := s.db.QueryRow(
+		`SELECT 1 FROM chats WHERE id = $1;`,
+		id,
+	)
+	if err := row.Scan(&tmp); err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}
+
+func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
+	_, err := s.db.Exec(
 		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3);`,
 		in.Login, in.Name, in.Password,
 	)
@@ -39,42 +53,24 @@ func (us *Store) AddTeacher(in *model.TeacherSignUp) error {
 	return nil
 }
 
-func (us *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
-	teacher := &model.TeacherProfile{}
-	rows, err := us.db.Query(
-		`SELECT name FROM teachers WHERE id = $1`,
+func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
+	row := s.db.QueryRow(
+		`SELECT name FROM teachers WHERE id = $1;`,
 		id,
 	)
-	if err != nil {
+
+	var teacher model.TeacherProfile
+	if err := row.Scan(&teacher.Name); err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		err := rows.Scan(&teacher.Name)
-		if err != nil {
-			return nil, e.StacktraceError(err)
-		}
-	}
-
-	return teacher, nil
+	return &teacher, nil
 }
 
-func (us *Store) GetChatByID(id int) (*model.Chat, error) {
-	messages := []*model.Message{}
-	tmp := 1
-	row := us.db.QueryRow(
-		`SELECT 1 FROM chats WHERE id = $1`,
-		id,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetChatByID(id int) (*model.Chat, error) {
+	rows, err := s.db.Query(
 		`SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages
-		 WHERE chatID = $1`,
+		 WHERE chatID = $1;`,
 		id,
 	)
 	if err != nil {
@@ -82,37 +78,43 @@ func (us *Store) GetChatByID(id int) (*model.Chat, error) {
 	}
 	defer rows.Close()
 
+	var messages []*model.Message
 	for rows.Next() {
-		dat := model.Message{}
-		err := rows.Scan(
-			&dat.ID, &dat.Text, &dat.IsAuthorTeacher,
-			&dat.Attaches, &dat.Time, &dat.IsRead,
-		)
-		if err != nil {
+		var tmpMsg model.Message
+		var tmpAttaches pgtype.TextArray
+
+		if err := rows.Scan(
+			&tmpMsg.ID, &tmpMsg.Text,
+			&tmpMsg.IsAuthorTeacher, &tmpAttaches,
+			&tmpMsg.Time, &tmpMsg.IsRead,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 
-		messages = append(messages, &dat)
+		tmpMsg.Attaches = make([]string, len(tmpAttaches.Elements))
+		for idx, el := range tmpAttaches.Elements {
+			tmpMsg.Attaches[idx] = el.String
+		}
+
+		messages = append(messages, &tmpMsg)
 	}
 	return &model.Chat{Messages: messages}, nil
 }
 
-func (us *Store) GetChatsByTeacherID(idTeacher int) (*model.ChatsPreview, error) {
-	chats := []*model.ChatPreview{}
-
-	rows, err := us.db.Query(
-		`SELECT id FROM chats WHERE teacherID = $1`,
-		idTeacher,
+func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
+	rows, err := s.db.Query(
+		`SELECT id FROM chats WHERE teacherID = $1;`,
+		teacherID,
 	)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	defer rows.Close()
 
+	var chats []*model.ChatPreview
 	for rows.Next() {
 		var tmpID int
-		err := rows.Scan(&tmpID)
-		if err != nil {
+		if err := rows.Scan(&tmpID); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 
@@ -122,20 +124,23 @@ func (us *Store) GetChatsByTeacherID(idTeacher int) (*model.ChatsPreview, error)
 			Img:    "mockImg",
 		}
 
-		row := us.db.QueryRow(
+		row := s.db.QueryRow(
 			`SELECT text, time, isRead FROM messages
 			 WHERE chatID = $1
 			 ORDER BY id DESC
-			 LIMIT 1`,
+			 LIMIT 1;`,
 			tmpID,
 		)
 
-		err = row.Scan(&tmpChat.LastMessageText, &tmpChat.LastMessageDate, &tmpChat.IsRead)
-		if err != nil {
+		if err = row.Scan(
+			&tmpChat.LastMessageText,
+			&tmpChat.LastMessageDate,
+			&tmpChat.IsRead,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 		chats = append(chats, &tmpChat)
 	}
 
-	return &model.ChatsPreview{Chats: chats}, nil
+	return &model.ChatPreviewList{Chats: chats}, nil
 }

@@ -103,7 +103,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 // @ID getChats
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.ChatsPreview
+// @Success 200 {object} model.ChatPreviewList
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /chats [get]
