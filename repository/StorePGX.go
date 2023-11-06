@@ -24,6 +24,9 @@ type StoreInterface interface {
 	GetClassFeed(classID int) (*model.Feed, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
+	GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error)
+	GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error)
+	GetSolutionByID(id int) (*model.SolutionByID, error)
 }
 
 type Store struct {
@@ -337,4 +340,92 @@ func (us *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	}
 
 	return &hw, nil
+}
+
+func (us *Store) GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error) {
+	var tmp int
+	row := us.db.QueryRow(
+		`SELECT 1 FROM classes WHERE id = $1`,
+		classID,
+	)
+	err := row.Scan(&tmp)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	rows, err := us.db.Query(
+		`SELECT s.id, s.hwID, s.studentID, s.text, s.time, s.file
+		 FROM solutions s
+		 JOIN homeworks h ON s.hwID = h.id
+		 WHERE h.classID = $1;`,
+		classID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	sols := []*model.SolutionFromClass{}
+	for rows.Next() {
+		tmpSol := model.SolutionFromClass{}
+		err := rows.Scan(
+			&tmpSol.ID, &tmpSol.HwID, &tmpSol.StudentID,
+			&tmpSol.Text, &tmpSol.Time, &tmpSol.File,
+		)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+		sols = append(sols, &tmpSol)
+	}
+
+	return &model.SolutionsFromClass{Solutions: sols}, nil
+}
+
+func (us *Store) GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error) {
+	var tmp int
+	row := us.db.QueryRow(
+		`SELECT 1 FROM homeworks WHERE id = $1`,
+		hwID,
+	)
+	err := row.Scan(&tmp)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	rows, err := us.db.Query(
+		`SELECT id, studentID, text, time, file FROM solutions WHERE hwID = $1;`,
+		hwID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	sols := []*model.SolutionForHw{}
+	for rows.Next() {
+		tmpSol := model.SolutionForHw{}
+		err := rows.Scan(
+			&tmpSol.ID, &tmpSol.StudentID, &tmpSol.Text, &tmpSol.Time, &tmpSol.File,
+		)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+		sols = append(sols, &tmpSol)
+	}
+
+	return &model.SolutionsForHw{Solutions: sols}, nil
+}
+
+func (us *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
+	row := us.db.QueryRow(
+		`SELECT hwID, studentID, text, time, file FROM solutions WHERE id = $1;`,
+		id,
+	)
+	sol := model.SolutionByID{}
+	err := row.Scan(&sol.HwID, &sol.StudentID, &sol.Text, &sol.Time, &sol.File)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return &sol, nil
 }

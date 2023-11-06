@@ -83,8 +83,12 @@ func main() {
 	myRouter.HandleFunc(conf.PathClassStudents, Handler.GetStudentsFromClass).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathClassFeed, Handler.GetClassFeed).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathClassHomeworks, Handler.GetHomeworksFromClass).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathClassSolutions, Handler.GetSolutionsFromClass).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathHomework, Handler.GetHomework).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathHomeworkSolutions, Handler.GetSolutionsForHomework).Methods(http.MethodGet, http.MethodOptions)
+
+	myRouter.HandleFunc(conf.PathSolution, Handler.GetSolution).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)
