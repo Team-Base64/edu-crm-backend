@@ -46,12 +46,11 @@ func NewStore(db *pgx.Conn) StoreInterface {
 
 func (s *Store) CheckChatExistence(id int) error {
 	var tmp int
-	row := s.db.QueryRow(
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT 1 FROM chats WHERE id = $1;`,
 		id,
-	)
-	if err := row.Scan(&tmp); err != nil {
+	).Scan(&tmp); err != nil {
 		return e.StacktraceError(err)
 	}
 	return nil
@@ -59,12 +58,11 @@ func (s *Store) CheckChatExistence(id int) error {
 
 func (s *Store) CheckClassExistence(id int) error {
 	var tmp int
-	row := s.db.QueryRow(
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT 1 FROM classes WHERE id = $1;`,
 		id,
-	)
-	if err := row.Scan(&tmp); err != nil {
+	).Scan(&tmp); err != nil {
 		return e.StacktraceError(err)
 	}
 	return nil
@@ -72,12 +70,11 @@ func (s *Store) CheckClassExistence(id int) error {
 
 func (s *Store) CheckHomeworkExistence(id int) error {
 	var tmp int
-	row := s.db.QueryRow(
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT 1 FROM homeworks WHERE id = $1;`,
 		id,
-	)
-	if err := row.Scan(&tmp); err != nil {
+	).Scan(&tmp); err != nil {
 		return e.StacktraceError(err)
 	}
 	return nil
@@ -97,14 +94,12 @@ func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
 }
 
 func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
-	row := s.db.QueryRow(
+	var teacher model.TeacherProfile
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT name FROM teachers WHERE id = $1;`,
 		id,
-	)
-
-	var teacher model.TeacherProfile
-	if err := row.Scan(&teacher.Name); err != nil {
+	).Scan(&teacher.Name); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
@@ -170,16 +165,14 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 			Img:    "mockImg",
 		}
 
-		row := s.db.QueryRow(
+		if err = s.db.QueryRow(
 			context.Background(),
 			`SELECT text, createTime, isRead FROM messages
 			 WHERE chatID = $1
 			 ORDER BY id DESC
 			 LIMIT 1;`,
 			tmpID,
-		)
-
-		if err = row.Scan(
+		).Scan(
 			&tmpChat.LastMessageText,
 			&tmpChat.LastMessageDate,
 			&tmpChat.IsRead,
@@ -220,14 +213,12 @@ func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 }
 
 func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
-	row := s.db.QueryRow(
+	var class model.ClassInfo
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1;`,
 		id,
-	)
-	var class model.ClassInfo
-
-	if err := row.Scan(
+	).Scan(
 		&class.Title,
 		&class.Description,
 		&class.InviteToken,
@@ -240,16 +231,14 @@ func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 }
 
 func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
-	row := s.db.QueryRow(
+	var id int
+	if err := s.db.QueryRow(
 		context.Background(),
 		`INSERT INTO classes (teacherID, title, description, inviteToken)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
 		teacherID, newClass.Title, newClass.Description, inviteToken,
-	)
-
-	var id int
-	if err := row.Scan(&id); err != nil {
+	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
 
@@ -320,16 +309,14 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 }
 
 func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error) {
-	row := s.db.QueryRow(
+	var id int
+	if err := s.db.QueryRow(
 		context.Background(),
 		`INSERT INTO posts (classID, text, attaches, createTime)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
 		classID, newPost.Text, newPost.Attaches, createTime,
-	)
-
-	var id int
-	if err := row.Scan(&id); err != nil {
+	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
 
@@ -381,16 +368,14 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass
 }
 
 func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
-	row := s.db.QueryRow(
+	var hw model.HomeworkByID
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT classID, title, description, createTime, deadlineTime, file
 		 FROM homeworks
 		 WHERE id = $1;`,
 		id,
-	)
-
-	var hw model.HomeworkByID
-	if err := row.Scan(
+	).Scan(
 		&hw.ClassID, &hw.Title, &hw.Description,
 		&hw.CreateTime, &hw.DeadlineTime, &hw.File,
 	); err != nil {
@@ -401,16 +386,14 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 }
 
 func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
-	row := s.db.QueryRow(
+	var id int
+	if err := s.db.QueryRow(
 		context.Background(),
 		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime, file)
 		 VALUES ($1, $2, $3, $4, $5, $6)
 		 RETURNING id;`,
 		newHw.ClassID, newHw.Title, newHw.Description, createTime, newHw.DeadlineTime, newHw.File,
-	)
-
-	var id int
-	if err := row.Scan(&id); err != nil {
+	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
 
@@ -491,14 +474,12 @@ func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 }
 
 func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
-	row := s.db.QueryRow(
+	var sol model.SolutionByID
+	if err := s.db.QueryRow(
 		context.Background(),
 		`SELECT hwID, studentID, text, createTime, file FROM solutions WHERE id = $1;`,
 		id,
-	)
-	var sol model.SolutionByID
-
-	if err := row.Scan(
+	).Scan(
 		&sol.HwID, &sol.StudentID,
 		&sol.Text, &sol.CreateTime, &sol.File,
 	); err != nil {
