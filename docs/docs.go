@@ -24,56 +24,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/addstudent": {
-            "post": {
-                "description": "Add student",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Add student",
-                "operationId": "addStudent",
-                "parameters": [
-                    {
-                        "description": "Student params",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.CreateStudentDB"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Problem with the request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/chats": {
             "get": {
                 "description": "Get chats of teacher",
@@ -89,17 +39,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Chats"
+                            "$ref": "#/definitions/model.ChatPreviewList"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
+                        "description": "unauthorized - Access token is missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "description": "internal server error - Request is valid but operation failed at server side",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
@@ -116,7 +66,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get chat by id",
+                "summary": "Get chat messages by id",
                 "operationId": "getChat",
                 "parameters": [
                     {
@@ -134,14 +84,608 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Chat"
                         }
                     },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
                     "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes": {
+            "get": {
+                "description": "Get teacher` + "`" + `s classes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get teacher` + "`" + `s classes",
+                "operationId": "getClasses",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ClassInfoList"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create class",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create class",
+                "operationId": "createClass",
+                "parameters": [
+                    {
+                        "description": "Class for creating",
+                        "name": "class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ClassCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ClassCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{classID}": {
+            "get": {
+                "description": "Get class by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get class by id",
+                "operationId": "getClass",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ClassInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{classID}/feed": {
+            "get": {
+                "description": "Get posts from class by class id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get class feed",
+                "operationId": "getClassFeed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Feed"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create post",
+                "operationId": "createPost",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Post for creating",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PostCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.PostCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{classID}/homeworks": {
+            "get": {
+                "description": "Get homeworks from class by class id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get class homeworks",
+                "operationId": "getHomeworksFromClass",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.HomeworkListFromClass"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{classID}/solutions": {
+            "get": {
+                "description": "Get solutions from class by class id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get solutions from class",
+                "operationId": "getSolutionsFromClass",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SolutionListFromClass"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{classID}/students": {
+            "get": {
+                "description": "Get students from class by class id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get students from class",
+                "operationId": "getStudentsFromClass",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class id",
+                        "name": "classID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.StudentListFromClass"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/homeworks": {
+            "post": {
+                "description": "Create homework",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create homework",
+                "operationId": "createHomework",
+                "parameters": [
+                    {
+                        "description": "Homework for creating",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.HomeworkCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.HomeworkCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/homeworks/{hwID}": {
+            "get": {
+                "description": "Get homework by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get homework",
+                "operationId": "getHomework",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Homework id",
+                        "name": "hwID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.HomeworkByID"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/homeworks/{hwID}/solutions": {
+            "get": {
+                "description": "Get solutions for homework by homework id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get solutions for homework",
+                "operationId": "getSolutionsForHomework",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Homework id",
+                        "name": "hwID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SolutionListForHw"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
@@ -164,65 +708,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.TeacherDB"
+                            "$ref": "#/definitions/model.TeacherProfile"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
+                        "description": "unauthorized - Access token is missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "changes teacher's parameters",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "changes teacher's parameters",
-                "operationId": "changeUserParameters",
-                "parameters": [
-                    {
-                        "description": "Teacher params",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.TeacherDB"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Problem with the request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "description": "internal server error - Request is valid but operation failed at server side",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
@@ -248,7 +744,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.TeacherDB"
+                            "$ref": "#/definitions/model.TeacherSignUp"
                         }
                     }
                 ],
@@ -260,13 +756,67 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Access token is missing or invalid",
+                        "description": "unauthorized - Access token is missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error - Request is valid but operation failed at server side",
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/solutions/{solID}": {
+            "get": {
+                "description": "Get solution by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get solution",
+                "operationId": "getSolution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Solution id",
+                        "name": "solID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SolutionByID"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
@@ -282,12 +832,12 @@ const docTemplate = `{
                 "messages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.MessageChat"
+                        "$ref": "#/definitions/model.Message"
                     }
                 }
             }
         },
-        "model.ChatInfo": {
+        "model.ChatPreview": {
             "type": "object",
             "properties": {
                 "chatid": {
@@ -310,22 +860,64 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Chats": {
+        "model.ChatPreviewList": {
             "type": "object",
             "properties": {
                 "chats": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.ChatInfo"
+                        "$ref": "#/definitions/model.ChatPreview"
                     }
                 }
             }
         },
-        "model.CreateStudentDB": {
+        "model.ClassCreate": {
             "type": "object",
             "properties": {
-                "name": {
+                "description": {
                     "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ClassCreateResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "inviteToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ClassInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "inviteToken": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ClassInfoList": {
+            "type": "object",
+            "properties": {
+                "classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ClassInfo"
+                    }
                 }
             }
         },
@@ -335,7 +927,106 @@ const docTemplate = `{
                 "error": {}
             }
         },
-        "model.MessageChat": {
+        "model.Feed": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Post"
+                    }
+                }
+            }
+        },
+        "model.HomeworkByID": {
+            "type": "object",
+            "properties": {
+                "classID": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deadlineTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HomeworkCreate": {
+            "type": "object",
+            "properties": {
+                "classID": {
+                    "type": "integer"
+                },
+                "deadlineTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HomeworkCreateResponse": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.HomeworkFromClass": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "deadlineTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HomeworkListFromClass": {
+            "type": "object",
+            "properties": {
+                "homeworks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.HomeworkFromClass"
+                    }
+                }
+            }
+        },
+        "model.Message": {
             "type": "object",
             "properties": {
                 "attaches": {
@@ -344,8 +1035,8 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "chatid": {
-                    "type": "integer"
+                "createTime": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -358,6 +1049,48 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Post": {
+            "type": "object",
+            "properties": {
+                "attaches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PostCreate": {
+            "type": "object",
+            "properties": {
+                "attaches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PostCreateResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 },
                 "time": {
                     "type": "string"
@@ -370,12 +1103,127 @@ const docTemplate = `{
                 "body": {}
             }
         },
-        "model.TeacherDB": {
+        "model.SolutionByID": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "hwID": {
+                    "type": "integer"
+                },
+                "studentID": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SolutionForHw": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "studentID": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SolutionFromClass": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "hwID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "studentID": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SolutionListForHw": {
+            "type": "object",
+            "properties": {
+                "solutions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SolutionForHw"
+                    }
+                }
+            }
+        },
+        "model.SolutionListFromClass": {
+            "type": "object",
+            "properties": {
+                "solutions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SolutionFromClass"
+                    }
+                }
+            }
+        },
+        "model.Student": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                },
+                "socialType": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.StudentListFromClass": {
+            "type": "object",
+            "properties": {
+                "students": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Student"
+                    }
+                }
+            }
+        },
+        "model.TeacherProfile": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TeacherSignUp": {
+            "type": "object",
+            "properties": {
                 "login": {
                     "type": "string"
                 },
@@ -383,18 +1231,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "tgAccount": {
-                    "type": "string"
-                },
-                "tgBotLink": {
-                    "type": "string"
-                },
-                "vkAccount": {
-                    "type": "string"
-                },
-                "vkBotLink": {
                     "type": "string"
                 }
             }

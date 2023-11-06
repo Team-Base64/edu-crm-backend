@@ -22,3 +22,4 @@ go.work
 
 commands_for_db.txt
 config/DBconf.go
+/db

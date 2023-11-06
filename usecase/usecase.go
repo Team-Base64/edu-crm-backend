@@ -1,10 +1,12 @@
 package usecase
 
 import (
+	"context"
 	"main/domain/model"
 	"math/rand"
 	"time"
 
+	ctrl "main/controller"
 	e "main/domain/errors"
 	rep "main/repository"
 )
@@ -28,23 +30,22 @@ type UsecaseInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 }
 
-// XXX
 type Usecase struct {
 	store    rep.StoreInterface
 	letters  []rune
 	tokenLen int
 	bufToken []rune
-	// chatService ctrl.ChatServiceInterface
+	//chatService ctrl.ChatServiceInterface
+	chatService ctrl.BotChatClient
 }
 
-// XXX
-func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int) UsecaseInterface { //cs ctrl.ChatServiceInterface) UsecaseInterface {
+func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.BotChatClient) UsecaseInterface {
 	return &Usecase{
-		store:    s,
-		letters:  []rune(lettes),
-		tokenLen: tokenLen,
-		bufToken: make([]rune, tokenLen),
-		// chatService: cs,
+		store:       s,
+		letters:     []rune(lettes),
+		tokenLen:    tokenLen,
+		bufToken:    make([]rune, tokenLen),
+		chatService: cs,
 	}
 }
 
@@ -148,17 +149,18 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
+	_, err = uc.chatService.BroadcastMsg(
+		context.Background(),
+		&ctrl.BroadcastMessage{
+			ClassID:        int32(classID),
+			Title:          "Внимание! Сообщение от преподавателя.",
+			Description:    newPost.Text,
+			AttachmentURLs: newPost.Attaches,
+		})
 
-	// XXX
-	// bcMsg := model.ClassBroudcastMessage{
-	// 	ClassID:     classID,
-	// 	Title:       "Внимание! Сообщение от преподавателя.",
-	// 	Description: newPost.Text,
-	// 	Attaches:    newPost.Attaches,
-	// }
-	// if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
-	// 	return nil, e.StacktraceError(err, uc.store.DeletePost(id))
-	// }
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
 
 	res := model.PostCreateResponse{
 		ID:   id,
@@ -197,17 +199,18 @@ func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkC
 		return nil, e.StacktraceError(err)
 	}
 
-	// XXX
-	// bcMsg := model.ClassBroudcastMessage{
-	// 	ClassID:      newHw.ClassID,
-	// 	Title:        "Внимание! Выдано домашнее задание: " + newHw.Title,
-	// 	Description:  newHw.Description,
-	// 	DeadlineTime: newHw.DeadlineTime,
-	// 	Attaches:     []string{newHw.File},
-	// }
-	// if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
-	// 	return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
-	// }
+	_, err = uc.chatService.BroadcastMsg(
+		context.Background(),
+		&ctrl.BroadcastMessage{
+			ClassID:        int32(newHw.ClassID),
+			Title:          "Внимание! Выдано домашнее задание: " + newHw.Title,
+			Description:    newHw.Description + "\n" + "Deadline: " + newHw.DeadlineTime.String(),
+			AttachmentURLs: []string{newHw.File},
+		})
+
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
 
 	res := model.HomeworkCreateResponse{
 		ID:         id,
