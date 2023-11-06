@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -16,9 +17,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"database/sql"
-
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -42,13 +41,13 @@ func main() {
 	//urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
 	//db, err := sql.Open("pgx", urlDB)
 
-	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
+	db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Fatalln("could not connect to database")
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
-	if err := db.Ping(); err != nil {
+	if err := db.Ping(context.Background()); err != nil {
 		log.Fatalln("unable to reach database ", err)
 	}
 	log.Println("database is reachable")

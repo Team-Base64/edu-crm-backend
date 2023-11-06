@@ -1,14 +1,12 @@
 package repository
 
 import (
+	"context"
 	"main/domain/model"
 
 	e "main/domain/errors"
 
-	"database/sql"
-
-	"github.com/jackc/pgtype"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5"
 )
 
 type StoreInterface interface {
@@ -32,10 +30,10 @@ type StoreInterface interface {
 }
 
 type Store struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
-func NewStore(db *sql.DB) StoreInterface {
+func NewStore(db *pgx.Conn) StoreInterface {
 	return &Store{
 		db: db,
 	}
@@ -44,6 +42,7 @@ func NewStore(db *sql.DB) StoreInterface {
 func (s *Store) CheckChatExistence(id int) error {
 	var tmp int
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT 1 FROM chats WHERE id = $1;`,
 		id,
 	)
@@ -56,6 +55,7 @@ func (s *Store) CheckChatExistence(id int) error {
 func (s *Store) CheckClassExistence(id int) error {
 	var tmp int
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT 1 FROM classes WHERE id = $1;`,
 		id,
 	)
@@ -68,6 +68,7 @@ func (s *Store) CheckClassExistence(id int) error {
 func (s *Store) CheckHomeworkExistence(id int) error {
 	var tmp int
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT 1 FROM homeworks WHERE id = $1;`,
 		id,
 	)
@@ -79,6 +80,7 @@ func (s *Store) CheckHomeworkExistence(id int) error {
 
 func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
 	_, err := s.db.Exec(
+		context.Background(),
 		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3);`,
 		in.Login, in.Name, in.Password,
 	)
@@ -91,6 +93,7 @@ func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
 
 func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT name FROM teachers WHERE id = $1;`,
 		id,
 	)
@@ -105,6 +108,7 @@ func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 
 func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages
 		 WHERE chatID = $1;`,
 		id,
@@ -117,20 +121,20 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	messages := []*model.Message{}
 	for rows.Next() {
 		var tmpMsg model.Message
-		var tmpAttaches pgtype.TextArray
+		// var tmpAttaches pgtype.TextArray
 
 		if err := rows.Scan(
 			&tmpMsg.ID, &tmpMsg.Text,
-			&tmpMsg.IsAuthorTeacher, &tmpAttaches,
+			&tmpMsg.IsAuthorTeacher, &tmpMsg.Attaches,
 			&tmpMsg.Time, &tmpMsg.IsRead,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 
-		tmpMsg.Attaches = make([]string, len(tmpAttaches.Elements))
-		for idx, el := range tmpAttaches.Elements {
-			tmpMsg.Attaches[idx] = el.String
-		}
+		// tmpMsg.Attaches = make([]string, len(tmpAttaches.Elements))
+		// for idx, el := range tmpAttaches.Elements {
+		// 	tmpMsg.Attaches[idx] = el.String
+		// }
 
 		messages = append(messages, &tmpMsg)
 	}
@@ -139,6 +143,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 
 func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id FROM chats WHERE teacherID = $1;`,
 		teacherID,
 	)
@@ -161,6 +166,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 		}
 
 		row := s.db.QueryRow(
+			context.Background(),
 			`SELECT text, time, isRead FROM messages
 			 WHERE chatID = $1
 			 ORDER BY id DESC
@@ -183,6 +189,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
 	)
@@ -209,6 +216,7 @@ func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 
 func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1;`,
 		id,
 	)
@@ -228,6 +236,7 @@ func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 
 func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
 	row := s.db.QueryRow(
+		context.Background(),
 		`INSERT INTO classes (teacherID, title, description, inviteToken)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
@@ -244,6 +253,7 @@ func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.Clas
 
 func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT s.id, s.name, s.socialType FROM students s
 		 JOIN classes_students cs ON s.id = cs.studentID
 		 WHERE cs.classID = $1;`,
@@ -272,6 +282,7 @@ func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, 
 
 func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id, text, attaches, time FROM posts WHERE classID = $1;`,
 		classID,
 	)
@@ -283,19 +294,19 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	posts := []*model.Post{}
 	for rows.Next() {
 		var tmpPost model.Post
-		var tmpAttaches pgtype.TextArray
+		// var tmpAttaches pgtype.TextArray
 
 		if err := rows.Scan(
 			&tmpPost.ID, &tmpPost.Text,
-			&tmpAttaches, &tmpPost.Time,
+			&tmpPost.Attaches, &tmpPost.Time,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 
-		tmpPost.Attaches = make([]string, len(tmpAttaches.Elements))
-		for idx, el := range tmpAttaches.Elements {
-			tmpPost.Attaches[idx] = el.String
-		}
+		// tmpPost.Attaches = make([]string, len(tmpAttaches.Elements))
+		// for idx, el := range tmpAttaches.Elements {
+		// 	tmpPost.Attaches[idx] = el.String
+		// }
 
 		posts = append(posts, &tmpPost)
 	}
@@ -305,6 +316,7 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 
 func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id, title, description, createTime, deadlineTime, file
 		 FROM homeworks
 		 WHERE classID = $1;`,
@@ -334,6 +346,7 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass
 
 func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT classID, title, description, createTime, deadlineTime, file
 		 FROM homeworks
 		 WHERE id = $1;`,
@@ -353,6 +366,7 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 
 func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT s.id, s.hwID, s.studentID, s.text, s.time, s.file
 		 FROM solutions s
 		 JOIN homeworks h ON s.hwID = h.id
@@ -383,6 +397,7 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 
 func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 	rows, err := s.db.Query(
+		context.Background(),
 		`SELECT id, studentID, text, time, file FROM solutions WHERE hwID = $1;`,
 		hwID,
 	)
@@ -410,6 +425,7 @@ func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 
 func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	row := s.db.QueryRow(
+		context.Background(),
 		`SELECT hwID, studentID, text, time, file FROM solutions WHERE id = $1;`,
 		id,
 	)

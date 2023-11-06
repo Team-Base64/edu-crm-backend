@@ -1,10 +1,11 @@
 package BaseErrors
 
 import (
-	"database/sql"
 	"errors"
 	"runtime"
 	"strconv"
+
+	"github.com/jackc/pgx/v5"
 )
 
 var ErrBadRequest400 = errors.New("bad request - Problem with the request")
@@ -39,7 +40,7 @@ func CheckError(err error) (int, string) {
 	}
 
 	if errors.Is(err, ErrNotFound404) ||
-		errors.Is(err, sql.ErrNoRows) {
+		errors.Is(err, pgx.ErrNoRows) {
 		return 404, ErrNotFound404.Error()
 	}
 

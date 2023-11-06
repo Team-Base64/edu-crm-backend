@@ -12,3 +12,13 @@ type Post struct {
 type Feed struct {
 	Posts []*Post `json:"posts"`
 }
+
+type PostCreate struct {
+	Text     string   `json:"text"`
+	Attaches []string `json:"attaches,omitempty"`
+}
+
+type PostCreateResponse struct {
+	ID   int       `json:"id"`
+	Time time.Time `json:"time"`
+}
