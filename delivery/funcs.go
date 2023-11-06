@@ -157,7 +157,7 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 // @ID getClasses
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.ClassesInfo
+// @Success 200 {object} model.ClassInfoList
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [get]
@@ -241,7 +241,7 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.StudentsFromClass
+// @Success 200 {object} model.StudentListFromClass
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -305,7 +305,7 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.HomeworksFromClass
+// @Success 200 {object} model.HomeworkListFromClass
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -369,7 +369,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.SolutionsFromClass
+// @Success 200 {object} model.SolutionListFromClass
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -401,7 +401,7 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 // @Accept  json
 // @Produce  json
 // @Param hwID path string true "Homework id"
-// @Success 200 {object} model.SolutionsForHw
+// @Success 200 {object} model.SolutionListForHw
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"

@@ -11,7 +11,7 @@ type HomeworkFromClass struct {
 	File         string    `json:"file"`
 }
 
-type HomeworksFromClass struct {
+type HomeworkListFromClass struct {
 	Homeworks []*HomeworkFromClass `json:"homeworks,omitempty"`
 }
 

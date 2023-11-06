@@ -13,19 +13,21 @@ import (
 
 type StoreInterface interface {
 	CheckChatExistence(id int) error
+	CheckClassExistence(id int) error
+	CheckHomeworkExistence(id int) error
 	AddTeacher(in *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetChatByID(id int) (*model.Chat, error)
 	GetChatsByTeacherID(idTeacher int) (*model.ChatPreviewList, error)
-	GetClassesByID(teacherID int) (*model.ClassesInfo, error)
+	GetClassesByID(teacherID int) (*model.ClassInfoList, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
-	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
+	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error)
-	GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error)
+	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
+	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 }
 
@@ -43,6 +45,30 @@ func (s *Store) CheckChatExistence(id int) error {
 	var tmp int
 	row := s.db.QueryRow(
 		`SELECT 1 FROM chats WHERE id = $1;`,
+		id,
+	)
+	if err := row.Scan(&tmp); err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}
+
+func (s *Store) CheckClassExistence(id int) error {
+	var tmp int
+	row := s.db.QueryRow(
+		`SELECT 1 FROM classes WHERE id = $1;`,
+		id,
+	)
+	if err := row.Scan(&tmp); err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}
+
+func (s *Store) CheckHomeworkExistence(id int) error {
+	var tmp int
+	row := s.db.QueryRow(
+		`SELECT 1 FROM homeworks WHERE id = $1;`,
 		id,
 	)
 	if err := row.Scan(&tmp); err != nil {
@@ -155,8 +181,8 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	return &model.ChatPreviewList{Chats: chats}, nil
 }
 
-func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
-	rows, err := us.db.Query(
+func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
+	rows, err := s.db.Query(
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
 	)
@@ -165,27 +191,34 @@ func (us *Store) GetClassesByID(teacherID int) (*model.ClassesInfo, error) {
 	}
 	defer rows.Close()
 
-	classes := []*model.ClassInfo{}
+	var classes []*model.ClassInfo
 	for rows.Next() {
-		tmpClass := model.ClassInfo{}
-		err := rows.Scan(&tmpClass.ID, &tmpClass.Title, &tmpClass.Description, &tmpClass.InviteToken)
-		if err != nil {
+		var tmpClass model.ClassInfo
+
+		if err := rows.Scan(
+			&tmpClass.ID, &tmpClass.Title,
+			&tmpClass.Description, &tmpClass.InviteToken,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 		classes = append(classes, &tmpClass)
 	}
 
-	return &model.ClassesInfo{Classes: classes}, nil
+	return &model.ClassInfoList{Classes: classes}, nil
 }
 
-func (us *Store) GetClassByID(id int) (*model.ClassInfo, error) {
-	row := us.db.QueryRow(
+func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
+	row := s.db.QueryRow(
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1;`,
 		id,
 	)
-	class := model.ClassInfo{}
-	err := row.Scan(&class.Title, &class.Description, &class.InviteToken)
-	if err != nil {
+	var class model.ClassInfo
+
+	if err := row.Scan(
+		&class.Title,
+		&class.Description,
+		&class.InviteToken,
+	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
@@ -193,35 +226,24 @@ func (us *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	return &class, nil
 }
 
-func (us *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
-	var id int
-
-	row := us.db.QueryRow(
+func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
+	row := s.db.QueryRow(
 		`INSERT INTO classes (teacherID, title, description, inviteToken)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
 		teacherID, newClass.Title, newClass.Description, inviteToken,
 	)
-	err := row.Scan(&id)
-	if err != nil {
+
+	var id int
+	if err := row.Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
 
 	return int(id), nil
 }
 
-func (us *Store) GetStudentsFromClass(classID int) (*model.StudentsFromClass, error) {
-	var tmp int
-	row := us.db.QueryRow(
-		`SELECT 1 FROM classes WHERE id = $1`,
-		classID,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, error) {
+	rows, err := s.db.Query(
 		`SELECT s.id, s.name, s.socialType FROM students s
 		 JOIN classes_students cs ON s.id = cs.studentID
 		 WHERE cs.classID = $1;`,
@@ -231,32 +253,25 @@ func (us *Store) GetStudentsFromClass(classID int) (*model.StudentsFromClass, er
 		return nil, e.StacktraceError(err)
 	}
 
-	students := []*model.Student{}
-
+	var students []*model.Student
 	for rows.Next() {
-		tmpStudent := model.Student{}
-		err := rows.Scan(&tmpStudent.ID, &tmpStudent.Name, &tmpStudent.SocialType)
-		if err != nil {
+		var tmpStudent model.Student
+
+		if err := rows.Scan(
+			&tmpStudent.ID,
+			&tmpStudent.Name,
+			&tmpStudent.SocialType,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 		students = append(students, &tmpStudent)
 	}
 
-	return &model.StudentsFromClass{Students: students}, nil
+	return &model.StudentListFromClass{Students: students}, nil
 }
 
-func (us *Store) GetClassFeed(classID int) (*model.Feed, error) {
-	var tmp int
-	row := us.db.QueryRow(
-		`SELECT 1 FROM classes WHERE id = $1`,
-		classID,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
+	rows, err := s.db.Query(
 		`SELECT id, text, attaches, time FROM posts WHERE classID = $1;`,
 		classID,
 	)
@@ -265,12 +280,15 @@ func (us *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	}
 	defer rows.Close()
 
-	posts := []*model.Post{}
+	var posts []*model.Post
 	for rows.Next() {
-		tmpPost := model.Post{}
-		tmpAttaches := pgtype.TextArray{}
-		err := rows.Scan(&tmpPost.ID, &tmpPost.Text, &tmpAttaches, &tmpPost.Time)
-		if err != nil {
+		var tmpPost model.Post
+		var tmpAttaches pgtype.TextArray
+
+		if err := rows.Scan(
+			&tmpPost.ID, &tmpPost.Text,
+			&tmpAttaches, &tmpPost.Time,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
 
@@ -285,18 +303,8 @@ func (us *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	return &model.Feed{Posts: posts}, nil
 }
 
-func (us *Store) GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error) {
-	var tmp int
-	row := us.db.QueryRow(
-		`SELECT 1 FROM classes WHERE id = $1`,
-		classID,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
+	rows, err := s.db.Query(
 		`SELECT id, title, description, createTime, deadlineTime, file
 		 FROM homeworks
 		 WHERE classID = $1;`,
@@ -307,53 +315,44 @@ func (us *Store) GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, 
 	}
 	defer rows.Close()
 
-	hws := []*model.HomeworkFromClass{}
+	var hws []*model.HomeworkFromClass
 	for rows.Next() {
-		tmpHw := model.HomeworkFromClass{}
-		err := rows.Scan(
+		var tmpHw model.HomeworkFromClass
+
+		if err := rows.Scan(
 			&tmpHw.ID, &tmpHw.Title, &tmpHw.Description,
 			&tmpHw.CreateTime, &tmpHw.DeadlineTime, &tmpHw.File,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
+
 		hws = append(hws, &tmpHw)
 	}
 
-	return &model.HomeworksFromClass{Homeworks: hws}, nil
+	return &model.HomeworkListFromClass{Homeworks: hws}, nil
 }
 
-func (us *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
-	row := us.db.QueryRow(
+func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
+	row := s.db.QueryRow(
 		`SELECT classID, title, description, createTime, deadlineTime, file
 		 FROM homeworks
 		 WHERE id = $1;`,
 		id,
 	)
-	hw := model.HomeworkByID{}
-	err := row.Scan(
+
+	var hw model.HomeworkByID
+	if err := row.Scan(
 		&hw.ClassID, &hw.Title, &hw.Description,
 		&hw.CreateTime, &hw.DeadlineTime, &hw.File,
-	)
-	if err != nil {
+	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
 	return &hw, nil
 }
 
-func (us *Store) GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error) {
-	var tmp int
-	row := us.db.QueryRow(
-		`SELECT 1 FROM classes WHERE id = $1`,
-		classID,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
+	rows, err := s.db.Query(
 		`SELECT s.id, s.hwID, s.studentID, s.text, s.time, s.file
 		 FROM solutions s
 		 JOIN homeworks h ON s.hwID = h.id
@@ -365,34 +364,25 @@ func (us *Store) GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, 
 	}
 	defer rows.Close()
 
-	sols := []*model.SolutionFromClass{}
+	var sols []*model.SolutionFromClass
 	for rows.Next() {
-		tmpSol := model.SolutionFromClass{}
-		err := rows.Scan(
+		var tmpSol model.SolutionFromClass
+
+		if err := rows.Scan(
 			&tmpSol.ID, &tmpSol.HwID, &tmpSol.StudentID,
 			&tmpSol.Text, &tmpSol.Time, &tmpSol.File,
-		)
-		if err != nil {
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
+
 		sols = append(sols, &tmpSol)
 	}
 
-	return &model.SolutionsFromClass{Solutions: sols}, nil
+	return &model.SolutionListFromClass{Solutions: sols}, nil
 }
 
-func (us *Store) GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error) {
-	var tmp int
-	row := us.db.QueryRow(
-		`SELECT 1 FROM homeworks WHERE id = $1`,
-		hwID,
-	)
-	err := row.Scan(&tmp)
-	if err != nil {
-		return nil, e.StacktraceError(err)
-	}
-
-	rows, err := us.db.Query(
+func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
+	rows, err := s.db.Query(
 		`SELECT id, studentID, text, time, file FROM solutions WHERE hwID = $1;`,
 		hwID,
 	)
@@ -401,29 +391,34 @@ func (us *Store) GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error) {
 	}
 	defer rows.Close()
 
-	sols := []*model.SolutionForHw{}
+	var sols []*model.SolutionForHw
 	for rows.Next() {
-		tmpSol := model.SolutionForHw{}
-		err := rows.Scan(
-			&tmpSol.ID, &tmpSol.StudentID, &tmpSol.Text, &tmpSol.Time, &tmpSol.File,
-		)
-		if err != nil {
+		var tmpSol model.SolutionForHw
+
+		if err := rows.Scan(
+			&tmpSol.ID, &tmpSol.StudentID,
+			&tmpSol.Text, &tmpSol.Time, &tmpSol.File,
+		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
+
 		sols = append(sols, &tmpSol)
 	}
 
-	return &model.SolutionsForHw{Solutions: sols}, nil
+	return &model.SolutionListForHw{Solutions: sols}, nil
 }
 
-func (us *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
-	row := us.db.QueryRow(
+func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
+	row := s.db.QueryRow(
 		`SELECT hwID, studentID, text, time, file FROM solutions WHERE id = $1;`,
 		id,
 	)
-	sol := model.SolutionByID{}
-	err := row.Scan(&sol.HwID, &sol.StudentID, &sol.Text, &sol.Time, &sol.File)
-	if err != nil {
+	var sol model.SolutionByID
+
+	if err := row.Scan(
+		&sol.HwID, &sol.StudentID,
+		&sol.Text, &sol.Time, &sol.File,
+	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 

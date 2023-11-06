@@ -11,7 +11,7 @@ type SolutionFromClass struct {
 	File      string    `json:"file"`
 }
 
-type SolutionsFromClass struct {
+type SolutionListFromClass struct {
 	Solutions []*SolutionFromClass `json:"solutions"`
 }
 
@@ -23,7 +23,7 @@ type SolutionForHw struct {
 	File      string    `json:"file"`
 }
 
-type SolutionsForHw struct {
+type SolutionListForHw struct {
 	Solutions []*SolutionForHw `json:"solutions"`
 }
 

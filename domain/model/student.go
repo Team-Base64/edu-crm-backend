@@ -6,6 +6,6 @@ type Student struct {
 	SocialType string `json:"socialType"`
 }
 
-type StudentsFromClass struct {
+type StudentListFromClass struct {
 	Students []*Student `json:"students"`
 }

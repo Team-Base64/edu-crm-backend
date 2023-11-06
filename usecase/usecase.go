@@ -13,15 +13,15 @@ type UsecaseInterface interface {
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetChatsByTeacherID(id int) (*model.ChatPreviewList, error)
 	GetChatByID(id int) (*model.Chat, error)
-	GetClassesByTeacherID(id int) (*model.ClassesInfo, error)
+	GetClassesByTeacherID(id int) (*model.ClassInfoList, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
-	GetStudentsFromClass(classID int) (*model.StudentsFromClass, error)
+	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error)
-	GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error)
+	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
+	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 }
 
@@ -73,29 +73,29 @@ func (uc *Usecase) GetChatByID(id int) (*model.Chat, error) {
 	return chat, nil
 }
 
-func (api *Usecase) GetClassesByTeacherID(id int) (*model.ClassesInfo, error) {
-	classes, err := api.store.GetClassesByID(id)
+func (uc *Usecase) GetClassesByTeacherID(id int) (*model.ClassInfoList, error) {
+	classes, err := uc.store.GetClassesByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return classes, nil
 }
 
-func (api *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
-	class, err := api.store.GetClassByID(id)
+func (uc *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
+	class, err := uc.store.GetClassByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return class, nil
 }
 
-func (api *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error) {
-	for i := range api.bufToken {
-		api.bufToken[i] = api.letters[rand.Intn(len(api.letters))]
+func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error) {
+	for i := range uc.bufToken {
+		uc.bufToken[i] = uc.letters[rand.Intn(len(uc.letters))]
 	}
-	inviteToken := string(api.bufToken)
+	inviteToken := string(uc.bufToken)
 
-	id, err := api.store.AddClass(teacherID, inviteToken, newClass)
+	id, err := uc.store.AddClass(teacherID, inviteToken, newClass)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -108,56 +108,76 @@ func (api *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*mo
 	return &res, nil
 }
 
-func (api *Usecase) GetStudentsFromClass(classID int) (*model.StudentsFromClass, error) {
-	students, err := api.store.GetStudentsFromClass(classID)
+func (uc *Usecase) GetStudentsFromClass(classID int) (*model.StudentListFromClass, error) {
+	if err := uc.store.CheckClassExistence(classID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	students, err := uc.store.GetStudentsFromClass(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return students, nil
 }
 
-func (api *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
-	feed, err := api.store.GetClassFeed(classID)
+func (uc *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
+	if err := uc.store.CheckClassExistence(classID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	feed, err := uc.store.GetClassFeed(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return feed, nil
 }
 
-func (api *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworksFromClass, error) {
-	hws, err := api.store.GetHomeworksByClassID(classID)
+func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
+	if err := uc.store.CheckClassExistence(classID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	hws, err := uc.store.GetHomeworksByClassID(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return hws, nil
 }
 
-func (api *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
-	hw, err := api.store.GetHomeworkByID(id)
+func (uc *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
+	hw, err := uc.store.GetHomeworkByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return hw, nil
 }
 
-func (api *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionsFromClass, error) {
-	sols, err := api.store.GetSolutionsByClassID(classID)
+func (uc *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
+	if err := uc.store.CheckClassExistence(classID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	sols, err := uc.store.GetSolutionsByClassID(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return sols, nil
 }
 
-func (api *Usecase) GetSolutionsByHwID(hwID int) (*model.SolutionsForHw, error) {
-	sols, err := api.store.GetSolutionsByHwID(hwID)
+func (uc *Usecase) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
+	if err := uc.store.CheckHomeworkExistence(hwID); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	sols, err := uc.store.GetSolutionsByHwID(hwID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	return sols, nil
 }
 
-func (api *Usecase) GetSolutionByID(id int) (*model.SolutionByID, error) {
-	sol, err := api.store.GetSolutionByID(id)
+func (uc *Usecase) GetSolutionByID(id int) (*model.SolutionByID, error) {
+	sol, err := uc.store.GetSolutionByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
