@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 
 	ctrl "main/controller"
 	"main/delivery"
@@ -39,10 +41,10 @@ func main() {
 
 	myRouter := mux.NewRouter()
 
-	urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
-	db, err := pgx.Connect(context.Background(), urlDB)
+	//urlDB := "postgres://" + conf.DBSPuser + ":" + conf.DBPassword + "@" + conf.DBHost + ":" + conf.DBPort + "/" + conf.DBName
+	//db, err := pgx.Connect(context.Background(), urlDB)
 
-	//db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
+	db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Fatalln("could not connect to database")
 	}
@@ -55,19 +57,14 @@ func main() {
 
 	Store := repository.NewStore(db)
 
-	// tokenLen, err := strconv.Atoi(os.Getenv(conf.TokenLenght))
-	// if err != nil {
-	// 	log.Fatalln("could not get token length from env")
-	// }
-	// tokenLetters, exist := os.LookupEnv(conf.TokenLetters)
-	// if !exist || len(tokenLetters) == 0 {
-	// 	log.Fatalln("could not get token letters from env")
-	// }
-
-	var TOKEN_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	var TOKEN_LENGTH = 8
-	tokenLen := TOKEN_LENGTH
-	tokenLetters := TOKEN_LETTERS
+	tokenLen, err := strconv.Atoi(os.Getenv(conf.TokenLenght))
+	if err != nil {
+		log.Fatalln("could not get token length from env")
+	}
+	tokenLetters, exist := os.LookupEnv(conf.TokenLetters)
+	if !exist || len(tokenLetters) == 0 {
+		log.Fatalln("could not get token letters from env")
+	}
 
 	grcpConnChat, err := grpc.Dial(
 		//"chat:8082", так будет в докере
@@ -83,7 +80,6 @@ func main() {
 
 	var chatManager ctrl.BotChatClient = ctrl.NewBotChatClient(grcpConnChat)
 
-	// TODO Нужно создать grpc клиента и отдать в usecase
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
