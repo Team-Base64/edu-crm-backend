@@ -114,7 +114,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	}
 	defer rows.Close()
 
-	var messages []*model.Message
+	messages := []*model.Message{}
 	for rows.Next() {
 		var tmpMsg model.Message
 		var tmpAttaches pgtype.TextArray
@@ -147,7 +147,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	}
 	defer rows.Close()
 
-	var chats []*model.ChatPreview
+	chats := []*model.ChatPreview{}
 	for rows.Next() {
 		var tmpID int
 		if err := rows.Scan(&tmpID); err != nil {
@@ -191,7 +191,7 @@ func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 	}
 	defer rows.Close()
 
-	var classes []*model.ClassInfo
+	classes := []*model.ClassInfo{}
 	for rows.Next() {
 		var tmpClass model.ClassInfo
 
@@ -253,7 +253,7 @@ func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, 
 		return nil, e.StacktraceError(err)
 	}
 
-	var students []*model.Student
+	students := []*model.Student{}
 	for rows.Next() {
 		var tmpStudent model.Student
 
@@ -280,7 +280,7 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	}
 	defer rows.Close()
 
-	var posts []*model.Post
+	posts := []*model.Post{}
 	for rows.Next() {
 		var tmpPost model.Post
 		var tmpAttaches pgtype.TextArray
@@ -315,7 +315,7 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass
 	}
 	defer rows.Close()
 
-	var hws []*model.HomeworkFromClass
+	hws := []*model.HomeworkFromClass{}
 	for rows.Next() {
 		var tmpHw model.HomeworkFromClass
 
@@ -364,7 +364,7 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 	}
 	defer rows.Close()
 
-	var sols []*model.SolutionFromClass
+	sols := []*model.SolutionFromClass{}
 	for rows.Next() {
 		var tmpSol model.SolutionFromClass
 
@@ -391,7 +391,7 @@ func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 	}
 	defer rows.Close()
 
-	var sols []*model.SolutionForHw
+	sols := []*model.SolutionForHw{}
 	for rows.Next() {
 		var tmpSol model.SolutionForHw
 
