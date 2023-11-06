@@ -62,10 +62,13 @@ func main() {
 	if !exist || len(tokenLetters) == 0 {
 		log.Fatalln("could not get token letters from env")
 	}
+
+	// TODO Нужно создать grpc клиента и отдать в usecase
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
 		tokenLen,
+		// grpcClient,
 	)
 
 	Handler := delivery.NewHandler(Usecase)

@@ -15,13 +15,13 @@ var ErrNotFound404 = errors.New("not found - Requested entity is not found in da
 var ErrConflict409 = errors.New("conflict - UserDB already exists")
 var ErrServerError500 = errors.New("internal server error - Request is valid but operation failed at server side")
 
-func StacktraceError(err error) error {
+func StacktraceError(errs ...error) error {
 	_, file, line, ok := runtime.Caller(1)
 	if !ok {
-		return err
+		return errs[0]
 	}
 	return errors.Join(
-		err,
+		errors.Join(errs...),
 		errors.New("				at "+file+":"+strconv.Itoa(line)),
 	)
 }

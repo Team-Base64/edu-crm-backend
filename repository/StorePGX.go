@@ -24,9 +24,11 @@ type StoreInterface interface {
 	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
 	AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error)
+	DeletePost(id int) error
 	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error)
+	DeleteHomework(id int) error
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -334,6 +336,20 @@ func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCr
 	return int(id), nil
 }
 
+func (s *Store) DeletePost(id int) error {
+	_, err := s.db.Exec(
+		context.Background(),
+		`DELETE FROM posts WHERE id = $1;`,
+		id,
+	)
+
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
+}
+
 func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
 	rows, err := s.db.Query(
 		context.Background(),
@@ -399,6 +415,20 @@ func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (
 	}
 
 	return int(id), nil
+}
+
+func (s *Store) DeleteHomework(id int) error {
+	_, err := s.db.Exec(
+		context.Background(),
+		`DELETE FROM homeworks WHERE id = $1;`,
+		id,
+	)
+
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
 }
 
 func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {

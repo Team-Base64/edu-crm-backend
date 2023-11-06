@@ -28,19 +28,23 @@ type UsecaseInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 }
 
+// XXX
 type Usecase struct {
 	store    rep.StoreInterface
 	letters  []rune
 	tokenLen int
 	bufToken []rune
+	// chatService ctrl.ChatServiceInterface
 }
 
-func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int) UsecaseInterface {
+// XXX
+func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int) UsecaseInterface { //cs ctrl.ChatServiceInterface) UsecaseInterface {
 	return &Usecase{
 		store:    s,
 		letters:  []rune(lettes),
 		tokenLen: tokenLen,
 		bufToken: make([]rune, tokenLen),
+		// chatService: cs,
 	}
 }
 
@@ -145,7 +149,16 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 		return nil, e.StacktraceError(err)
 	}
 
-	// TODO отравить на сервис чата броудкаст, если не успешно, то удалить пост из базы
+	// XXX
+	// bcMsg := model.ClassBroudcastMessage{
+	// 	ClassID:     classID,
+	// 	Title:       "Внимание! Сообщение от преподавателя.",
+	// 	Description: newPost.Text,
+	// 	Attaches:    newPost.Attaches,
+	// }
+	// if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+	// 	return nil, e.StacktraceError(err, uc.store.DeletePost(id))
+	// }
 
 	res := model.PostCreateResponse{
 		ID:   id,
@@ -184,7 +197,17 @@ func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkC
 		return nil, e.StacktraceError(err)
 	}
 
-	// TODO отравить на сервис чата броудкаст, если не успешно, то удалить пост из базы
+	// XXX
+	// bcMsg := model.ClassBroudcastMessage{
+	// 	ClassID:      newHw.ClassID,
+	// 	Title:        "Внимание! Выдано домашнее задание: " + newHw.Title,
+	// 	Description:  newHw.Description,
+	// 	DeadlineTime: newHw.DeadlineTime,
+	// 	Attaches:     []string{newHw.File},
+	// }
+	// if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+	// 	return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
+	// }
 
 	res := model.HomeworkCreateResponse{
 		ID:         id,
