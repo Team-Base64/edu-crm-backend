@@ -23,10 +23,10 @@ type StoreInterface interface {
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
-	AddPost(classID int, time time.Time, newPost *model.PostCreate) (int, error)
+	AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	AddHomework(time time.Time, newHw *model.HomeworkCreate) (int, error)
+	AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -112,7 +112,7 @@ func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT id, text, isAuthorTeacher, attaches, time, isRead FROM messages
+		`SELECT id, text, isAuthorTeacher, attaches, createTime, isRead FROM messages
 		 WHERE chatID = $1;`,
 		id,
 	)
@@ -129,7 +129,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 		if err := rows.Scan(
 			&tmpMsg.ID, &tmpMsg.Text,
 			&tmpMsg.IsAuthorTeacher, &tmpMsg.Attaches,
-			&tmpMsg.Time, &tmpMsg.IsRead,
+			&tmpMsg.CreateTime, &tmpMsg.IsRead,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -170,7 +170,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 		row := s.db.QueryRow(
 			context.Background(),
-			`SELECT text, time, isRead FROM messages
+			`SELECT text, createTime, isRead FROM messages
 			 WHERE chatID = $1
 			 ORDER BY id DESC
 			 LIMIT 1;`,
@@ -286,7 +286,7 @@ func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, 
 func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT id, text, attaches, time FROM posts WHERE classID = $1;`,
+		`SELECT id, text, attaches, createTime FROM posts WHERE classID = $1;`,
 		classID,
 	)
 	if err != nil {
@@ -301,7 +301,7 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 
 		if err := rows.Scan(
 			&tmpPost.ID, &tmpPost.Text,
-			&tmpPost.Attaches, &tmpPost.Time,
+			&tmpPost.Attaches, &tmpPost.CreateTime,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -317,13 +317,13 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	return &model.Feed{Posts: posts}, nil
 }
 
-func (s *Store) AddPost(classID int, time time.Time, newPost *model.PostCreate) (int, error) {
+func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error) {
 	row := s.db.QueryRow(
 		context.Background(),
-		`INSERT INTO posts (classID, text, attaches, time)
+		`INSERT INTO posts (classID, text, attaches, createTime)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
-		classID, newPost.Text, newPost.Attaches, time,
+		classID, newPost.Text, newPost.Attaches, createTime,
 	)
 
 	var id int
@@ -384,13 +384,13 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	return &hw, nil
 }
 
-func (s *Store) AddHomework(time time.Time, newHw *model.HomeworkCreate) (int, error) {
+func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
 	row := s.db.QueryRow(
 		context.Background(),
 		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime, file)
 		 VALUES ($1, $2, $3, $4, $5, $6)
 		 RETURNING id;`,
-		newHw.ClassID, newHw.Title, newHw.Description, time, newHw.DeadlineTime, newHw.File,
+		newHw.ClassID, newHw.Title, newHw.Description, createTime, newHw.DeadlineTime, newHw.File,
 	)
 
 	var id int
@@ -404,7 +404,7 @@ func (s *Store) AddHomework(time time.Time, newHw *model.HomeworkCreate) (int, e
 func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT s.id, s.hwID, s.studentID, s.text, s.time, s.file
+		`SELECT s.id, s.hwID, s.studentID, s.text, s.createTime, s.file
 		 FROM solutions s
 		 JOIN homeworks h ON s.hwID = h.id
 		 WHERE h.classID = $1;`,
@@ -421,7 +421,7 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 
 		if err := rows.Scan(
 			&tmpSol.ID, &tmpSol.HwID, &tmpSol.StudentID,
-			&tmpSol.Text, &tmpSol.Time, &tmpSol.File,
+			&tmpSol.Text, &tmpSol.CreateTime, &tmpSol.File,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -435,7 +435,7 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT id, studentID, text, time, file FROM solutions WHERE hwID = $1;`,
+		`SELECT id, studentID, text, createTime, file FROM solutions WHERE hwID = $1;`,
 		hwID,
 	)
 	if err != nil {
@@ -449,7 +449,7 @@ func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 
 		if err := rows.Scan(
 			&tmpSol.ID, &tmpSol.StudentID,
-			&tmpSol.Text, &tmpSol.Time, &tmpSol.File,
+			&tmpSol.Text, &tmpSol.CreateTime, &tmpSol.File,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -463,14 +463,14 @@ func (s *Store) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
 func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	row := s.db.QueryRow(
 		context.Background(),
-		`SELECT hwID, studentID, text, time, file FROM solutions WHERE id = $1;`,
+		`SELECT hwID, studentID, text, createTime, file FROM solutions WHERE id = $1;`,
 		id,
 	)
 	var sol model.SolutionByID
 
 	if err := row.Scan(
 		&sol.HwID, &sol.StudentID,
-		&sol.Text, &sol.Time, &sol.File,
+		&sol.Text, &sol.CreateTime, &sol.File,
 	); err != nil {
 		return nil, e.StacktraceError(err)
 	}

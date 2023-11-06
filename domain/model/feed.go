@@ -3,10 +3,10 @@ package model
 import "time"
 
 type Post struct {
-	ID       int       `json:"id"`
-	Text     string    `json:"text"`
-	Attaches []string  `json:"attaches,omitempty"`
-	Time     time.Time `json:"time"`
+	ID         int       `json:"id"`
+	Text       string    `json:"text"`
+	Attaches   []string  `json:"attaches,omitempty"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 type Feed struct {
