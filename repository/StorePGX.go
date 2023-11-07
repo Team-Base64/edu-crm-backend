@@ -121,7 +121,6 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	messages := []*model.Message{}
 	for rows.Next() {
 		var tmpMsg model.Message
-		// var tmpAttaches pgtype.TextArray
 
 		if err := rows.Scan(
 			&tmpMsg.ID, &tmpMsg.Text,
@@ -131,11 +130,6 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		// tmpMsg.Attaches = make([]string, len(tmpAttaches.Elements))
-		// for idx, el := range tmpAttaches.Elements {
-		// 	tmpMsg.Attaches[idx] = el.String
-		// }
-
 		messages = append(messages, &tmpMsg)
 	}
 	return &model.Chat{Messages: messages}, nil
@@ -144,7 +138,12 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT id FROM chats WHERE teacherID = $1;`,
+		`SELECT m1.chatID, m1.text, m1.createTime, m1.isRead
+		 FROM messages m1
+		 LEFT JOIN messages m2
+		 ON m1.chatId = m2.chatId AND m1.createTime < m2.createTime
+		 JOIN chats c ON m1.chatID = c.id
+		 WHERE m2.chatID IS NULL AND c.teacherID = $1 ORDER BY m1.createTime DESC;`,
 		teacherID,
 	)
 	if err != nil {
@@ -154,25 +153,14 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 	chats := []*model.ChatPreview{}
 	for rows.Next() {
-		var tmpID int
-		if err := rows.Scan(&tmpID); err != nil {
-			return nil, e.StacktraceError(err)
-		}
-
 		tmpChat := model.ChatPreview{
-			ChatID: tmpID,
-			Name:   "mockName",
-			Img:    "mockImg",
+			// HACK Может это лучше фронт сам отдельным запросом получает? А мы ему id студента собеседника вернем
+			Name: "mockName",
+			Img:  "mockImg",
 		}
 
-		if err = s.db.QueryRow(
-			context.Background(),
-			`SELECT text, createTime, isRead FROM messages
-			 WHERE chatID = $1
-			 ORDER BY id DESC
-			 LIMIT 1;`,
-			tmpID,
-		).Scan(
+		if err = rows.Scan(
+			&tmpChat.ChatID,
 			&tmpChat.LastMessageText,
 			&tmpChat.LastMessageDate,
 			&tmpChat.IsRead,
@@ -288,7 +276,6 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	posts := []*model.Post{}
 	for rows.Next() {
 		var tmpPost model.Post
-		// var tmpAttaches pgtype.TextArray
 
 		if err := rows.Scan(
 			&tmpPost.ID, &tmpPost.Text,
@@ -296,11 +283,6 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
-
-		// tmpPost.Attaches = make([]string, len(tmpAttaches.Elements))
-		// for idx, el := range tmpAttaches.Elements {
-		// 	tmpPost.Attaches[idx] = el.String
-		// }
 
 		posts = append(posts, &tmpPost)
 	}
