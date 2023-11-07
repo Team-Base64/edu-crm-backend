@@ -35,7 +35,6 @@ type Usecase struct {
 	tokenLen    int
 	bufToken    []rune
 	chatService ctrl.ChatServiceInterface
-	// chatService ctrl.BotChatClient
 }
 
 func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface) UsecaseInterface {
@@ -63,6 +62,7 @@ func (uc *Usecase) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 func (uc *Usecase) GetChatsByTeacherID(id int) (*model.ChatPreviewList, error) {
 	chat, err := uc.store.GetChatsByTeacherID(id)
 	if err != nil {
+
 		return nil, e.StacktraceError(err)
 	}
 	return chat, nil
@@ -148,18 +148,6 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	// _, err = uc.chatService.BroadcastMsg(
-	// 	context.Background(),
-	// 	&ctrl.BroadcastMessage{
-	// 		ClassID:        int32(classID),
-	// 		Title:          "Внимание! Сообщение от преподавателя.",
-	// 		Description:    newPost.Text,
-	// 		AttachmentURLs: newPost.Attaches,
-	// 	})
-
-	// if err != nil {
-	// 	return nil, e.StacktraceError(err)
-	// }
 
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID:     classID,
@@ -207,19 +195,6 @@ func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkC
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-
-	// _, err = uc.chatService.BroadcastMsg(
-	// 	context.Background(),
-	// 	&ctrl.BroadcastMessage{
-	// 		ClassID:        int32(newHw.ClassID),
-	// 		Title:          "Внимание! Выдано домашнее задание: " + newHw.Title,
-	// 		Description:    newHw.Description + "\n" + "Deadline: " + newHw.DeadlineTime.String(),
-	// 		AttachmentURLs: []string{newHw.File},
-	// 	})
-
-	// if err != nil {
-	// 	return nil, e.StacktraceError(err)
-	// }
 
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID:     newHw.ClassID,

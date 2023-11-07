@@ -68,10 +68,9 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Println("cant connect to grpc chat")
-	} else {
-		log.Println("connected to grpc chat service")
+		log.Fatalln("cant create connecter to grpc chat")
 	}
+	log.Println("connecter to grpc chat service is created")
 	defer grcpConnChat.Close()
 
 	ChatService := ctrl.NewChatService(ctrl.NewBotChatClient(grcpConnChat))

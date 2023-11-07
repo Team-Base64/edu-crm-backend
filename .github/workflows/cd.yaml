@@ -5,7 +5,6 @@ on: push
 env:
   IMAGE: "ghcr.io/team-base64/edu-crm-backend-app"
   CONTAINER: "backend"
-  ENV_FILE: ".backend-env"
 
 permissions:
   contents: read
@@ -41,8 +40,10 @@ jobs:
           script_stop: true
           script: |
             cd ${{ secrets.TARGET_DOCKER_COMPOSE }}
-            echo "${{ secrets.BACKEND_ENV }}" > ${{ env.ENV_FILE }}
-            sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ env.ENV_FILE }}
-            docker compose pull --parallel ${{ env.CONTAINER }}
-            docker compose up -d --no-deps --force-recreate ${{ env.CONTAINER }}
+            echo "${{ secrets.BACKEND_ENV }}" > ${{ vars.ENV_FILE_BACKEND }}
+            sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.ENV_FILE_BACKEND }}
+            docker compose stop
+            docker compose pull ${{ env.CONTAINER }}
+            docker compose create ${{ env.CONTAINER }}
+            docker compose start
             docker system prune -af --volumes
