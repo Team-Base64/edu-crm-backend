@@ -6,6 +6,7 @@ type ChatPreview struct {
 	ChatID          int       `json:"chatid"`
 	Name            string    `json:"name"`
 	Img             string    `json:"cover"`
+	SocialType      string    `json:"socialType"`
 	IsRead          bool      `json:"isread"`
 	LastMessageText string    `json:"lastmessagetext"`
 	LastMessageDate time.Time `json:"lastmessagedate"`

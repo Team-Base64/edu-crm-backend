@@ -138,11 +138,12 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
 	rows, err := s.db.Query(
 		context.Background(),
-		`SELECT m1.chatID, m1.text, m1.createTime, m1.isRead
+		`SELECT m1.chatID, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
 		 FROM messages m1
 		 LEFT JOIN messages m2
 		 ON m1.chatId = m2.chatId AND m1.createTime < m2.createTime
 		 JOIN chats c ON m1.chatID = c.id
+		 JOIN students s ON c.studentID = s.id
 		 WHERE m2.chatID IS NULL AND c.teacherID = $1 ORDER BY m1.createTime DESC;`,
 		teacherID,
 	)
@@ -154,13 +155,13 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	chats := []*model.ChatPreview{}
 	for rows.Next() {
 		tmpChat := model.ChatPreview{
-			// HACK Может это лучше фронт сам отдельным запросом получает? А мы ему id студента собеседника вернем
-			Name: "mockName",
-			Img:  "mockImg",
+			Img: "mockImg",
 		}
 
 		if err = rows.Scan(
 			&tmpChat.ChatID,
+			&tmpChat.Name,
+			&tmpChat.SocialType,
 			&tmpChat.LastMessageText,
 			&tmpChat.LastMessageDate,
 			&tmpChat.IsRead,
