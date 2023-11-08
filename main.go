@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -19,8 +19,6 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"github.com/jackc/pgx/v5"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -41,13 +39,14 @@ func main() {
 
 	myRouter := mux.NewRouter()
 
-	db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
+	//db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
+	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Fatalln("could not connect to database")
 	}
-	defer db.Close(context.Background())
+	defer db.Close()
 
-	if err := db.Ping(context.Background()); err != nil {
+	if err := db.Ping(); err != nil {
 		log.Fatalln("unable to reach database ", err)
 	}
 	log.Println("database is reachable")
