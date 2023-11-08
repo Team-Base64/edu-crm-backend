@@ -8,8 +8,8 @@ type ChatPreview struct {
 	Img             string    `json:"cover"`
 	SocialType      string    `json:"socialType"`
 	IsRead          bool      `json:"isread"`
-	LastMessageText string    `json:"lastmessagetext"`
-	LastMessageDate time.Time `json:"lastmessagedate"`
+	LastMessageText string    `json:"text"`
+	LastMessageDate time.Time `json:"date"`
 }
 
 type ChatPreviewList struct {

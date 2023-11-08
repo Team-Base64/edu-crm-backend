@@ -7,6 +7,6 @@ type Message struct {
 	Text            string    `json:"text"`
 	IsAuthorTeacher bool      `json:"ismine"`
 	Attaches        []string  `json:"attaches,omitempty"`
-	CreateTime      time.Time `json:"createTime"`
+	CreateTime      time.Time `json:"date"`
 	IsRead          bool      `json:"isread"`
 }
