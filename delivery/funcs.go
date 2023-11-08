@@ -74,6 +74,10 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&model.Response{})
 }
 
+type T struct {
+	ID model.TeacherProfile `json:"teacher"`
+}
+
 // GetTeacher godoc
 // @Summary Get teacher's info
 // @Description gets teacher's info
@@ -92,7 +96,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(teacher)
+	json.NewEncoder(w).Encode(T{ID: *teacher})
 }
 
 // GetChats godoc
@@ -169,6 +173,10 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(classes)
 }
 
+type Cl struct {
+	ID model.ClassInfo `json:"class"`
+}
+
 // GetClasses godoc
 // @Summary Get class by id
 // @Description Get class by id
@@ -196,7 +204,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 		ReturnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(class)
+	json.NewEncoder(w).Encode(Cl{ID: *class})
 }
 
 // CreateClass godoc
@@ -365,6 +373,10 @@ func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(hws)
 }
 
+type Hw struct {
+	ID model.HomeworkByID `json:"homework"`
+}
+
 // GetHomework godoc
 // @Summary Get homework
 // @Description Get homework by id
@@ -394,7 +406,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(hw)
+	json.NewEncoder(w).Encode(Hw{ID: *hw})
 }
 
 // CreateHomework godoc
@@ -492,6 +504,10 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(sols)
 }
 
+type Sol struct {
+	ID model.SolutionByID `json:"solution"`
+}
+
 // GetSolution godoc
 // @Summary Get solution
 // @Description Get solution by id
@@ -521,5 +537,41 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(sol)
+	json.NewEncoder(w).Encode(Sol{ID: *sol})
+}
+
+type St struct {
+	ID model.StudentByID `json:"student"`
+}
+
+// GetStudent godoc
+// @Summary Get student
+// @Description Get student by id
+// @ID getStudent
+// @Accept  json
+// @Produce  json
+// @Param studentID path string true "StudentID id"
+// @Success 200 {object} model.StudentByID
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /students/{studentID} [get]
+func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	solID, err := strconv.Atoi(path[len(path)-1])
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	sol, err := api.usecase.GetStudentByID(solID)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		ReturnErrorJSON(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(St{ID: *sol})
 }

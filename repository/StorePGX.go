@@ -34,6 +34,7 @@ type StoreInterface interface {
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
+	GetStudentByID(id int) (*model.StudentByID, error)
 }
 
 type Store struct {
@@ -293,9 +294,9 @@ func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, 
 		return nil, e.StacktraceError(err)
 	}
 
-	students := []*model.Student{}
+	students := []*model.StudentFromClass{}
 	for rows.Next() {
-		var tmpStudent model.Student
+		var tmpStudent model.StudentFromClass
 
 		if err := rows.Scan(
 			&tmpStudent.ID,
@@ -326,7 +327,7 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 
 		if err := rows.Scan(
 			&tmpPost.ID, &tmpPost.Text,
-			&tmpPost.Attaches, &tmpPost.CreateTime,
+			(*pq.StringArray)(&tmpPost.Attaches), &tmpPost.CreateTime,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -344,7 +345,7 @@ func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCr
 		`INSERT INTO posts (classID, text, attaches, createTime)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id;`,
-		classID, newPost.Text, newPost.Attaches, createTime,
+		classID, newPost.Text, (*pq.StringArray)(&newPost.Attaches), createTime,
 	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
@@ -515,4 +516,19 @@ func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	}
 
 	return &sol, nil
+}
+
+func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
+	var stud model.StudentByID
+	if err := s.db.QueryRow(
+
+		`SELECT name, socialType FROM students WHERE id = $1;`,
+		id,
+	).Scan(
+		&stud.Name, &stud.SocialType,
+	); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return &stud, nil
 }

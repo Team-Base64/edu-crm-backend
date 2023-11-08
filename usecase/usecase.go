@@ -27,6 +27,7 @@ type UsecaseInterface interface {
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
+	GetStudentByID(id int) (*model.StudentByID, error)
 }
 
 type Usecase struct {
@@ -239,6 +240,14 @@ func (uc *Usecase) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error
 
 func (uc *Usecase) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	sol, err := uc.store.GetSolutionByID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return sol, nil
+}
+
+func (uc *Usecase) GetStudentByID(id int) (*model.StudentByID, error) {
+	sol, err := uc.store.GetStudentByID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}

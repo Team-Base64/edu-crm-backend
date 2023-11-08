@@ -104,6 +104,8 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathSolution, Handler.GetSolution).Methods(http.MethodGet, http.MethodOptions)
 
+	myRouter.HandleFunc(conf.PathStudent, Handler.GetStudent).Methods(http.MethodGet, http.MethodOptions)
+
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)
 
