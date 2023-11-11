@@ -39,7 +39,6 @@ func main() {
 
 	myRouter := mux.NewRouter()
 
-	//db, err := pgx.Connect(context.Background(), os.Getenv(conf.UrlDB))
 	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
 	if err != nil {
 		log.Fatalln("could not connect to database")
