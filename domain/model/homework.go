@@ -39,8 +39,3 @@ type HomeworkCreate struct {
 	DeadlineTime time.Time `json:"deadlineTime"`
 	File         string    `json:"file"`
 }
-
-// type HomeworkCreateResponse struct {
-// 	ID         int       `json:"id"`
-// 	CreateTime time.Time `json:"createTime"`
-// }
