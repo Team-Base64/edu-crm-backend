@@ -34,3 +34,7 @@ type SolutionByID struct {
 	CreateTime time.Time `json:"createTime"`
 	File       string    `json:"file"`
 }
+
+type SolutionByIDResponse struct {
+	Solution SolutionByID `json:"solution"`
+}

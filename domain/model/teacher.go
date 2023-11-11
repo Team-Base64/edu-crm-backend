@@ -9,3 +9,7 @@ type TeacherSignUp struct {
 type TeacherProfile struct {
 	Name string `json:"name"`
 }
+
+type TeacherProfileResponse struct {
+	Teacher TeacherProfile `json:"teacher"`
+}

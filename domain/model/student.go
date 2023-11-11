@@ -14,3 +14,7 @@ type StudentByID struct {
 	Name       string `json:"name"`
 	SocialType string `json:"socialType"`
 }
+
+type StudentByIDResponse struct {
+	Student StudentByID `json:"student"`
+}

@@ -7,6 +7,10 @@ type ClassInfo struct {
 	InviteToken string `json:"inviteToken"`
 }
 
+type ClassInfoResponse struct {
+	Class ClassInfo `json:"class"`
+}
+
 type ClassInfoList struct {
 	Classes []*ClassInfo `json:"classes,omitempty"`
 }

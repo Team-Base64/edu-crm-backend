@@ -74,17 +74,13 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&model.Response{})
 }
 
-type T struct {
-	ID model.TeacherProfile `json:"teacher"`
-}
-
 // GetTeacher godoc
 // @Summary Get teacher's info
 // @Description gets teacher's info
 // @ID getTeacher
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.TeacherProfile
+// @Success 200 {object} model.TeacherProfileResponse
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /profile [get]
@@ -96,7 +92,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(T{ID: *teacher})
+	json.NewEncoder(w).Encode(model.TeacherProfileResponse{Teacher: *teacher})
 }
 
 // GetChats godoc
@@ -173,10 +169,6 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(classes)
 }
 
-type Cl struct {
-	ID model.ClassInfo `json:"class"`
-}
-
 // GetClasses godoc
 // @Summary Get class by id
 // @Description Get class by id
@@ -184,7 +176,7 @@ type Cl struct {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.ClassInfo
+// @Success 200 {object} model.ClassInfoResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -204,7 +196,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 		ReturnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(Cl{ID: *class})
+	json.NewEncoder(w).Encode(model.ClassInfoResponse{Class: *class})
 }
 
 // CreateClass godoc
@@ -373,10 +365,6 @@ func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(hws)
 }
 
-type Hw struct {
-	ID model.HomeworkByID `json:"homework"`
-}
-
 // GetHomework godoc
 // @Summary Get homework
 // @Description Get homework by id
@@ -384,7 +372,7 @@ type Hw struct {
 // @Accept  json
 // @Produce  json
 // @Param hwID path string true "Homework id"
-// @Success 200 {object} model.HomeworkByID
+// @Success 200 {object} model.HomeworkByIDResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -406,7 +394,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(Hw{ID: *hw})
+	json.NewEncoder(w).Encode(model.HomeworkByIDResponse{Homework: *hw})
 }
 
 // CreateHomework godoc
@@ -504,10 +492,6 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(sols)
 }
 
-type Sol struct {
-	ID model.SolutionByID `json:"solution"`
-}
-
 // GetSolution godoc
 // @Summary Get solution
 // @Description Get solution by id
@@ -515,7 +499,7 @@ type Sol struct {
 // @Accept  json
 // @Produce  json
 // @Param solID path string true "Solution id"
-// @Success 200 {object} model.SolutionByID
+// @Success 200 {object} model.SolutionByIDResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -537,11 +521,7 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(Sol{ID: *sol})
-}
-
-type St struct {
-	ID model.StudentByID `json:"student"`
+	json.NewEncoder(w).Encode(model.SolutionByIDResponse{Solution: *sol})
 }
 
 // GetStudent godoc
@@ -551,7 +531,7 @@ type St struct {
 // @Accept  json
 // @Produce  json
 // @Param studentID path string true "StudentID id"
-// @Success 200 {object} model.StudentByID
+// @Success 200 {object} model.StudentByIDResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -566,12 +546,12 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sol, err := api.usecase.GetStudentByID(solID)
+	student, err := api.usecase.GetStudentByID(solID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		ReturnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(St{ID: *sol})
+	json.NewEncoder(w).Encode(model.StudentByIDResponse{Student: *student})
 }

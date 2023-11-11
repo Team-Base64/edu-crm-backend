@@ -24,6 +24,10 @@ type HomeworkByID struct {
 	File         string    `json:"file"`
 }
 
+type HomeworkByIDResponse struct {
+	Homework HomeworkByID `json:"homework"`
+}
+
 type HomeworkCreate struct {
 	ClassID      int       `json:"classID"`
 	Title        string    `json:"title"`
