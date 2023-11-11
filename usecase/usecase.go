@@ -242,7 +242,7 @@ func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.Homework,
 
 		if len(saveTask.Attach) != 0 {
 			pdf.Br(20)
-			if err := pdf.Image(saveTask.Attach, 50, 200, nil); err != nil {
+			if err := pdf.Image(saveTask.Attach[21:], 50, 200, nil); err != nil {
 				return nil, e.StacktraceError(err)
 			}
 		}

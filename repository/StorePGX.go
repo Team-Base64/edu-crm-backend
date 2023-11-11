@@ -328,7 +328,7 @@ func (s *Store) DeletePost(id int) error {
 
 func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) {
 	rows, err := s.db.Query(
-		`SELECT id, title, description, createTime, deadlineTime, file
+		`SELECT id, title, description, createTime, deadlineTime
 		 FROM homeworks
 		 WHERE classID = $1;`,
 		classID,
@@ -344,7 +344,7 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) 
 
 		if err := rows.Scan(
 			&tmpHw.ID, &tmpHw.Title, &tmpHw.Description,
-			&tmpHw.CreateTime, &tmpHw.DeadlineTime, &tmpHw.File,
+			&tmpHw.CreateTime, &tmpHw.DeadlineTime,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
