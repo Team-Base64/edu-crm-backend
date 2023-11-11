@@ -92,7 +92,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(model.TeacherProfileResponse{Teacher: *teacher})
+	json.NewEncoder(w).Encode(&model.TeacherProfileResponse{Teacher: *teacher})
 }
 
 // GetChats godoc
@@ -196,7 +196,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 		ReturnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(model.ClassInfoResponse{Class: *class})
+	json.NewEncoder(w).Encode(&model.ClassInfoResponse{Class: *class})
 }
 
 // CreateClass godoc
@@ -206,7 +206,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param class body model.ClassCreate true "Class for creating"
-// @Success 200 {object} model.ClassCreateResponse
+// @Success 200 {object} model.ClassInfoResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -220,13 +220,14 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := api.usecase.CreateClass(mockTeacherID, &newClass)
+	class, err := api.usecase.CreateClass(mockTeacherID, &newClass)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		ReturnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(res)
+
+	json.NewEncoder(w).Encode(&model.ClassInfoResponse{Class: *class})
 }
 
 // GetStudentsFromClass godoc
@@ -301,7 +302,7 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param classID path string true "Class id"
 // @Param post body model.PostCreate true "Post for creating"
-// @Success 200 {object} model.PostCreateResponse
+// @Success 200 {object} model.PostResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -323,14 +324,14 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := api.usecase.CreatePost(classID, &newPost)
+	post, err := api.usecase.CreatePost(classID, &newPost)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		ReturnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(&model.PostResponse{Post: *post})
 }
 
 // GetHomeworksFromClass godoc
@@ -340,7 +341,7 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.HomeworkListFromClass
+// @Success 200 {object} model.HomeworkList
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -394,7 +395,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(model.HomeworkByIDResponse{Homework: *hw})
+	json.NewEncoder(w).Encode(&model.HomeworkByIDResponse{Homework: *hw})
 }
 
 // CreateHomework godoc
@@ -404,7 +405,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param post body model.HomeworkCreate true "Homework for creating"
-// @Success 200 {object} model.HomeworkCreateResponse
+// @Success 200 {object} model.HomeworkResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
@@ -418,14 +419,14 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := api.usecase.CreateHomework(&newHw)
+	hw, err := api.usecase.CreateHomework(&newHw)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		ReturnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(&model.HomeworkResponse{Homework: *hw})
 }
 
 // GetSolutionsFromClass godoc
@@ -521,7 +522,7 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(model.SolutionByIDResponse{Solution: *sol})
+	json.NewEncoder(w).Encode(&model.SolutionByIDResponse{Solution: *sol})
 }
 
 // GetStudent godoc
@@ -553,5 +554,5 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(model.StudentByIDResponse{Student: *student})
+	json.NewEncoder(w).Encode(&model.StudentByIDResponse{Student: *student})
 }

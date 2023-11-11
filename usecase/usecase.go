@@ -17,13 +17,13 @@ type UsecaseInterface interface {
 	GetChatByID(id int) (*model.Chat, error)
 	GetClassesByTeacherID(id int) (*model.ClassInfoList, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
-	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error)
+	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error)
 	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
 	GetClassFeed(classID int) (*model.Feed, error)
-	CreatePost(classID int, newPost *model.PostCreate) (*model.PostCreateResponse, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
+	CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkCreateResponse, error)
+	CreateHomework(newHw *model.HomeworkCreate) (*model.Homework, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -97,7 +97,7 @@ func (uc *Usecase) GetClassByID(id int) (*model.ClassInfo, error) {
 	return class, nil
 }
 
-func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassCreateResponse, error) {
+func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error) {
 	for i := range uc.bufToken {
 		uc.bufToken[i] = uc.letters[rand.Intn(len(uc.letters))]
 	}
@@ -108,8 +108,10 @@ func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*mod
 		return nil, e.StacktraceError(err)
 	}
 
-	res := model.ClassCreateResponse{
+	res := model.ClassInfo{
 		ID:          id,
+		Title:       newClass.Title,
+		Description: newClass.Description,
 		InviteToken: inviteToken,
 	}
 
@@ -140,7 +142,7 @@ func (uc *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
 	return feed, nil
 }
 
-func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.PostCreateResponse, error) {
+func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -160,14 +162,16 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 		return nil, e.StacktraceError(err, uc.store.DeletePost(id))
 	}
 
-	res := model.PostCreateResponse{
-		ID:   id,
-		Time: createTime,
+	res := model.Post{
+		ID:         id,
+		Text:       newPost.Text,
+		Attaches:   newPost.Attaches,
+		CreateTime: createTime,
 	}
 	return &res, nil
 }
 
-func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
+func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -187,7 +191,7 @@ func (uc *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	return hw, nil
 }
 
-func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkCreateResponse, error) {
+func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.Homework, error) {
 	if err := uc.store.CheckClassExistence(newHw.ClassID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -207,9 +211,13 @@ func (uc *Usecase) CreateHomework(newHw *model.HomeworkCreate) (*model.HomeworkC
 		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 
-	res := model.HomeworkCreateResponse{
-		ID:         id,
-		CreateTime: createTime,
+	res := model.Homework{
+		ID:           id,
+		Title:        newHw.Title,
+		Description:  newHw.Description,
+		DeadlineTime: newHw.DeadlineTime,
+		CreateTime:   createTime,
+		File:         newHw.File,
 	}
 	return &res, nil
 }

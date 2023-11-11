@@ -18,7 +18,6 @@ type PostCreate struct {
 	Attaches []string `json:"attaches,omitempty"`
 }
 
-type PostCreateResponse struct {
-	ID   int       `json:"id"`
-	Time time.Time `json:"time"`
+type PostResponse struct {
+	Post Post `json:"post"`
 }

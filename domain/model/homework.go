@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type HomeworkFromClass struct {
+type Homework struct {
 	ID           int       `json:"id"`
 	Title        string    `json:"title"`
 	Description  string    `json:"description"`
@@ -11,8 +11,12 @@ type HomeworkFromClass struct {
 	File         string    `json:"file"`
 }
 
-type HomeworkListFromClass struct {
-	Homeworks []*HomeworkFromClass `json:"homeworks,omitempty"`
+type HomeworkList struct {
+	Homeworks []*Homework `json:"homeworks,omitempty"`
+}
+
+type HomeworkResponse struct {
+	Homework Homework `json:"homework"`
 }
 
 type HomeworkByID struct {
@@ -36,7 +40,7 @@ type HomeworkCreate struct {
 	File         string    `json:"file"`
 }
 
-type HomeworkCreateResponse struct {
-	ID         int       `json:"id"`
-	CreateTime time.Time `json:"createTime"`
-}
+// type HomeworkCreateResponse struct {
+// 	ID         int       `json:"id"`
+// 	CreateTime time.Time `json:"createTime"`
+// }

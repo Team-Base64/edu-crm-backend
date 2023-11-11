@@ -20,7 +20,7 @@ type ClassCreate struct {
 	Description string `json:"description,omitempty"`
 }
 
-type ClassCreateResponse struct {
-	ID          int    `json:"id"`
-	InviteToken string `json:"inviteToken"`
-}
+// type ClassCreateResponse struct {
+// 	ID          int    `json:"id"`
+// 	InviteToken string `json:"inviteToken"`
+// }

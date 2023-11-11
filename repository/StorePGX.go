@@ -27,7 +27,7 @@ type StoreInterface interface {
 	GetClassFeed(classID int) (*model.Feed, error)
 	AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error)
 	DeletePost(id int) error
-	GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error)
+	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	DeleteHomework(id int) error
@@ -367,7 +367,7 @@ func (s *Store) DeletePost(id int) error {
 	return nil
 }
 
-func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass, error) {
+func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) {
 	rows, err := s.db.Query(
 
 		`SELECT id, title, description, createTime, deadlineTime, file
@@ -380,9 +380,9 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass
 	}
 	defer rows.Close()
 
-	hws := []*model.HomeworkFromClass{}
+	hws := []*model.Homework{}
 	for rows.Next() {
-		var tmpHw model.HomeworkFromClass
+		var tmpHw model.Homework
 
 		if err := rows.Scan(
 			&tmpHw.ID, &tmpHw.Title, &tmpHw.Description,
@@ -394,7 +394,7 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkListFromClass
 		hws = append(hws, &tmpHw)
 	}
 
-	return &model.HomeworkListFromClass{Homeworks: hws}, nil
+	return &model.HomeworkList{Homeworks: hws}, nil
 }
 
 func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
