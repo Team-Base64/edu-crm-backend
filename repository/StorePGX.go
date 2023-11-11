@@ -32,6 +32,9 @@ type StoreInterface interface {
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	DeleteHomework(id int) error
+	GetTaskByID(id int) (*model.TaskByID, error)
+	AddTask(newTask *model.TaskCreate) (int, error)
+	AttachTaskToHomework(hwID int, taskID int) error
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
 	GetSolutionByID(id int) (*model.SolutionByID, error)
@@ -372,12 +375,27 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
-		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime, file)
-		 VALUES ($1, $2, $3, $4, $5, $6)
+		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime)
+		 VALUES ($1, $2, $3, $4, $5)
 		 RETURNING id;`,
-		newHw.ClassID, newHw.Title, newHw.Description, createTime, newHw.DeadlineTime, newHw.File,
+		newHw.ClassID, newHw.Title, newHw.Description, createTime, newHw.DeadlineTime,
 	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
+	}
+
+	for _, task := range newHw.Tasks {
+		taskID := task.ID
+		if taskID < 0 {
+			newTaskID, err := s.AddTask(&model.TaskCreate{
+				Description: task.Description,
+				Attach:      task.Attach,
+			})
+			if err != nil {
+				return 0, e.StacktraceError(err)
+			}
+			taskID = newTaskID
+		}
+		s.AttachTaskToHomework(id, taskID)
 	}
 
 	return int(id), nil
@@ -389,6 +407,46 @@ func (s *Store) DeleteHomework(id int) error {
 		id,
 	)
 
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
+}
+
+func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
+	var task model.TaskByID
+	if err := s.db.QueryRow(
+		`SELECT description, attach FROM solutions WHERE id = $1;`,
+		id,
+	).Scan(
+		&task.Description, &task.Attach,
+	); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return &task, nil
+}
+
+func (s *Store) AddTask(newTask *model.TaskCreate) (int, error) {
+	var id int
+	if err := s.db.QueryRow(
+		`INSERT INTO tasks (description, attach)
+		 VALUES ($1, $2)
+		 RETURNING id;`,
+		newTask.Description, newTask.Attach,
+	).Scan(&id); err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return int(id), nil
+}
+
+func (s *Store) AttachTaskToHomework(hwID int, taskID int) error {
+	_, err := s.db.Exec(
+		`INSERT INTO homeworks_tasks (homeworkID, taskID) VALUES ($1, $2)`,
+		hwID, taskID,
+	)
 	if err != nil {
 		return e.StacktraceError(err)
 	}

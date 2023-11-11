@@ -37,5 +37,5 @@ type HomeworkCreate struct {
 	Title        string    `json:"title"`
 	Description  string    `json:"description"`
 	DeadlineTime time.Time `json:"deadlineTime"`
-	File         string    `json:"file"`
+	Tasks        []*Task   `json:"tasks,omitempty"`
 }

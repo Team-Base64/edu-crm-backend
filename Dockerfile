@@ -15,6 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /backend main.go
 FROM scratch
 
 COPY --from=builder /backend /backend
+COPY --from=builder /app/times.ttf /times.ttf
 
 EXPOSE 8080
 
