@@ -43,6 +43,10 @@ type StoreInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
+	// CALENDAR
+	GetTokenDB(id int) (string, error)
+	CreateCalendarDB(teacherID int, googleID string) (int, error)
+	GetCalendarGoogleID(teacherID int) (string, error)
 }
 
 type Store struct {

@@ -32,6 +32,11 @@ type UsecaseInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
+	// CALENDAR
+	SetOAUTH2Token() error
+	SaveOAUTH2Token(authCode string) error
+	CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error)
+	CreateCalendarEvent(req *model.CreateCalendarEvent, teacherID int, classID int) error
 }
 
 type Usecase struct {

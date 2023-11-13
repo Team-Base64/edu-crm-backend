@@ -2,10 +2,12 @@ package delivery
 
 import (
 	"encoding/json"
+	"log"
 	e "main/domain/errors"
 	"main/domain/model"
 	uc "main/usecase"
 	"net/http"
+	"os"
 )
 
 // @title TCRA API
@@ -23,13 +25,28 @@ import (
 // @host 127.0.0.1:8080
 // @BasePath  /api
 
+var chatFilesPath = "/chat"
+var homeworkFilesPath = "/homework"
+var solutionFilesPath = "/solution"
+
 type Handler struct {
-	usecase uc.UsecaseInterface
+	usecase     uc.UsecaseInterface
+	filestorage string
+	prefix      string
 }
 
-func NewHandler(uc uc.UsecaseInterface) *Handler {
+func NewHandler(uc uc.UsecaseInterface, fs string, pf string) *Handler {
+	for _, path := range []string{chatFilesPath, homeworkFilesPath, solutionFilesPath} {
+		if err := os.MkdirAll(fs+path, os.ModePerm); err != nil {
+			log.Fatalln(e.StacktraceError(err))
+		}
+	}
+
 	return &Handler{
 		usecase: uc,
+
+		filestorage: fs,
+		prefix:      pf,
 	}
 }
 

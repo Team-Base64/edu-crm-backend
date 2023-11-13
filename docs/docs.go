@@ -24,6 +24,127 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/attach": {
+            "post": {
+                "description": "Upload attach",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Upload attach",
+                "operationId": "uploadAttach",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "attach",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "type: homework or solution or chat",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal Server Error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar": {
+            "post": {
+                "description": "Creates teacher's calendar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Creates teacher's calendar",
+                "operationId": "CreateCalendar",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateCalendarResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar/addevent": {
+            "post": {
+                "description": "Creates teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Creates teacher's calendar event",
+                "operationId": "CreateCalendarEvent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/chats": {
             "get": {
                 "description": "Get chats of teacher",
@@ -168,7 +289,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ClassCreateResponse"
+                            "$ref": "#/definitions/model.ClassInfoResponse"
                         }
                     },
                     "400": {
@@ -222,7 +343,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ClassInfo"
+                            "$ref": "#/definitions/model.ClassInfoResponse"
                         }
                     },
                     "400": {
@@ -337,7 +458,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.PostCreateResponse"
+                            "$ref": "#/definitions/model.PostResponse"
                         }
                     },
                     "400": {
@@ -391,7 +512,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.HomeworkListFromClass"
+                            "$ref": "#/definitions/model.HomeworkList"
                         }
                     },
                     "400": {
@@ -555,7 +676,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.HomeworkCreateResponse"
+                            "$ref": "#/definitions/model.HomeworkResponse"
                         }
                     },
                     "400": {
@@ -609,7 +730,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.HomeworkByID"
+                            "$ref": "#/definitions/model.HomeworkByIDResponse"
                         }
                     },
                     "400": {
@@ -693,6 +814,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/oauth": {
+            "post": {
+                "description": "Sets teacher's OAUTH2Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Sets teacher's OAUTH2Token",
+                "operationId": "SetOAUTH2Token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/savetoken": {
+            "get": {
+                "description": "Saves teacher's OAUTH2Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Saves teacher's OAUTH2Token",
+                "operationId": "SaveOAUTH2TokenToFile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/profile": {
             "get": {
                 "description": "gets teacher's info",
@@ -708,7 +898,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.TeacherProfile"
+                            "$ref": "#/definitions/model.TeacherProfileResponse"
                         }
                     },
                     "401": {
@@ -794,7 +984,61 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.SolutionByID"
+                            "$ref": "#/definitions/model.SolutionByIDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request - Problem with the request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "not found - Requested entity is not found in database",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/{studentID}": {
+            "get": {
+                "description": "Get student by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get student",
+                "operationId": "getStudent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "StudentID id",
+                        "name": "studentID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.StudentByIDResponse"
                         }
                     },
                     "400": {
@@ -846,16 +1090,19 @@ const docTemplate = `{
                 "cover": {
                     "type": "string"
                 },
+                "date": {
+                    "type": "string"
+                },
                 "isread": {
                     "type": "boolean"
                 },
-                "lastmessagedate": {
-                    "type": "string"
-                },
-                "lastmessagetext": {
-                    "type": "string"
-                },
                 "name": {
+                    "type": "string"
+                },
+                "socialType": {
+                    "type": "string"
+                },
+                "text": {
                     "type": "string"
                 }
             }
@@ -878,17 +1125,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.ClassCreateResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "inviteToken": {
                     "type": "string"
                 }
             }
@@ -921,6 +1157,25 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ClassInfoResponse": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "$ref": "#/definitions/model.ClassInfo"
+                }
+            }
+        },
+        "model.CreateCalendarResponse": {
+            "type": "object",
+            "properties": {
+                "googleid": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Error": {
             "type": "object",
             "properties": {
@@ -935,6 +1190,29 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Post"
                     }
+                }
+            }
+        },
+        "model.Homework": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "deadlineTime": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -961,6 +1239,14 @@ const docTemplate = `{
                 }
             }
         },
+        "model.HomeworkByIDResponse": {
+            "type": "object",
+            "properties": {
+                "homework": {
+                    "$ref": "#/definitions/model.HomeworkByID"
+                }
+            }
+        },
         "model.HomeworkCreate": {
             "type": "object",
             "properties": {
@@ -973,56 +1259,33 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "file": {
-                    "type": "string"
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Task"
+                    }
                 },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "model.HomeworkCreateResponse": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.HomeworkFromClass": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "deadlineTime": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "file": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.HomeworkListFromClass": {
+        "model.HomeworkList": {
             "type": "object",
             "properties": {
                 "homeworks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.HomeworkFromClass"
+                        "$ref": "#/definitions/model.Homework"
                     }
+                }
+            }
+        },
+        "model.HomeworkResponse": {
+            "type": "object",
+            "properties": {
+                "homework": {
+                    "$ref": "#/definitions/model.Homework"
                 }
             }
         },
@@ -1035,7 +1298,7 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "createTime": {
+                "date": {
                     "type": "string"
                 },
                 "id": {
@@ -1086,14 +1349,11 @@ const docTemplate = `{
                 }
             }
         },
-        "model.PostCreateResponse": {
+        "model.PostResponse": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "time": {
-                    "type": "string"
+                "post": {
+                    "$ref": "#/definitions/model.Post"
                 }
             }
         },
@@ -1120,6 +1380,14 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
+                }
+            }
+        },
+        "model.SolutionByIDResponse": {
+            "type": "object",
+            "properties": {
+                "solution": {
+                    "$ref": "#/definitions/model.SolutionByID"
                 }
             }
         },
@@ -1188,7 +1456,26 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Student": {
+        "model.StudentByID": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "socialType": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.StudentByIDResponse": {
+            "type": "object",
+            "properties": {
+                "student": {
+                    "$ref": "#/definitions/model.StudentByID"
+                }
+            }
+        },
+        "model.StudentFromClass": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1208,8 +1495,22 @@ const docTemplate = `{
                 "students": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Student"
+                        "$ref": "#/definitions/model.StudentFromClass"
                     }
+                }
+            }
+        },
+        "model.Task": {
+            "type": "object",
+            "properties": {
+                "attach": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1218,6 +1519,14 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "model.TeacherProfileResponse": {
+            "type": "object",
+            "properties": {
+                "teacher": {
+                    "$ref": "#/definitions/model.TeacherProfile"
                 }
             }
         },

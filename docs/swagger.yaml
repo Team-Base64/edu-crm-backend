@@ -13,13 +13,15 @@ definitions:
         type: integer
       cover:
         type: string
+      date:
+        type: string
       isread:
         type: boolean
-      lastmessagedate:
-        type: string
-      lastmessagetext:
-        type: string
       name:
+        type: string
+      socialType:
+        type: string
+      text:
         type: string
     type: object
   model.ChatPreviewList:
@@ -34,13 +36,6 @@ definitions:
       description:
         type: string
       title:
-        type: string
-    type: object
-  model.ClassCreateResponse:
-    properties:
-      id:
-        type: integer
-      inviteToken:
         type: string
     type: object
   model.ClassInfo:
@@ -61,6 +56,18 @@ definitions:
           $ref: '#/definitions/model.ClassInfo'
         type: array
     type: object
+  model.ClassInfoResponse:
+    properties:
+      class:
+        $ref: '#/definitions/model.ClassInfo'
+    type: object
+  model.CreateCalendarResponse:
+    properties:
+      googleid:
+        type: string
+      id:
+        type: integer
+    type: object
   model.Error:
     properties:
       error: {}
@@ -71,6 +78,21 @@ definitions:
         items:
           $ref: '#/definitions/model.Post'
         type: array
+    type: object
+  model.Homework:
+    properties:
+      createTime:
+        type: string
+      deadlineTime:
+        type: string
+      description:
+        type: string
+      file:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
     type: object
   model.HomeworkByID:
     properties:
@@ -87,6 +109,11 @@ definitions:
       title:
         type: string
     type: object
+  model.HomeworkByIDResponse:
+    properties:
+      homework:
+        $ref: '#/definitions/model.HomeworkByID'
+    type: object
   model.HomeworkCreate:
     properties:
       classID:
@@ -95,39 +122,24 @@ definitions:
         type: string
       description:
         type: string
-      file:
-        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/model.Task'
+        type: array
       title:
         type: string
     type: object
-  model.HomeworkCreateResponse:
-    properties:
-      createTime:
-        type: string
-      id:
-        type: integer
-    type: object
-  model.HomeworkFromClass:
-    properties:
-      createTime:
-        type: string
-      deadlineTime:
-        type: string
-      description:
-        type: string
-      file:
-        type: string
-      id:
-        type: integer
-      title:
-        type: string
-    type: object
-  model.HomeworkListFromClass:
+  model.HomeworkList:
     properties:
       homeworks:
         items:
-          $ref: '#/definitions/model.HomeworkFromClass'
+          $ref: '#/definitions/model.Homework'
         type: array
+    type: object
+  model.HomeworkResponse:
+    properties:
+      homework:
+        $ref: '#/definitions/model.Homework'
     type: object
   model.Message:
     properties:
@@ -135,7 +147,7 @@ definitions:
         items:
           type: string
         type: array
-      createTime:
+      date:
         type: string
       id:
         type: integer
@@ -168,12 +180,10 @@ definitions:
       text:
         type: string
     type: object
-  model.PostCreateResponse:
+  model.PostResponse:
     properties:
-      id:
-        type: integer
-      time:
-        type: string
+      post:
+        $ref: '#/definitions/model.Post'
     type: object
   model.Response:
     properties:
@@ -191,6 +201,11 @@ definitions:
         type: integer
       text:
         type: string
+    type: object
+  model.SolutionByIDResponse:
+    properties:
+      solution:
+        $ref: '#/definitions/model.SolutionByID'
     type: object
   model.SolutionForHw:
     properties:
@@ -234,7 +249,19 @@ definitions:
           $ref: '#/definitions/model.SolutionFromClass'
         type: array
     type: object
-  model.Student:
+  model.StudentByID:
+    properties:
+      name:
+        type: string
+      socialType:
+        type: string
+    type: object
+  model.StudentByIDResponse:
+    properties:
+      student:
+        $ref: '#/definitions/model.StudentByID'
+    type: object
+  model.StudentFromClass:
     properties:
       id:
         type: integer
@@ -247,13 +274,27 @@ definitions:
     properties:
       students:
         items:
-          $ref: '#/definitions/model.Student'
+          $ref: '#/definitions/model.StudentFromClass'
         type: array
+    type: object
+  model.Task:
+    properties:
+      attach:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
     type: object
   model.TeacherProfile:
     properties:
       name:
         type: string
+    type: object
+  model.TeacherProfileResponse:
+    properties:
+      teacher:
+        $ref: '#/definitions/model.TeacherProfile'
     type: object
   model.TeacherSignUp:
     properties:
@@ -278,6 +319,90 @@ info:
   title: TCRA API
   version: "1.0"
 paths:
+  /attach:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload attach
+      operationId: uploadAttach
+      parameters:
+      - description: attach
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 'type: homework or solution or chat'
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Upload attach
+  /calendar:
+    post:
+      consumes:
+      - application/json
+      description: Creates teacher's calendar
+      operationId: CreateCalendar
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CreateCalendarResponse'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Creates teacher's calendar
+      tags:
+      - Calendar
+  /calendar/addevent:
+    post:
+      consumes:
+      - application/json
+      description: Creates teacher's calendar event
+      operationId: CreateCalendarEvent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Creates teacher's calendar event
+      tags:
+      - Calendar
   /chats:
     get:
       consumes:
@@ -379,7 +504,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ClassCreateResponse'
+            $ref: '#/definitions/model.ClassInfoResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -416,7 +541,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ClassInfo'
+            $ref: '#/definitions/model.ClassInfoResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -495,7 +620,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.PostCreateResponse'
+            $ref: '#/definitions/model.PostResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -532,7 +657,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.HomeworkListFromClass'
+            $ref: '#/definitions/model.HomeworkList'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -644,7 +769,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.HomeworkCreateResponse'
+            $ref: '#/definitions/model.HomeworkResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -681,7 +806,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.HomeworkByID'
+            $ref: '#/definitions/model.HomeworkByIDResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -737,6 +862,54 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get solutions for homework
+  /oauth:
+    post:
+      consumes:
+      - application/json
+      description: Sets teacher's OAUTH2Token
+      operationId: SetOAUTH2Token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Sets teacher's OAUTH2Token
+      tags:
+      - Calendar
+  /oauth/savetoken:
+    get:
+      consumes:
+      - application/json
+      description: Saves teacher's OAUTH2Token
+      operationId: SaveOAUTH2TokenToFile
+      parameters:
+      - description: code
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Saves teacher's OAUTH2Token
+      tags:
+      - Calendar
   /profile:
     get:
       consumes:
@@ -749,7 +922,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.TeacherProfile'
+            $ref: '#/definitions/model.TeacherProfileResponse'
         "401":
           description: unauthorized - Access token is missing or invalid
           schema:
@@ -808,7 +981,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.SolutionByID'
+            $ref: '#/definitions/model.SolutionByIDResponse'
         "400":
           description: bad request - Problem with the request
           schema:
@@ -827,4 +1000,41 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get solution
+  /students/{studentID}:
+    get:
+      consumes:
+      - application/json
+      description: Get student by id
+      operationId: getStudent
+      parameters:
+      - description: StudentID id
+        in: path
+        name: studentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StudentByIDResponse'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get student
 swagger: "2.0"

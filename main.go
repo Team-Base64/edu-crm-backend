@@ -80,13 +80,21 @@ func main() {
 		ChatService,
 	)
 
-	Handler := delivery.NewHandler(Usecase)
+	Handler := delivery.NewHandler(Usecase, os.Getenv(conf.BaseFilestorage), os.Getenv(conf.PrefixFilestorage))
+
+	myRouter.HandleFunc(conf.PathAttach, Handler.UploadFile).Methods(http.MethodPost, http.MethodOptions)
+
+	myRouter.HandleFunc(conf.PathOAuthSetToken, Handler.SetOAUTH2Token).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathOAuthSaveToken, Handler.SaveOAUTH2TokenToFile).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathSignUp, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacherProfile).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathChatByID, Handler.GetChat).Methods(http.MethodGet, http.MethodOptions)
+
+	myRouter.HandleFunc(conf.PathCalendar, Handler.CreateCalendar).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathAddEvent, Handler.CreateCalendarEvent).Methods(http.MethodPost, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathClasses, Handler.GetTeacherClasses).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathClassByID, Handler.GetClass).Methods(http.MethodGet, http.MethodOptions)
