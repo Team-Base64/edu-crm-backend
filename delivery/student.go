@@ -28,14 +28,14 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 	studentID, err := strconv.Atoi(path[len(path)-1])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	student, err := api.usecase.GetStudentByID(studentID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -60,14 +60,14 @@ func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request)
 	chatId, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	students, err := api.usecase.GetStudentsFromClass(chatId)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 

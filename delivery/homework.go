@@ -28,14 +28,14 @@ func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request
 	chatId, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	hws, err := api.usecase.GetHomeworksByClassID(chatId)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -60,14 +60,14 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 	hwID, err := strconv.Atoi(path[len(path)-1])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	hw, err := api.usecase.GetHomeworkByID(hwID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -91,14 +91,14 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var newHw model.HomeworkCreate
 	if err := decoder.Decode(&newHw); err != nil {
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	hw, err := api.usecase.CreateHomework(&newHw)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 

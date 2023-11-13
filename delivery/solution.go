@@ -28,14 +28,14 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 	classID, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	sols, err := api.usecase.GetSolutionsByClassID(classID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -60,14 +60,14 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 	hwID, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	sols, err := api.usecase.GetSolutionsByHwID(hwID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -92,14 +92,14 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 	solID, err := strconv.Atoi(path[len(path)-1])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	sol, err := api.usecase.GetSolutionByID(solID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 

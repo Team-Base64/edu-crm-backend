@@ -28,14 +28,14 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 	chatId, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	feed, err := api.usecase.GetClassFeed(chatId)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -61,21 +61,21 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	classID, err := strconv.Atoi(path[len(path)-2])
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var newPost model.PostCreate
 	if err := decoder.Decode(&newPost); err != nil {
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	post, err := api.usecase.CreatePost(classID, &newPost)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 

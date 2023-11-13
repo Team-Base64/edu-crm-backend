@@ -1,7 +1,11 @@
 package delivery
 
 import (
+	"encoding/json"
+	e "main/domain/errors"
+	"main/domain/model"
 	uc "main/usecase"
+	"net/http"
 )
 
 // @title TCRA API
@@ -27,4 +31,12 @@ func NewHandler(uc uc.UsecaseInterface) *Handler {
 	return &Handler{
 		usecase: uc,
 	}
+}
+
+var mockTeacherID = 1
+
+func returnErrorJSON(w http.ResponseWriter, err error) {
+	errCode, errText := e.CheckError(err)
+	w.WriteHeader(errCode)
+	json.NewEncoder(w).Encode(&model.Error{Error: errText})
 }

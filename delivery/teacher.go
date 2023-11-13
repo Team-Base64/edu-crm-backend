@@ -23,13 +23,13 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var req model.TeacherSignUp
 	if err := decoder.Decode(&req); err != nil {
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	if err := api.usecase.CreateTeacher(&req); err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
 	teacher, err := api.usecase.GetTeacherProfile(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 

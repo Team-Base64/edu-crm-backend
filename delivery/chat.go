@@ -23,7 +23,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
@@ -49,14 +49,14 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idS)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, e.ErrBadRequest400)
+		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	msgs, err := api.usecase.GetChatByID(id)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
-		ReturnErrorJSON(w, err)
+		returnErrorJSON(w, err)
 		return
 	}
 
