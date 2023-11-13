@@ -17,7 +17,7 @@ func (s *Store) CheckHomeworkExistence(id int) error {
 	return nil
 }
 
-func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
+func (s *Store) AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
 		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime)
@@ -29,18 +29,15 @@ func (s *Store) AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (
 	}
 
 	for _, task := range newHw.Tasks {
-		taskID := task.ID
-		if taskID < 0 {
-			newTaskID, err := s.AddTask(&model.TaskCreate{
+		if task.ID < 0 {
+			_, err := s.AddTask(teacherID, &model.TaskCreate{
 				Description: task.Description,
 				Attach:      task.Attach,
 			})
 			if err != nil {
 				return 0, e.StacktraceError(err)
 			}
-			taskID = newTaskID
 		}
-		s.AttachTaskToHomework(id, taskID)
 	}
 
 	return int(id), nil

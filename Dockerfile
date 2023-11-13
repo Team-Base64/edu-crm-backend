@@ -8,14 +8,17 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 COPY ./ ./
 
-RUN swag init -g delivery/funcs.go
+RUN swag init -g delivery/handler.go
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /backend main.go
 
 FROM scratch
 
 COPY --from=builder /backend /backend
-COPY --from=builder /app/times.ttf /times.ttf
+# COPY --from=builder /app/times.ttf /times.ttf
+COPY --from=builder /app/credentials.json /credentials.json
+COPY --from=builder /app/token.json /token.json
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8080
 

@@ -15,3 +15,7 @@ type TaskByID struct {
 	Description string `json:"description,omitempty"`
 	Attach      string `json:"attach,omitempty"`
 }
+
+type TaskListByTeacherID struct {
+	Tasks []Task `json:"tasks"`
+}

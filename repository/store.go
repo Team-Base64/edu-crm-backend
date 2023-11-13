@@ -31,14 +31,14 @@ type StoreInterface interface {
 	GetClassFeed(classID int) (*model.Feed, error)
 	// HOMEWORK
 	CheckHomeworkExistence(id int) error
-	AddHomework(createTime time.Time, newHw *model.HomeworkCreate) (int, error)
+	AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	DeleteHomework(id int) error
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	// TASK
-	AddTask(newTask *model.TaskCreate) (int, error)
+	AddTask(teacherID int, newTask *model.TaskCreate) (int, error)
 	GetTaskByID(id int) (*model.TaskByID, error)
-	AttachTaskToHomework(hwID int, taskID int) error
+	GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error)
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)

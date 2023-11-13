@@ -95,7 +95,7 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hw, err := api.usecase.CreateHomework(&newHw)
+	hw, err := api.usecase.CreateHomework(mockTeacherID, &newHw)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
