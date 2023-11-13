@@ -5,13 +5,13 @@ import (
 	"main/domain/model"
 )
 
-func (s *Store) AddTask(newTask *model.TaskCreate) (int, error) {
+func (s *Store) AddTask(teacherID int, newTask *model.TaskCreate) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
-		`INSERT INTO tasks (description, attach)
-		 VALUES ($1, $2)
+		`INSERT INTO tasks (teacherID, description, attach)
+		 VALUES ($1, $2, $3)
 		 RETURNING id;`,
-		newTask.Description, newTask.Attach,
+		teacherID, newTask.Description, newTask.Attach,
 	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
@@ -33,14 +33,26 @@ func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 	return &task, nil
 }
 
-func (s *Store) AttachTaskToHomework(hwID int, taskID int) error {
-	_, err := s.db.Exec(
-		`INSERT INTO homeworks_tasks (homeworkID, taskID) VALUES ($1, $2)`,
-		hwID, taskID,
+func (s *Store) GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error) {
+	rows, err := s.db.Query(
+		`SELECT id, description, attach FROM solutions WHERE teacherID = $1;`,
+		teacherID,
 	)
 	if err != nil {
-		return e.StacktraceError(err)
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	tasks := []model.Task{}
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+
+		tasks = append(tasks, task)
 	}
 
-	return nil
+	return &model.TaskListByTeacherID{Tasks: tasks}, nil
 }

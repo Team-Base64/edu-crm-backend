@@ -3,14 +3,10 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
-	"math/rand"
 )
 
 func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error) {
-	for i := range uc.bufToken {
-		uc.bufToken[i] = uc.letters[rand.Intn(len(uc.letters))]
-	}
-	inviteToken := string(uc.bufToken)
+	inviteToken := uc.genRandomToken()
 
 	id, err := uc.store.AddClass(teacherID, inviteToken, newClass)
 	if err != nil {

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"main/domain/model"
+	"math/rand"
 
 	ctrl "main/controller"
 	rep "main/repository"
@@ -25,9 +26,11 @@ type UsecaseInterface interface {
 	CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error)
 	GetClassFeed(classID int) (*model.Feed, error)
 	// HOMEWORK
-	CreateHomework(newHw *model.HomeworkCreate) (*model.Homework, error)
+	CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
+	// TASKS
+	GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error)
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
@@ -55,4 +58,11 @@ func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatS
 		bufToken:    make([]rune, tokenLen),
 		chatService: cs,
 	}
+}
+
+func (uc Usecase) genRandomToken() string {
+	for i := range uc.bufToken {
+		uc.bufToken[i] = uc.letters[rand.Intn(len(uc.letters))]
+	}
+	return string(uc.bufToken)
 }

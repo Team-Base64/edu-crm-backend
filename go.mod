@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.3
-	github.com/signintech/gopdf v0.19.0
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.2
 )
@@ -30,7 +29,6 @@ require (
 	github.com/jackc/pgtype v1.14.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/phpdave11/gofpdi v1.0.14-0.20211212211723-1f10f9844311 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
@@ -50,7 +48,6 @@ require (
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/lib/pq v1.10.9
-	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	golang.org/x/crypto v0.15.0 // indirect
 	golang.org/x/oauth2 v0.14.0
 	golang.org/x/text v0.14.0 // indirect
