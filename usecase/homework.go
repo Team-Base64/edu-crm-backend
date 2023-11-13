@@ -11,11 +11,6 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (r
 		return nil, e.StacktraceError(err)
 	}
 
-	// file, err := uc.genHomeworkPDF(newHw.Tasks)
-	// if err != nil {
-	// 	return nil, e.StacktraceError(err)
-	// }
-
 	createTime := time.Now()
 	id, err := uc.store.AddHomework(teacherID, createTime, newHw)
 	if err != nil {
@@ -67,52 +62,3 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 	}
 	return hws, nil
 }
-
-// func (uc Usecase) genHomeworkPDF(tasks []*model.Task) (string, error) {
-// 	pdf := gopdf.GoPdf{}
-// 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
-
-// 	if err := pdf.AddTTFFont("times", "times.ttf"); err != nil {
-// 		return "", e.StacktraceError(err)
-// 	}
-// 	if err := pdf.SetFont("times", "", 14); err != nil {
-// 		return "", e.StacktraceError(err)
-// 	}
-
-// 	for n, task := range tasks {
-// 		pdf.AddPage()
-// 		saveTask := &model.TaskByID{}
-
-// 		if task.ID > 0 {
-// 			storeTask, err := uc.store.GetTaskByID(task.ID)
-// 			if err != nil {
-// 				return "", e.StacktraceError(err)
-// 			}
-// 			saveTask = storeTask
-// 		} else {
-// 			saveTask.Description = task.Description
-// 			saveTask.Attach = task.Attach
-// 		}
-
-// 		if err := pdf.Cell(nil, "Задание № "+strconv.Itoa(n+1)); err != nil {
-// 			return "", e.StacktraceError(err)
-// 		}
-
-// 		pdf.Br(20)
-// 		if err := pdf.Cell(nil, saveTask.Description); err != nil {
-// 			return "", e.StacktraceError(err)
-// 		}
-
-// 		if len(saveTask.Attach) != 0 {
-// 			if err := pdf.Image(saveTask.Attach[21:], 50, 200, nil); err != nil {
-// 				return "", e.StacktraceError(err)
-// 			}
-// 		}
-// 	}
-
-// 	file := "/filestorage/homework/" + uuid.New().String() + ".pdf"
-// 	if err := pdf.WritePdf(file); err != nil {
-// 		return "", e.StacktraceError(err)
-// 	}
-// 	return file, nil
-// }
