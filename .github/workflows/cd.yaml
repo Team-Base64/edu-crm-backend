@@ -42,6 +42,8 @@ jobs:
             cd ${{ secrets.TARGET_DOCKER_COMPOSE }}
             echo "${{ secrets.BACKEND_ENV }}" > ${{ vars.ENV_FILE_BACKEND }}
             sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.ENV_FILE_BACKEND }}
+            echo "${{ secrets.BACKEND_CREDENTIALS }}" > ${{ vars.BACKEND_CREDENTIALS_FILE }}
+            sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.BACKEND_CREDENTIALS_FILE }}
             docker compose stop
             docker compose pull ${{ env.CONTAINER }}
             docker compose create ${{ env.CONTAINER }}

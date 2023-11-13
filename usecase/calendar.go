@@ -25,6 +25,9 @@ func getClient(config *oauth2.Config) (*http.Client, error) {
 	//now := time.Now()
 	//redTime := now.Add(1 * time.Minute)
 	tok, err := tokenFromFile(tokFile)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
 	tokenSource := config.TokenSource(context.Background(), tok)
 	//tokenSource := conf.TokenSource(oauth2.NoContext, token)
 	newToken, err := tokenSource.Token()
