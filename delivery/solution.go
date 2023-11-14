@@ -48,13 +48,13 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 // @ID getSolutionsForHomework
 // @Accept  json
 // @Produce  json
-// @Param hwID path string true "Homework id"
+// @Param homeworkID path string true "Homework id"
 // @Success 200 {object} model.SolutionListForHw
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
-// @Router /homeworks/{hwID}/solutions [get]
+// @Router /homeworks/{homeworkID}/solutions [get]
 func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
 	hwID, err := strconv.Atoi(path[len(path)-2])
@@ -64,7 +64,7 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	sols, err := api.usecase.GetSolutionsByHwID(hwID)
+	sols, err := api.usecase.GetSolutionsByHomeworkID(hwID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

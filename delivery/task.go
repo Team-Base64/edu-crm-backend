@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	e "main/domain/errors"
+	"main/domain/model"
 	"net/http"
 )
 
@@ -18,12 +19,12 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /tasks [get]
 func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, err := api.usecase.GetTasksByTeacher(mockTeacherID)
+	tasks, err := api.usecase.GetTasksByTeacherID(mockTeacherID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(tasks)
+	json.NewEncoder(w).Encode(model.TaskListByTeacherID{Tasks: tasks})
 }

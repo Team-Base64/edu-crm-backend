@@ -5,8 +5,8 @@ import (
 	"main/domain/model"
 )
 
-func (uc *Usecase) GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error) {
-	tasks, err := uc.store.GetTasksByTeacher(teacherID)
+func (uc *Usecase) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
+	tasks, err := uc.store.GetTasksByTeacherID(teacherID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}

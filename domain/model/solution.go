@@ -4,7 +4,7 @@ import "time"
 
 type SolutionFromClass struct {
 	ID         int       `json:"id"`
-	HwID       int       `json:"hwID"`
+	HomeworkID int       `json:"hwID"`
 	StudentID  int       `json:"studentID"`
 	Text       string    `json:"text,omitempty"`
 	CreateTime time.Time `json:"createTime"`
@@ -28,7 +28,7 @@ type SolutionListForHw struct {
 }
 
 type SolutionByID struct {
-	HwID       int       `json:"hwID"`
+	HomeworkID int       `json:"hwID"`
 	StudentID  int       `json:"studentID"`
 	Text       string    `json:"text,omitempty"`
 	CreateTime time.Time `json:"createTime"`

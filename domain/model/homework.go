@@ -8,7 +8,7 @@ type Homework struct {
 	Description  string    `json:"description"`
 	CreateTime   time.Time `json:"createTime"`
 	DeadlineTime time.Time `json:"deadlineTime"`
-	File         string    `json:"file"`
+	Tasks        []*Task   `json:"tasks,omitempty"`
 }
 
 type HomeworkList struct {
@@ -25,7 +25,7 @@ type HomeworkByID struct {
 	Description  string    `json:"description"`
 	CreateTime   time.Time `json:"createTime"`
 	DeadlineTime time.Time `json:"deadlineTime"`
-	File         string    `json:"file"`
+	Tasks        []*Task   `json:"tasks,omitempty"`
 }
 
 type HomeworkByIDResponse struct {

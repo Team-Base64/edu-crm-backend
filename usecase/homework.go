@@ -3,11 +3,12 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+	"strconv"
 	"time"
 )
 
-func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (res *model.Homework, err error) {
-	if err = uc.store.CheckClassExistence(newHw.ClassID); err != nil {
+func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error) {
+	if err := uc.store.CheckClassExistence(newHw.ClassID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
@@ -16,31 +17,25 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (r
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	defer func() {
-		if res == nil {
-			uc.store.DeleteHomework(id)
-		}
-	}()
 
-	bcMsg := model.ClassBroadcastMessage{
-		ClassID:     newHw.ClassID,
-		Title:       "Внимание! Выдано домашнее задание: " + newHw.Title,
-		Description: newHw.Description + "\n" + "Срок выполнения: " + newHw.DeadlineTime.String(),
-		Attaches:    []string{newHw.Tasks[0].Attach},
-	}
-	if err = uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+	if err = uc.chatService.BroadcastMsg(genHomeworkMsg(newHw)); err != nil {
 		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 
-	res = &model.Homework{
+	tasks, err := uc.store.GetTasksByHomeworkID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	res := &model.Homework{
 		ID:           id,
 		Title:        newHw.Title,
 		Description:  newHw.Description,
 		DeadlineTime: newHw.DeadlineTime,
 		CreateTime:   createTime,
-		File:         newHw.Tasks[0].Attach,
+		Tasks:        tasks,
 	}
-	return
+	return res, nil
 }
 
 func (uc *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
@@ -61,4 +56,21 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 		return nil, e.StacktraceError(err)
 	}
 	return hws, nil
+}
+
+func genHomeworkMsg(hw *model.HomeworkCreate) *model.ClassBroadcastMessage {
+	msg := model.ClassBroadcastMessage{
+		ClassID:     hw.ClassID,
+		Title:       "Внимание! Выдано домашнее задание: " + hw.Title,
+		Description: hw.Description,
+	}
+
+	for id, task := range hw.Tasks {
+		msg.Description += "\n" + "Задание №" + strconv.Itoa(id) + "\n" + task.Description
+		msg.Attaches = append(msg.Attaches, task.Attach)
+	}
+
+	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.String()
+
+	return &msg
 }

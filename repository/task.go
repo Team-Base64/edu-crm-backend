@@ -33,7 +33,7 @@ func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 	return &task, nil
 }
 
-func (s *Store) GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error) {
+func (s *Store) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT id, description, attach FROM solutions WHERE teacherID = $1;`,
 		teacherID,
@@ -43,7 +43,7 @@ func (s *Store) GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, er
 	}
 	defer rows.Close()
 
-	tasks := []model.Task{}
+	tasks := []*model.Task{}
 	for rows.Next() {
 		var task model.Task
 		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
@@ -51,8 +51,48 @@ func (s *Store) GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, er
 			return nil, e.StacktraceError(err)
 		}
 
-		tasks = append(tasks, task)
+		tasks = append(tasks, &task)
 	}
 
-	return &model.TaskListByTeacherID{Tasks: tasks}, nil
+	return tasks, nil
+}
+
+func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]*model.Task, error) {
+	rows, err := s.db.Query(
+		`SELECT t.id, t.description, t.attach
+		 FROM tasks
+		 JOIN homeworks_tasks ht ON t.id = ht.taskID
+		 WHERE ht.homeworkID = $1
+		 ORDER BY ht.rank`,
+		homeworkID,
+	)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	defer rows.Close()
+
+	tasks := []*model.Task{}
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+
+		tasks = append(tasks, &task)
+	}
+
+	return tasks, nil
+}
+
+func (s *Store) AttachTaskToHomework(hwID int, taskID int, taskRank int) error {
+	_, err := s.db.Exec(
+		`INSERT INTO homeworks_tasks (homeworkID, taskID) VALUES ($1, $2, $3)`,
+		hwID, taskID, taskRank,
+	)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
 }
