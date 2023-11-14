@@ -40,11 +40,11 @@ jobs:
           script_stop: true
           script: |
             cd ${{ secrets.TARGET_DOCKER_COMPOSE }}
-            echo "${{ secrets.BACKEND_ENV }}" > ${{ vars.ENV_FILE_BACKEND }}
+            echo '${{ secrets.BACKEND_ENV }}' > ${{ vars.ENV_FILE_BACKEND }}
             sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.ENV_FILE_BACKEND }}
-            echo "${{ secrets.BACKEND_CREDENTIALS }}" > ${{ vars.BACKEND_CREDENTIALS_FILE }}
+            echo '${{ secrets.BACKEND_CREDENTIALS }}' > ${{ vars.BACKEND_CREDENTIALS_FILE }}
             sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.BACKEND_CREDENTIALS_FILE }}
-            echo "${{ secrets.GOOGLE_TOKEN_API }}" > ${{ vars.GOOGLE_TOKEN_FILE }}
+            echo '${{ secrets.GOOGLE_TOKEN_API }}' > ${{ vars.GOOGLE_TOKEN_FILE }}
             sed -i '/DRONE_SSH_PREV_COMMAND_EXIT_CODE/d' ${{ vars.GOOGLE_TOKEN_FILE }}
             docker compose stop
             docker compose pull ${{ env.CONTAINER }}
