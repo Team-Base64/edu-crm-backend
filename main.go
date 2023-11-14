@@ -29,7 +29,8 @@ var tokenLen int
 var tokenLetters string
 var tokenFile string
 var credentialsFile string
-var baseFilestorage string
+var filestoragePath string
+var urlDomain string
 
 func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -76,9 +77,14 @@ func init() {
 		log.Fatalln("could not get credentials file path from env")
 	}
 
-	baseFilestorage, exist = os.LookupEnv(conf.BaseFilestorage)
-	if !exist || len(baseFilestorage) == 0 {
-		log.Fatalln("could not get base filestorage path from env")
+	filestoragePath, exist = os.LookupEnv(conf.FilestoragePath)
+	if !exist || len(filestoragePath) == 0 {
+		log.Fatalln("could not get filestorage path from env")
+	}
+
+	urlDomain, exist = os.LookupEnv(conf.UrlDomain)
+	if !exist || len(urlDomain) == 0 {
+		log.Fatalln("could not get url domain path from env")
 	}
 }
 
@@ -121,7 +127,7 @@ func main() {
 		credentialsFile,
 	)
 
-	Handler := delivery.NewHandler(Usecase, baseFilestorage)
+	Handler := delivery.NewHandler(Usecase, filestoragePath, urlDomain)
 
 	myRouter.HandleFunc(conf.PathAttach, Handler.UploadFile).Methods(http.MethodPost, http.MethodOptions)
 
