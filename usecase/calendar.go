@@ -17,11 +17,11 @@ import (
 )
 
 // Retrieve a token, saves the token, then returns the generated client.
-func getClient(config *oauth2.Config) (*http.Client, error) {
+func getClient(tokFile string, config *oauth2.Config) (*http.Client, error) {
 	// The file token.json stores the user's access and refresh tokens, and is
 	// created automatically when the authorization flow completes for the first
 	// time.
-	tokFile := "token.json"
+	// tokFile := "token.json"
 	//now := time.Now()
 	//redTime := now.Add(1 * time.Minute)
 	tok, err := tokenFromFile(tokFile)
@@ -101,7 +101,7 @@ func saveToken(path string, token *oauth2.Token) {
 
 func (uc *Usecase) SetOAUTH2Token() error {
 	//ctx := context.Background()
-	b, err := os.ReadFile("credentials.json")
+	b, err := os.ReadFile(uc.credentialsFile)
 	if err != nil {
 		log.Println("Unable to read client secret file: ", err)
 		return e.StacktraceError(err)
@@ -125,7 +125,7 @@ func (uc *Usecase) SetOAUTH2Token() error {
 
 func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 	//ctx := context.Background()
-	b, err := os.ReadFile("credentials.json")
+	b, err := os.ReadFile(uc.credentialsFile)
 	if err != nil {
 		log.Println("Unable to read client secret file: ", err)
 		return e.StacktraceError(err)
@@ -143,8 +143,7 @@ func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 		return e.StacktraceError(err)
 	}
 
-	path := "token.json"
-	saveToken(path, token)
+	saveToken(uc.tokenFile, token)
 	// log.Println("Saving credential file to: ", path)
 	// f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	// if err != nil {
@@ -166,7 +165,7 @@ func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 
 func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error) {
 	ctx := context.Background()
-	b, err := os.ReadFile("credentials.json")
+	b, err := os.ReadFile(uc.credentialsFile)
 	if err != nil {
 		log.Println("Unable to read client secret file: ", err)
 		return nil, e.StacktraceError(err)
@@ -178,7 +177,7 @@ func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse,
 		return nil, e.StacktraceError(err)
 	}
 
-	client, err := getClient(config)
+	client, err := getClient(uc.tokenFile, config)
 	if err != nil {
 		log.Println("Unable to get client from token: ", err)
 		return nil, e.StacktraceError(err)
@@ -215,7 +214,7 @@ func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse,
 
 func (uc *Usecase) CreateCalendarEvent(req *model.CreateCalendarEvent, teacherID int, classID int) error {
 	ctx := context.Background()
-	b, err := os.ReadFile("credentials.json")
+	b, err := os.ReadFile(uc.credentialsFile)
 	if err != nil {
 		log.Println("Unable to read client secret file: ", err)
 		return e.StacktraceError(err)
@@ -227,7 +226,7 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CreateCalendarEvent, teacherID
 		return e.StacktraceError(err)
 	}
 
-	client, err := getClient(config)
+	client, err := getClient(uc.tokenFile, config)
 	if err != nil {
 		log.Println("Unable to get client from token: ", err)
 		return e.StacktraceError(err)

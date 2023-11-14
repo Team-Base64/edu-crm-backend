@@ -43,20 +43,24 @@ type UsecaseInterface interface {
 }
 
 type Usecase struct {
-	store       rep.StoreInterface
-	letters     []rune
-	tokenLen    int
-	bufToken    []rune
-	chatService ctrl.ChatServiceInterface
+	store           rep.StoreInterface
+	letters         []rune
+	tokenLen        int
+	bufToken        []rune
+	chatService     ctrl.ChatServiceInterface
+	tokenFile       string
+	credentialsFile string
 }
 
-func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface) UsecaseInterface {
+func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface, tok string, cred string) UsecaseInterface {
 	return &Usecase{
-		store:       s,
-		letters:     []rune(lettes),
-		tokenLen:    tokenLen,
-		bufToken:    make([]rune, tokenLen),
-		chatService: cs,
+		store:           s,
+		letters:         []rune(lettes),
+		tokenLen:        tokenLen,
+		bufToken:        make([]rune, tokenLen),
+		chatService:     cs,
+		tokenFile:       tok,
+		credentialsFile: cred,
 	}
 }
 

@@ -31,7 +31,7 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	filePath := ""
 	switch typeS {
 	case "homework":
-		filePath = api.filestorage + chatFilesPath
+		filePath = api.filestorage + homeworkFilesPath
 	case "solution":
 		filePath = api.filestorage + solutionFilesPath
 	case "chat":
@@ -83,7 +83,7 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	attachNum := uuid.New().String()
 
 	fileName := filePath + "/" + attachNum + fileExt
-	f, err := os.OpenFile(api.prefix+fileName, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)

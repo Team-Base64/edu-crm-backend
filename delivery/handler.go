@@ -32,10 +32,9 @@ var solutionFilesPath = "/solution"
 type Handler struct {
 	usecase     uc.UsecaseInterface
 	filestorage string
-	prefix      string
 }
 
-func NewHandler(uc uc.UsecaseInterface, fs string, pf string) *Handler {
+func NewHandler(uc uc.UsecaseInterface, fs string) *Handler {
 	for _, path := range []string{chatFilesPath, homeworkFilesPath, solutionFilesPath} {
 		if err := os.MkdirAll(fs+path, os.ModePerm); err != nil {
 			log.Fatalln(e.StacktraceError(err))
@@ -46,7 +45,6 @@ func NewHandler(uc uc.UsecaseInterface, fs string, pf string) *Handler {
 		usecase: uc,
 
 		filestorage: fs,
-		prefix:      pf,
 	}
 }
 

@@ -23,6 +23,14 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+var urlDB string
+var chatGrpcUrl string
+var tokenLen int
+var tokenLetters string
+var tokenFile string
+var credentialsFile string
+var baseFilestorage string
+
 func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI, r.Method)
@@ -34,12 +42,52 @@ func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func init() {
+	var err error
+	var exist bool
+
+	chatGrpcUrl, exist = os.LookupEnv(conf.ChatGrpcUrl)
+	if !exist || len(chatGrpcUrl) == 0 {
+		log.Fatalln("could not get chat grpc url from env")
+	}
+
+	urlDB, exist = os.LookupEnv(conf.UrlDB)
+	if !exist || len(urlDB) == 0 {
+		log.Fatalln("could not get database url from env")
+	}
+
+	tokenLen, err = strconv.Atoi(os.Getenv(conf.TokenLenght))
+	if err != nil {
+		log.Fatalln("could not get token length from env")
+	}
+
+	tokenLetters, exist = os.LookupEnv(conf.TokenLetters)
+	if !exist || len(tokenLetters) == 0 {
+		log.Fatalln("could not get token letters from env")
+	}
+
+	tokenFile, exist = os.LookupEnv(conf.TokenFile)
+	if !exist || len(tokenFile) == 0 {
+		log.Fatalln("could not get token file path from env")
+	}
+
+	credentialsFile, exist = os.LookupEnv(conf.CredentialsFile)
+	if !exist || len(credentialsFile) == 0 {
+		log.Fatalln("could not get credentials file path from env")
+	}
+
+	baseFilestorage, exist = os.LookupEnv(conf.BaseFilestorage)
+	if !exist || len(baseFilestorage) == 0 {
+		log.Fatalln("could not get base filestorage path from env")
+	}
+}
+
 func main() {
 	log.SetFlags(log.LstdFlags)
 
 	myRouter := mux.NewRouter()
 
-	db, err := sql.Open("pgx", os.Getenv(conf.UrlDB))
+	db, err := sql.Open("pgx", urlDB)
 	if err != nil {
 		log.Fatalln("could not connect to database")
 	}
@@ -52,17 +100,8 @@ func main() {
 
 	Store := repository.NewStore(db)
 
-	tokenLen, err := strconv.Atoi(os.Getenv(conf.TokenLenght))
-	if err != nil {
-		log.Fatalln("could not get token length from env")
-	}
-	tokenLetters, exist := os.LookupEnv(conf.TokenLetters)
-	if !exist || len(tokenLetters) == 0 {
-		log.Fatalln("could not get token letters from env")
-	}
-
 	grcpConnChat, err := grpc.Dial(
-		os.Getenv(conf.ChatGrpcUrl),
+		chatGrpcUrl,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -78,9 +117,11 @@ func main() {
 		tokenLetters,
 		tokenLen,
 		ChatService,
+		tokenFile,
+		credentialsFile,
 	)
 
-	Handler := delivery.NewHandler(Usecase, os.Getenv(conf.BaseFilestorage), os.Getenv(conf.PrefixFilestorage))
+	Handler := delivery.NewHandler(Usecase, baseFilestorage)
 
 	myRouter.HandleFunc(conf.PathAttach, Handler.UploadFile).Methods(http.MethodPost, http.MethodOptions)
 
