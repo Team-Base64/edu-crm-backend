@@ -4,9 +4,8 @@ var UrlDB = "URL_DB"
 var TokenLetters = "TOKEN_LETTERS"
 var TokenLenght = "TOKEN_LENGTH"
 var ChatGrpcUrl = "CHAT_GRPC_URL"
-
-var BaseFilestorage = "BASE_FILESTORAGE"
-
+var FilestoragePath = "FILESTORAGE_PATH"
+var UrlDomain = "URL_DOMAIN"
 var TokenFile = "TOKEN_FILE"
 var CredentialsFile = "CREDENTIALS_FILE"
 

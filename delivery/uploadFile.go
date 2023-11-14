@@ -31,11 +31,11 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	filePath := ""
 	switch typeS {
 	case "homework":
-		filePath = api.filestorage + homeworkFilesPath
+		filePath = api.filestoragePath + homeworkFilesPath
 	case "solution":
-		filePath = api.filestorage + solutionFilesPath
+		filePath = api.filestoragePath + solutionFilesPath
 	case "chat":
-		filePath = api.filestorage + chatFilesPath
+		filePath = api.filestoragePath + chatFilesPath
 	default:
 		log.Println(e.StacktraceError(errors.New("error wrong type query param")))
 		returnErrorJSON(w, e.ErrBadRequest400)
@@ -98,5 +98,5 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.UploadAttachResponse{File: "http://127.0.0.1:8080/" + fileName[1:]})
+	json.NewEncoder(w).Encode(&model.UploadAttachResponse{File: api.urlDomain + fileName})
 }
