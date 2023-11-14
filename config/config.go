@@ -26,6 +26,8 @@ var PathChatByID = BasePath + "/chats/{id}"
 
 var PathCalendar = BasePath + "/calendar"
 var PathAddEvent = BasePath + "/calendar/addevent"
+var PathGetEvents = BasePath + "/calendar/events"
+var PathEvent = BasePath + "/calendar/event"
 
 var PathClasses = BasePath + "/classes"
 var PathClassByID = BasePath + "/classes/{id}"

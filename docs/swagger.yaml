@@ -1,5 +1,20 @@
 basePath: /api
 definitions:
+  model.CalendarEvent:
+    properties:
+      classid:
+        type: integer
+      description:
+        type: string
+      endDate:
+        type: string
+      id:
+        type: string
+      startDate:
+        type: string
+      title:
+        type: string
+    type: object
   model.Chat:
     properties:
       messages:
@@ -67,6 +82,11 @@ definitions:
         type: string
       id:
         type: integer
+    type: object
+  model.DeleteEvent:
+    properties:
+      id:
+        type: string
     type: object
   model.Error:
     properties:
@@ -286,6 +306,13 @@ definitions:
       id:
         type: integer
     type: object
+  model.TaskListByTeacherID:
+    properties:
+      tasks:
+        items:
+          $ref: '#/definitions/model.Task'
+        type: array
+    type: object
   model.TeacherProfile:
     properties:
       name:
@@ -384,6 +411,13 @@ paths:
       - application/json
       description: Creates teacher's calendar event
       operationId: CreateCalendarEvent
+      parameters:
+      - description: Event for creating
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/model.CalendarEvent'
       produces:
       - application/json
       responses:
@@ -401,6 +435,94 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Creates teacher's calendar event
+      tags:
+      - Calendar
+  /calendar/event:
+    delete:
+      consumes:
+      - application/json
+      description: Delete teacher's calendar event
+      operationId: DeleteCalendarEvent
+      parameters:
+      - description: Event for deleting
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/model.DeleteEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Delete teacher's calendar event
+      tags:
+      - Calendar
+    post:
+      consumes:
+      - application/json
+      description: Update teacher's calendar event
+      operationId: UpdateCalendarEvent
+      parameters:
+      - description: Event for updating
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/model.CalendarEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Update teacher's calendar event
+      tags:
+      - Calendar
+  /calendar/events:
+    get:
+      consumes:
+      - application/json
+      description: Get teacher's calendar event
+      operationId: GetCalendarEvents
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CalendarEvent'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get teacher's calendar event
       tags:
       - Calendar
   /chats:
@@ -1037,4 +1159,27 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get student
+  /tasks:
+    get:
+      consumes:
+      - application/json
+      description: gets teacher's tasks
+      operationId: getTeacherTasks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TaskListByTeacherID'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get teacher's tasks
 swagger: "2.0"
