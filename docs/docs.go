@@ -293,6 +293,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Chats"
+                ],
                 "summary": "Get chats of teacher",
                 "operationId": "getChats",
                 "responses": {
@@ -325,6 +328,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chat messages by id",
                 "operationId": "getChat",
@@ -380,6 +386,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get teacher` + "`" + `s classes",
                 "operationId": "getClasses",
                 "responses": {
@@ -410,6 +419,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Class"
                 ],
                 "summary": "Create class",
                 "operationId": "createClass",
@@ -467,6 +479,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get class by id",
                 "operationId": "getClass",
                 "parameters": [
@@ -521,6 +536,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Feed"
+                ],
                 "summary": "Get class feed",
                 "operationId": "getClassFeed",
                 "parameters": [
@@ -572,6 +590,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Feed"
                 ],
                 "summary": "Create post",
                 "operationId": "createPost",
@@ -636,6 +657,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get class homeworks",
                 "operationId": "getHomeworksFromClass",
                 "parameters": [
@@ -689,6 +713,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions from class",
                 "operationId": "getSolutionsFromClass",
@@ -744,6 +771,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get students from class",
                 "operationId": "getStudentsFromClass",
                 "parameters": [
@@ -797,6 +827,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Homework"
                 ],
                 "summary": "Create homework",
                 "operationId": "createHomework",
@@ -854,6 +887,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get homework",
                 "operationId": "getHomework",
                 "parameters": [
@@ -907,6 +943,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions for homework",
                 "operationId": "getSolutionsForHomework",
@@ -1031,6 +1070,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Teacher"
+                ],
                 "summary": "Get teacher's info",
                 "operationId": "getTeacher",
                 "responses": {
@@ -1063,6 +1105,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Teacher"
                 ],
                 "summary": "Create teacher",
                 "operationId": "createTeacher",
@@ -1107,6 +1152,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solution",
                 "operationId": "getSolution",
@@ -1162,6 +1210,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get student",
                 "operationId": "getStudent",
                 "parameters": [
@@ -1215,6 +1266,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Tasks"
                 ],
                 "summary": "Get teacher's tasks",
                 "operationId": "getTeacherTasks",

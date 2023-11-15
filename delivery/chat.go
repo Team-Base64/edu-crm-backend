@@ -15,6 +15,7 @@ import (
 // @ID getChats
 // @Accept  json
 // @Produce  json
+// @Tags Chats
 // @Success 200 {object} model.ChatPreviewList
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
@@ -36,6 +37,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 // @ID getChat
 // @Accept  json
 // @Produce  json
+// @Tags Chats
 // @Param chatID path string true "Chat id"
 // @Success 200 {object} model.Chat
 // @Failure 400 {object} model.Error "bad request - Problem with the request"

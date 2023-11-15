@@ -19,12 +19,6 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /oauth [post]
 func (api *Handler) SetOAUTH2Token(w http.ResponseWriter, r *http.Request) {
-	//decoder := json.NewDecoder(r.Body)
-	// var tok model.OAUTH2Token
-	// if err := decoder.Decode(&tok); err != nil {
-	// 	returnErrorJSON(w, e.ErrBadRequest400)
-	// 	return
-	// }
 	err := api.usecase.SetOAUTH2Token()
 	if err != nil {
 		log.Println("Error ", err)
@@ -46,12 +40,6 @@ func (api *Handler) SetOAUTH2Token(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /oauth/savetoken [get]
 func (api *Handler) SaveOAUTH2TokenToFile(w http.ResponseWriter, r *http.Request) {
-	//decoder := json.NewDecoder(r.Body)
-	// var tok model.OAUTH2Token
-	// if err := decoder.Decode(&tok); err != nil {
-	// 	returnErrorJSON(w, e.ErrBadRequest400)
-	// 	return
-	// }
 	code := r.URL.Query().Get("code")
 	err := api.usecase.SaveOAUTH2Token(code)
 	if err != nil {

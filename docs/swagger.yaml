@@ -548,6 +548,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get chats of teacher
+      tags:
+      - Chats
   /chats/{chatID}:
     get:
       consumes:
@@ -585,6 +587,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get chat messages by id
+      tags:
+      - Chats
   /classes:
     get:
       consumes:
@@ -608,6 +612,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get teacher`s classes
+      tags:
+      - Class
     post:
       consumes:
       - application/json
@@ -645,6 +651,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Create class
+      tags:
+      - Class
   /classes/{classID}:
     get:
       consumes:
@@ -682,6 +690,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get class by id
+      tags:
+      - Class
   /classes/{classID}/feed:
     get:
       consumes:
@@ -719,6 +729,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get class feed
+      tags:
+      - Feed
     post:
       consumes:
       - application/json
@@ -761,6 +773,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Create post
+      tags:
+      - Feed
   /classes/{classID}/homeworks:
     get:
       consumes:
@@ -798,6 +812,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get class homeworks
+      tags:
+      - Homework
   /classes/{classID}/solutions:
     get:
       consumes:
@@ -835,6 +851,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get solutions from class
+      tags:
+      - Solution
   /classes/{classID}/students:
     get:
       consumes:
@@ -872,6 +890,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get students from class
+      tags:
+      - Student
   /homeworks:
     post:
       consumes:
@@ -910,6 +930,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Create homework
+      tags:
+      - Homework
   /homeworks/{hwID}:
     get:
       consumes:
@@ -947,6 +969,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get homework
+      tags:
+      - Homework
   /homeworks/{hwID}/solutions:
     get:
       consumes:
@@ -984,6 +1008,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get solutions for homework
+      tags:
+      - Solution
   /oauth:
     post:
       consumes:
@@ -1055,6 +1081,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get teacher's info
+      tags:
+      - Teacher
   /register:
     post:
       consumes:
@@ -1085,6 +1113,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Create teacher
+      tags:
+      - Teacher
   /solutions/{solID}:
     get:
       consumes:
@@ -1122,6 +1152,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get solution
+      tags:
+      - Solution
   /students/{studentID}:
     get:
       consumes:
@@ -1159,6 +1191,8 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get student
+      tags:
+      - Student
   /tasks:
     get:
       consumes:
@@ -1182,4 +1216,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get teacher's tasks
+      tags:
+      - Tasks
 swagger: "2.0"

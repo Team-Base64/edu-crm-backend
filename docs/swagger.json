@@ -287,6 +287,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Chats"
+                ],
                 "summary": "Get chats of teacher",
                 "operationId": "getChats",
                 "responses": {
@@ -319,6 +322,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chat messages by id",
                 "operationId": "getChat",
@@ -374,6 +380,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get teacher`s classes",
                 "operationId": "getClasses",
                 "responses": {
@@ -404,6 +413,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Class"
                 ],
                 "summary": "Create class",
                 "operationId": "createClass",
@@ -461,6 +473,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get class by id",
                 "operationId": "getClass",
                 "parameters": [
@@ -515,6 +530,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Feed"
+                ],
                 "summary": "Get class feed",
                 "operationId": "getClassFeed",
                 "parameters": [
@@ -566,6 +584,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Feed"
                 ],
                 "summary": "Create post",
                 "operationId": "createPost",
@@ -630,6 +651,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get class homeworks",
                 "operationId": "getHomeworksFromClass",
                 "parameters": [
@@ -683,6 +707,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions from class",
                 "operationId": "getSolutionsFromClass",
@@ -738,6 +765,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get students from class",
                 "operationId": "getStudentsFromClass",
                 "parameters": [
@@ -791,6 +821,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Homework"
                 ],
                 "summary": "Create homework",
                 "operationId": "createHomework",
@@ -848,6 +881,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get homework",
                 "operationId": "getHomework",
                 "parameters": [
@@ -901,6 +937,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions for homework",
                 "operationId": "getSolutionsForHomework",
@@ -1025,6 +1064,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Teacher"
+                ],
                 "summary": "Get teacher's info",
                 "operationId": "getTeacher",
                 "responses": {
@@ -1057,6 +1099,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Teacher"
                 ],
                 "summary": "Create teacher",
                 "operationId": "createTeacher",
@@ -1101,6 +1146,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solution",
                 "operationId": "getSolution",
@@ -1156,6 +1204,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get student",
                 "operationId": "getStudent",
                 "parameters": [
@@ -1209,6 +1260,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Tasks"
                 ],
                 "summary": "Get teacher's tasks",
                 "operationId": "getTeacherTasks",
