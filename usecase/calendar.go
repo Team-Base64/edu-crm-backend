@@ -233,11 +233,11 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		Description: req.Description,
 		Start: &calendar.EventDateTime{
 			DateTime: req.StartDate,
-			TimeZone: "Europe/Moscow",
+			//TimeZone: "Europe/Moscow",
 		},
 		End: &calendar.EventDateTime{
 			DateTime: req.EndDate,
-			TimeZone: "Europe/Moscow",
+			//TimeZone: "Europe/Moscow",
 		},
 		Visibility: "public",
 	}
@@ -331,17 +331,26 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return e.StacktraceError(err)
 	}
+	s := strings.Split(req.Title, " ")
+	//log.Println(s)
+	newTitle := ""
+	if len(s) > 2 && s[len(s)-2] == "Class" {
+		newTitle = strings.Join(s[:len(s)-2], " ")
+	} else {
+		newTitle = req.Title
+	}
 
+	//log.Println(newTitle)
 	event := &calendar.Event{
-		Summary:     req.Title + " Class " + fmt.Sprintf("%d", req.ClassID),
+		Summary:     newTitle + " Class " + fmt.Sprintf("%d", req.ClassID),
 		Description: req.Description,
 		Start: &calendar.EventDateTime{
 			DateTime: req.StartDate,
-			TimeZone: "Europe/Moscow",
+			//TimeZone: "Europe/Moscow",
 		},
 		End: &calendar.EventDateTime{
 			DateTime: req.EndDate,
-			TimeZone: "Europe/Moscow",
+			//TimeZone: "Europe/Moscow",
 		},
 		Visibility: "public",
 	}
