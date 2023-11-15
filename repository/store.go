@@ -34,12 +34,13 @@ type StoreInterface interface {
 	AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	DeleteHomework(id int) error
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
+	GetHomeworksByClassID(classID int) ([]model.Homework, error)
 	// TASK
 	AddTask(teacherID int, newTask *model.TaskCreate) (int, error)
 	GetTaskByID(id int) (*model.TaskByID, error)
 	GetTasksByTeacherID(teacherID int) ([]*model.Task, error)
 	GetTasksByHomeworkID(homeworkID int) ([]*model.Task, error)
+	GetTasksIDByHomeworkID(homeworkID int) ([]int, error)
 	AttachTaskToHomework(hwID int, taskID int, taskRank int) error
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)

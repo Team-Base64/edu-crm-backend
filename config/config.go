@@ -37,6 +37,8 @@ var PathHomework = BasePath + "/homeworks"
 var PathHomeworkByID = BasePath + "/homeworks/{id}"
 var PathHomeworkSolutions = BasePath + "/homeworks/{id}/solutions"
 
+var PathTasks = BasePath + "/tasks"
+
 var PathSolution = BasePath + "/solutions/{id}"
 
 var PathStudent = BasePath + "/students/{id}"

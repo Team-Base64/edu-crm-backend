@@ -18,13 +18,13 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*
 		return nil, e.StacktraceError(err)
 	}
 
-	if err = uc.chatService.BroadcastMsg(genHomeworkMsg(newHw)); err != nil {
-		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
+	msg, err := uc.genHomeworkMsg(newHw)
+	if err != nil {
+		return nil, err
 	}
 
-	tasks, err := uc.store.GetTasksByHomeworkID(id)
-	if err != nil {
-		return nil, e.StacktraceError(err)
+	if err = uc.chatService.BroadcastMsg(msg); err != nil {
+		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 
 	res := &model.Homework{
@@ -33,7 +33,7 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*
 		Description:  newHw.Description,
 		DeadlineTime: newHw.DeadlineTime,
 		CreateTime:   createTime,
-		Tasks:        tasks,
+		Tasks:        newHw.Tasks,
 	}
 	return res, nil
 }
@@ -55,22 +55,27 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	return hws, nil
+	return &model.HomeworkList{Homeworks: hws}, nil
 }
 
-func genHomeworkMsg(hw *model.HomeworkCreate) *model.ClassBroadcastMessage {
+func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) (*model.ClassBroadcastMessage, error) {
 	msg := model.ClassBroadcastMessage{
 		ClassID:     hw.ClassID,
 		Title:       "Внимание! Выдано домашнее задание: " + hw.Title,
 		Description: hw.Description,
 	}
 
-	for id, task := range hw.Tasks {
+	for id, taskID := range hw.Tasks {
+		task, err := uc.store.GetTaskByID(taskID)
+		if err != nil {
+			return nil, err
+		}
+
 		msg.Description += "\n" + "Задание №" + strconv.Itoa(id) + "\n" + task.Description
 		msg.Attaches = append(msg.Attaches, task.Attach)
 	}
 
 	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.String()
 
-	return &msg
+	return &msg, nil
 }
