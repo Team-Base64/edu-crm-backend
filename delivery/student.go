@@ -16,6 +16,7 @@ import (
 // @ID getStudent
 // @Accept  json
 // @Produce  json
+// @Tags Student
 // @Param studentID path string true "StudentID id"
 // @Success 200 {object} model.StudentByIDResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
@@ -48,6 +49,7 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 // @ID getStudentsFromClass
 // @Accept  json
 // @Produce  json
+// @Tags Student
 // @Param classID path string true "Class id"
 // @Success 200 {object} model.StudentListFromClass
 // @Failure 400 {object} model.Error "bad request - Problem with the request"

@@ -9,9 +9,19 @@ type CreateCalendarResponse struct {
 	IDInGoogle string `json:"googleid"`
 }
 
-type CreateCalendarEvent struct {
+type CalendarEvent struct {
 	Title       string `json:"title"`
 	Description string `json:"description,omitempty"`
 	StartDate   string `json:"startDate"`
 	EndDate     string `json:"endDate"`
+	ClassID     int    `json:"classid"`
+	ID          string `json:"id,omitempty"`
+}
+
+type CalendarEvents struct {
+	Events []*CalendarEvent `json:"events"`
+}
+
+type DeleteEvent struct {
+	ID string `json:"id"`
 }

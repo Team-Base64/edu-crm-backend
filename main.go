@@ -142,6 +142,9 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathCalendar, Handler.CreateCalendar).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathAddEvent, Handler.CreateCalendarEvent).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathGetEvents, Handler.GetCalendarEvents).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathEvent, Handler.DeleteCalendarEvent).Methods(http.MethodDelete, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathEvent, Handler.UpdateCalendarEvent).Methods(http.MethodPost, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathClasses, Handler.GetTeacherClasses).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathClassByID, Handler.GetClass).Methods(http.MethodGet, http.MethodOptions)

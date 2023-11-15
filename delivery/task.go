@@ -14,6 +14,7 @@ import (
 // @ID getTeacherTasks
 // @Accept  json
 // @Produce  json
+// @Tags Tasks
 // @Success 200 {object} model.TaskListByTeacherID
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"

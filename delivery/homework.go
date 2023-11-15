@@ -16,6 +16,7 @@ import (
 // @ID getHomeworksFromClass
 // @Accept  json
 // @Produce  json
+// @Tags Homework
 // @Param classID path string true "Class id"
 // @Success 200 {object} model.HomeworkList
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
@@ -80,6 +81,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 // @ID createHomework
 // @Accept  json
 // @Produce  json
+// @Tags Homework
 // @Param post body model.HomeworkCreate true "Homework for creating"
 // @Success 200 {object} model.HomeworkResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
