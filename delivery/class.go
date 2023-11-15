@@ -16,6 +16,7 @@ import (
 // @ID getClasses
 // @Accept  json
 // @Produce  json
+// @Tags Class
 // @Success 200 {object} model.ClassInfoList
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
@@ -36,6 +37,7 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 // @ID getClass
 // @Accept  json
 // @Produce  json
+// @Tags Class
 // @Param classID path string true "Class id"
 // @Success 200 {object} model.ClassInfoResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
@@ -66,6 +68,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 // @ID createClass
 // @Accept  json
 // @Produce  json
+// @Tags Class
 // @Param class body model.ClassCreate true "Class for creating"
 // @Success 200 {object} model.ClassInfoResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"

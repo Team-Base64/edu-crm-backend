@@ -14,6 +14,7 @@ import (
 // @ID createTeacher
 // @Accept  json
 // @Produce  json
+// @Tags Teacher
 // @Param user body model.TeacherSignUp true "Teacher params"
 // @Success 200 {object} model.Response "OK"
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
@@ -42,6 +43,7 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 // @ID getTeacher
 // @Accept  json
 // @Produce  json
+// @Tags Teacher
 // @Success 200 {object} model.TeacherProfileResponse
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"

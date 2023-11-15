@@ -16,6 +16,7 @@ import (
 // @ID getClassFeed
 // @Accept  json
 // @Produce  json
+// @Tags Feed
 // @Param classID path string true "Class id"
 // @Success 200 {object} model.Feed
 // @Failure 400 {object} model.Error "bad request - Problem with the request"
@@ -48,6 +49,7 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 // @ID createPost
 // @Accept  json
 // @Produce  json
+// @Tags Feed
 // @Param classID path string true "Class id"
 // @Param post body model.PostCreate true "Post for creating"
 // @Success 200 {object} model.PostResponse

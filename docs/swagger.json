@@ -117,11 +117,150 @@
                 ],
                 "summary": "Creates teacher's calendar event",
                 "operationId": "CreateCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for creating",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar/event": {
+            "post": {
+                "description": "Update teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Update teacher's calendar event",
+                "operationId": "UpdateCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for updating",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Delete teacher's calendar event",
+                "operationId": "DeleteCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for deleting",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar/events": {
+            "get": {
+                "description": "Get teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Get teacher's calendar event",
+                "operationId": "GetCalendarEvents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
                         }
                     },
                     "401": {
@@ -147,6 +286,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chats of teacher",
                 "operationId": "getChats",
@@ -180,6 +322,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chat messages by id",
                 "operationId": "getChat",
@@ -235,6 +380,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get teacher`s classes",
                 "operationId": "getClasses",
                 "responses": {
@@ -265,6 +413,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Class"
                 ],
                 "summary": "Create class",
                 "operationId": "createClass",
@@ -322,6 +473,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get class by id",
                 "operationId": "getClass",
                 "parameters": [
@@ -376,6 +530,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Feed"
+                ],
                 "summary": "Get class feed",
                 "operationId": "getClassFeed",
                 "parameters": [
@@ -427,6 +584,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Feed"
                 ],
                 "summary": "Create post",
                 "operationId": "createPost",
@@ -491,6 +651,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get class homeworks",
                 "operationId": "getHomeworksFromClass",
                 "parameters": [
@@ -544,6 +707,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions from class",
                 "operationId": "getSolutionsFromClass",
@@ -599,6 +765,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get students from class",
                 "operationId": "getStudentsFromClass",
                 "parameters": [
@@ -652,6 +821,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Homework"
                 ],
                 "summary": "Create homework",
                 "operationId": "createHomework",
@@ -709,6 +881,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get homework",
                 "operationId": "getHomework",
                 "parameters": [
@@ -762,6 +937,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions for homework",
                 "operationId": "getSolutionsForHomework",
@@ -886,6 +1064,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Teacher"
+                ],
                 "summary": "Get teacher's info",
                 "operationId": "getTeacher",
                 "responses": {
@@ -918,6 +1099,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Teacher"
                 ],
                 "summary": "Create teacher",
                 "operationId": "createTeacher",
@@ -962,6 +1146,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solution",
                 "operationId": "getSolution",
@@ -1017,6 +1204,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get student",
                 "operationId": "getStudent",
                 "parameters": [
@@ -1061,9 +1251,68 @@
                     }
                 }
             }
+        },
+        "/tasks": {
+            "get": {
+                "description": "gets teacher's tasks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get teacher's tasks",
+                "operationId": "getTeacherTasks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TaskListByTeacherID"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.CalendarEvent": {
+            "type": "object",
+            "properties": {
+                "classid": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Chat": {
             "type": "object",
             "properties": {
@@ -1167,6 +1416,14 @@
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.DeleteEvent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },
@@ -1505,6 +1762,17 @@
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.TaskListByTeacherID": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Task"
+                    }
                 }
             }
         },

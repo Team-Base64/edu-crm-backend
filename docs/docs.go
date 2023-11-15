@@ -123,11 +123,150 @@ const docTemplate = `{
                 ],
                 "summary": "Creates teacher's calendar event",
                 "operationId": "CreateCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for creating",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar/event": {
+            "post": {
+                "description": "Update teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Update teacher's calendar event",
+                "operationId": "UpdateCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for updating",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Delete teacher's calendar event",
+                "operationId": "DeleteCalendarEvent",
+                "parameters": [
+                    {
+                        "description": "Event for deleting",
+                        "name": "event",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/calendar/events": {
+            "get": {
+                "description": "Get teacher's calendar event",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Get teacher's calendar event",
+                "operationId": "GetCalendarEvents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarEvent"
                         }
                     },
                     "401": {
@@ -153,6 +292,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chats of teacher",
                 "operationId": "getChats",
@@ -186,6 +328,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Chats"
                 ],
                 "summary": "Get chat messages by id",
                 "operationId": "getChat",
@@ -241,6 +386,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get teacher` + "`" + `s classes",
                 "operationId": "getClasses",
                 "responses": {
@@ -271,6 +419,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Class"
                 ],
                 "summary": "Create class",
                 "operationId": "createClass",
@@ -328,6 +479,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Class"
+                ],
                 "summary": "Get class by id",
                 "operationId": "getClass",
                 "parameters": [
@@ -382,6 +536,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Feed"
+                ],
                 "summary": "Get class feed",
                 "operationId": "getClassFeed",
                 "parameters": [
@@ -433,6 +590,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Feed"
                 ],
                 "summary": "Create post",
                 "operationId": "createPost",
@@ -497,6 +657,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get class homeworks",
                 "operationId": "getHomeworksFromClass",
                 "parameters": [
@@ -550,6 +713,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions from class",
                 "operationId": "getSolutionsFromClass",
@@ -605,6 +771,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get students from class",
                 "operationId": "getStudentsFromClass",
                 "parameters": [
@@ -658,6 +827,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Homework"
                 ],
                 "summary": "Create homework",
                 "operationId": "createHomework",
@@ -715,6 +887,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Homework"
+                ],
                 "summary": "Get homework",
                 "operationId": "getHomework",
                 "parameters": [
@@ -768,6 +943,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solutions for homework",
                 "operationId": "getSolutionsForHomework",
@@ -892,6 +1070,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Teacher"
+                ],
                 "summary": "Get teacher's info",
                 "operationId": "getTeacher",
                 "responses": {
@@ -924,6 +1105,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Teacher"
                 ],
                 "summary": "Create teacher",
                 "operationId": "createTeacher",
@@ -968,6 +1152,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Solution"
                 ],
                 "summary": "Get solution",
                 "operationId": "getSolution",
@@ -1023,6 +1210,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Student"
+                ],
                 "summary": "Get student",
                 "operationId": "getStudent",
                 "parameters": [
@@ -1067,9 +1257,68 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tasks": {
+            "get": {
+                "description": "gets teacher's tasks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get teacher's tasks",
+                "operationId": "getTeacherTasks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TaskListByTeacherID"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.CalendarEvent": {
+            "type": "object",
+            "properties": {
+                "classid": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Chat": {
             "type": "object",
             "properties": {
@@ -1173,6 +1422,14 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.DeleteEvent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },
@@ -1511,6 +1768,17 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.TaskListByTeacherID": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Task"
+                    }
                 }
             }
         },

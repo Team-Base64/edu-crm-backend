@@ -39,7 +39,10 @@ type UsecaseInterface interface {
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error
 	CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error)
-	CreateCalendarEvent(req *model.CreateCalendarEvent, teacherID int, classID int) error
+	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
+	GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, error)
+	DeleteCalendarEvent(teacherID int, eventID string) error
+	UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 }
 
 type Usecase struct {
