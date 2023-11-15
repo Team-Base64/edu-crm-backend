@@ -159,6 +159,8 @@ func main() {
 	myRouter.HandleFunc(conf.PathHomework, Handler.CreateHomework).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathHomeworkSolutions, Handler.GetSolutionsForHomework).Methods(http.MethodGet, http.MethodOptions)
 
+	myRouter.HandleFunc(conf.PathTasks, Handler.GetTeacherTasks).Methods(http.MethodGet, http.MethodOptions)
+
 	myRouter.HandleFunc(conf.PathSolution, Handler.GetSolution).Methods(http.MethodGet, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathStudent, Handler.GetStudent).Methods(http.MethodGet, http.MethodOptions)

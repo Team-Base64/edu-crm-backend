@@ -30,11 +30,11 @@ type UsecaseInterface interface {
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	// TASKS
-	GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error)
+	GetTasksByTeacherID(teacherID int) ([]*model.Task, error)
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
-	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
+	GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error)
 	// CALENDAR
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error

@@ -25,12 +25,12 @@ func (uc *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionListFromCl
 	return sols, nil
 }
 
-func (uc *Usecase) GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error) {
-	if err := uc.store.CheckHomeworkExistence(hwID); err != nil {
+func (uc *Usecase) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error) {
+	if err := uc.store.CheckHomeworkExistence(homeworkID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
-	sols, err := uc.store.GetSolutionsByHwID(hwID)
+	sols, err := uc.store.GetSolutionsByHomeworkID(homeworkID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
