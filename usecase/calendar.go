@@ -22,18 +22,11 @@ import (
 
 // Retrieve a token, saves the token, then returns the generated client.
 func getClient(tokFile string, config *oauth2.Config) (*http.Client, error) {
-	// The file token.json stores the user's access and refresh tokens, and is
-	// created automatically when the authorization flow completes for the first
-	// time.
-	// tokFile := "token.json"
-	//now := time.Now()
-	//redTime := now.Add(1 * time.Minute)
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	tokenSource := config.TokenSource(context.Background(), tok)
-	//tokenSource := conf.TokenSource(oauth2.NoContext, token)
 	newToken, err := tokenSource.Token()
 	if err != nil {
 		return nil, e.StacktraceError(err)
@@ -42,43 +35,8 @@ func getClient(tokFile string, config *oauth2.Config) (*http.Client, error) {
 		saveToken(tokFile, newToken)
 		log.Println("Saved new token:", newToken.AccessToken)
 	}
-
-	//if err != nil {
-	//log.Println(err)
-	// if tok.Expiry.Before(redTime) {
-	// 	exec.Command("xdg-open", "http://127.0.0.1:8080/api/oauth").Start()
-	// }
-	if err != nil {
-		//tok = getTokenFromWeb(config)
-		//saveToken(tokFile, tok)
-		return nil, e.StacktraceError(err)
-		//return config.Client(context.Background(), tok), nil
-	}
 	return config.Client(context.Background(), tok), nil
 }
-
-// // Request a token from the web, then returns the retrieved token.
-// func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-// 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-// 	// fmt.Printf("Go to the following link in your browser then type the "+
-// 	// 	"authorization code: \n%v\n", authURL)
-// 	//открыть новую вкладку
-// 	//exec.Command("xdg-open", authURL).Start()
-
-// 	log.Println("authorization code: ")
-// 	browser.OpenURL(authURL)
-// 	var authCode string
-// 	if _, err := fmt.Scan(&authCode); err != nil {
-// 		log.Fatalf("Unable to read authorization code: %v", err)
-// 	}
-
-// 	tok, err := config.Exchange(context.TODO(), authCode)
-// 	if err != nil {
-// 		log.Fatalf("Unable to retrieve token from web: %v", err)
-// 	}
-// 	//tok := "0AfJohXk2EWvIKvCXEK_vUSJRn7W4eoy2RqQX-wWwiYavt7Q0KOi6nnAlOb_tKn_7IM0tlg"
-// 	return tok
-// }
 
 // Retrieves a token from a local file.
 func tokenFromFile(file string) (*oauth2.Token, error) {
@@ -171,23 +129,7 @@ func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 	}
 
 	saveToken(uc.tokenFile, token)
-	// log.Println("Saving credential file to: ", path)
-	// f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	// if err != nil {
-	// 	log.Println("Unable to cache oauth token: ", err)
-	// 	return e.StacktraceError(err)
-	// }
-	// defer f.Close()
-	// json.NewEncoder(f).Encode(token)
 	return nil
-	//authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	//browser.OpenURL(authURL)
-	//return nil
-	// client, err := getClient(config)
-	// if err != nil {
-	// 	log.Println("Unable to get client from token: ", err)
-	// 	return  e.StacktraceError(err)
-	// }
 }
 
 func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error) {
@@ -253,7 +195,6 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
-	//MockClassID := 1
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID:     req.ClassID,
 		Title:       "Новое событие!" + "\n" + req.Title,
@@ -340,7 +281,6 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		newTitle = req.Title
 	}
 
-	//log.Println(newTitle)
 	event := &calendar.Event{
 		Summary:     newTitle + " Class " + fmt.Sprintf("%d", req.ClassID),
 		Description: req.Description,
@@ -366,7 +306,6 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
-	//MockClassID := 1
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID:     req.ClassID,
 		Title:       "Событие обновлено!" + "\n" + req.Title,
