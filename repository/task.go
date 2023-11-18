@@ -113,7 +113,7 @@ func (s *Store) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
 
 func (s *Store) AttachTaskToHomework(hwID int, taskID int, taskRank int) error {
 	_, err := s.db.Exec(
-		`INSERT INTO homeworks_tasks (homeworkID, taskID) VALUES ($1, $2, $3)`,
+		`INSERT INTO homeworks_tasks (homeworkID, taskID, rank) VALUES ($1, $2, $3)`,
 		hwID, taskID, taskRank,
 	)
 	if err != nil {

@@ -30,7 +30,7 @@ func (s *Store) AddHomework(teacherID int, createTime time.Time, newHw *model.Ho
 
 	for rank, taskID := range newHw.Tasks {
 		if err := s.AttachTaskToHomework(hwID, taskID, rank); err != nil {
-			return 0, e.StacktraceError(err)
+			return 0, e.StacktraceError(err, s.DeleteHomework(hwID))
 		}
 	}
 
