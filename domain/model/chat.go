@@ -3,7 +3,7 @@ package model
 import "time"
 
 type ChatPreview struct {
-	ChatID          int       `json:"chatid"`
+	ChatID          int       `json:"chatID"`
 	Name            string    `json:"name"`
 	Img             string    `json:"cover"`
 	SocialType      string    `json:"socialType"`
