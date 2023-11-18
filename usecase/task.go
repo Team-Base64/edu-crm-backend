@@ -14,6 +14,15 @@ func (uc *Usecase) CreateTask(teacherID int, newTask *model.TaskCreate) (*model.
 	return &model.TaskCreateResponse{ID: id}, nil
 }
 
+func (uc *Usecase) GetTaskByID(id int) (*model.TaskByID, error) {
+	task, err := uc.store.GetTaskByID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return task, nil
+}
+
 func (uc *Usecase) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
 	tasks, err := uc.store.GetTasksByTeacherID(teacherID)
 	if err != nil {

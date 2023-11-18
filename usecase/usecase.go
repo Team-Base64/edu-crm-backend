@@ -31,6 +31,7 @@ type UsecaseInterface interface {
 	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	// TASKS
 	CreateTask(teacherID int, newTask *model.TaskCreate) (*model.TaskCreateResponse, error)
+	GetTaskByID(id int) (*model.TaskByID, error)
 	GetTasksByTeacherID(teacherID int) ([]*model.Task, error)
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
