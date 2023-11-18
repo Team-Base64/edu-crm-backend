@@ -19,3 +19,7 @@ type TaskByID struct {
 type TaskListByTeacherID struct {
 	Tasks []*Task `json:"tasks,omitempty"`
 }
+
+type TaskCreateResponse struct {
+	ID int `json:"id"`
+}
