@@ -48,7 +48,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 
 func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
 	rows, err := s.db.Query(
-		`SELECT m1.chatID, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
+		`SELECT m1.chatID, s.id, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
 		 FROM messages m1
 		 LEFT JOIN messages m2
 		 ON m1.chatId = m2.chatId AND m1.createTime < m2.createTime
@@ -70,7 +70,8 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 		if err = rows.Scan(
 			&tmpChat.ChatID,
-			&tmpChat.Name,
+			&tmpChat.StudentID,
+			&tmpChat.StudentName,
 			&tmpChat.SocialType,
 			&tmpChat.LastMessageText,
 			&tmpChat.LastMessageDate,

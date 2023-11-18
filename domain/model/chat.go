@@ -4,7 +4,8 @@ import "time"
 
 type ChatPreview struct {
 	ChatID          int       `json:"chatID"`
-	Name            string    `json:"name"`
+	StudentID       int       `json:"studentID"`
+	StudentName     string    `json:"studentName"`
 	Img             string    `json:"cover"`
 	SocialType      string    `json:"socialType"`
 	IsRead          bool      `json:"isread"`
