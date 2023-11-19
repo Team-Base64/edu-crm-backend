@@ -37,6 +37,7 @@ type UsecaseInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error)
+	EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error
 	// CALENDAR
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error

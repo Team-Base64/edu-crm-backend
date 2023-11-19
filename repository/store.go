@@ -46,6 +46,8 @@ type StoreInterface interface {
 	GetSolutionByID(id int) (*model.SolutionByID, error)
 	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
 	GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error)
+	GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.SolutionInfoForEvaluationMsg, error)
+	AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error
 	// CALENDAR
 	GetTokenDB(id int) (string, error)
 	CreateCalendarDB(teacherID int, googleID string) (int, error)

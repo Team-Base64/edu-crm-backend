@@ -3,6 +3,7 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+	"strconv"
 )
 
 func (uc *Usecase) GetSolutionByID(id int) (*model.SolutionByID, error) {
@@ -35,4 +36,45 @@ func (uc *Usecase) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionList
 		return nil, e.StacktraceError(err)
 	}
 	return sols, nil
+}
+
+func (uc *Usecase) EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error {
+	msg, err := uc.genEvaluationMsg(solutionID, evaluation)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+
+	if err := uc.store.AddEvaluationForSolution(solutionID, evaluation.IsApproved, msg); err != nil {
+		return e.StacktraceError(err)
+	}
+
+	// TODO add send to student msg
+
+	return nil
+}
+
+func (uc *Usecase) genEvaluationMsg(solutionID int, evaluation *model.SolutionEvaluation) (string, error) {
+	info, err := uc.store.GetInfoForEvaluationMsgBySolutionID(solutionID)
+	if err != nil {
+		return "", e.StacktraceError(err)
+	}
+
+	var msg string
+	msg += "Преподаватель проверил ваше решение от " +
+		info.SolutionCreateTime.Format("15:4 02.01.2006") +
+		" для домашнего задания: " + info.HomeworkTitle + "\n"
+
+	for id, taskEval := range evaluation.Tasks {
+		msg += "Задание №" + strconv.Itoa(id+1) + ":\n" +
+			taskEval.Evaluation + "\n"
+	}
+
+	msg += "Результат: "
+	if evaluation.IsApproved {
+		msg += "Зачтено!"
+	} else {
+		msg += "Не зачетно!"
+	}
+
+	return msg, nil
 }

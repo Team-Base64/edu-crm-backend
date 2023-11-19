@@ -108,3 +108,43 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(&model.SolutionByIDResponse{Solution: *sol})
 }
+
+// AddEvaluationForSolution godoc
+// @Summary Add evaluation for solution
+// @Description Add evaluation for solution by solution id
+// @ID addEvaluationForSolution
+// @Accept  json
+// @Produce  json
+// @Tags Solution
+// @Param solID path string true "Solution id"
+// @Param put body model.SolutionEvaluation true "Evaluation for adding"
+// @Success 200 {object} model.Response
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /solutions/{solID} [put]
+func (api *Handler) AddEvaluationForSolution(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	solID, err := strconv.Atoi(path[len(path)-1])
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	d := json.NewDecoder(r.Body)
+	var eval model.SolutionEvaluation
+	if err := d.Decode(&eval); err != nil {
+		returnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	if err := api.usecase.EvaluateSolutionbyID(solID, &eval); err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(&model.Response{})
+}

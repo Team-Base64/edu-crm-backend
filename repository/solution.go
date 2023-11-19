@@ -97,3 +97,29 @@ func (s *Store) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListFor
 
 	return &model.SolutionListForHw{Solutions: sols}, nil
 }
+
+func (s *Store) GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.SolutionInfoForEvaluationMsg, error) {
+	var info model.SolutionInfoForEvaluationMsg
+
+	if err := s.db.QueryRow(
+		`SELECT h.title, s.createTime FROM homeworks h
+		 JOIN solutions s ON h.id = s.homeworkID
+		 WHERE s.id = $1;`,
+		solutionID,
+	).Scan(&info.HomeworkTitle, &info.SolutionCreateTime); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+
+	return &info, nil
+}
+
+func (s *Store) AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error {
+	if _, err := s.db.Exec(
+		`UPDATE solutions SET isapproved = $1, teacherevaluation = $2 WHERE id = $3;`,
+		isApproved, evaluation, solutionID,
+	); err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
+}

@@ -44,3 +44,8 @@ type SolutionByID struct {
 type SolutionByIDResponse struct {
 	Solution SolutionByID `json:"solution"`
 }
+
+type SolutionInfoForEvaluationMsg struct {
+	HomeworkTitle      string
+	SolutionCreateTime time.Time
+}
