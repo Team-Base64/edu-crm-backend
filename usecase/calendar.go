@@ -178,11 +178,11 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		Summary:     req.Title + " Class " + fmt.Sprintf("%d", req.ClassID),
 		Description: req.Description,
 		Start: &calendar.EventDateTime{
-			DateTime: req.StartDate,
+			DateTime: req.StartDate.Format(time.RFC3339Nano),
 			//TimeZone: "Europe/Moscow",
 		},
 		End: &calendar.EventDateTime{
-			DateTime: req.EndDate,
+			DateTime: req.EndDate.Format(time.RFC3339Nano),
 			//TimeZone: "Europe/Moscow",
 		},
 		Visibility: "public",
@@ -199,11 +199,13 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
+	//s := req.StartDate.Format("2006-01-02 15:04:05")
+
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID: req.ClassID,
 		Title:   "Новое событие!" + "\n" + req.Title,
-		Description: req.Description + "\n" + "Начало: " + req.StartDate + "\n" + "Окончание: " + req.EndDate + "\n" + "Ссылка на календарь: " +
-			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&showTz=1&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&src=611a7b115cb31d14e41c9909e07db425548dd3b5fa76a145f3c93ae7410bc142@group.calendar.google.com",
+		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format(time.RFC1123) + "\n" + "Окончание: " + req.EndDate.Format(time.RFC1123) + "\n" + "Ссылка на календарь: " +
+			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
 		Attaches: []string{},
 	}
 	if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
@@ -245,11 +247,21 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, err
 			classID, err = strconv.Atoi(classIDs)
 			if err != nil {
 				log.Println("error: ", err)
+				return nil, e.StacktraceError(err)
 			}
 		}
-
+		time1, err := time.Parse(time.RFC3339, item.Start.DateTime)
+		if err != nil {
+			log.Println("Error while parsing date :", err)
+			return nil, e.StacktraceError(err)
+		}
+		time2, err := time.Parse(time.RFC3339, item.End.DateTime)
+		if err != nil {
+			log.Println("Error while parsing date :", err)
+			return nil, e.StacktraceError(err)
+		}
 		tmp := &model.CalendarEvent{Title: item.Summary, Description: item.Description,
-			StartDate: item.Start.DateTime, EndDate: item.End.DateTime, ClassID: classID, ID: item.Id}
+			StartDate: time1, EndDate: time2, ClassID: classID, ID: item.Id}
 		ans = append(ans, tmp)
 	}
 
@@ -295,11 +307,11 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		Summary:     newTitle + " Class " + fmt.Sprintf("%d", req.ClassID),
 		Description: req.Description,
 		Start: &calendar.EventDateTime{
-			DateTime: req.StartDate,
+			DateTime: req.StartDate.Format(time.RFC3339Nano),
 			//TimeZone: "Europe/Moscow",
 		},
 		End: &calendar.EventDateTime{
-			DateTime: req.EndDate,
+			DateTime: req.EndDate.Format(time.RFC3339Nano),
 			//TimeZone: "Europe/Moscow",
 		},
 		Visibility: "public",
@@ -317,10 +329,11 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 	}
 
 	bcMsg := model.ClassBroadcastMessage{
-		ClassID:     req.ClassID,
-		Title:       "Событие обновлено!" + "\n" + req.Title,
-		Description: req.Description + "\n" + "Начало: " + req.StartDate + "\n" + "Окончание: " + req.EndDate,
-		Attaches:    []string{},
+		ClassID: req.ClassID,
+		Title:   "Событие обновлено!" + "\n" + req.Title,
+		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format(time.RFC1123) + "\n" + "Окончание: " + req.EndDate.Format(time.RFC1123) + "\n" + "Ссылка на календарь: " +
+			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
+		Attaches: []string{},
 	}
 	if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
 		err = uc.DeleteCalendarEvent(teacherID, event.Id)

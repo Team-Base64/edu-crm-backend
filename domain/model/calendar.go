@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type OAUTH2Token struct {
 	Token string `json:"token"`
 }
@@ -10,12 +12,12 @@ type CalendarParams struct {
 }
 
 type CalendarEvent struct {
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
-	StartDate   string `json:"startDate"`
-	EndDate     string `json:"endDate"`
-	ClassID     int    `json:"classid"`
-	ID          string `json:"id,omitempty"`
+	Title       string    `json:"title"`
+	Description string    `json:"description,omitempty"`
+	StartDate   time.Time `json:"startDate"`
+	EndDate     time.Time `json:"endDate"`
+	ClassID     int       `json:"classid"`
+	ID          string    `json:"id,omitempty"`
 }
 
 type CalendarEvents struct {
