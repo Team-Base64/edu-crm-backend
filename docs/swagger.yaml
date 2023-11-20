@@ -15,6 +15,13 @@ definitions:
       title:
         type: string
     type: object
+  model.CalendarParams:
+    properties:
+      googleid:
+        type: string
+      id:
+        type: integer
+    type: object
   model.Chat:
     properties:
       messages:
@@ -75,13 +82,6 @@ definitions:
     properties:
       class:
         $ref: '#/definitions/model.ClassInfo'
-    type: object
-  model.CreateCalendarResponse:
-    properties:
-      googleid:
-        type: string
-      id:
-        type: integer
     type: object
   model.DeleteEvent:
     properties:
@@ -381,6 +381,30 @@ paths:
             $ref: '#/definitions/model.Error'
       summary: Upload attach
   /calendar:
+    get:
+      consumes:
+      - application/json
+      description: Gets teacher's calendar
+      operationId: GetCalendar
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CalendarParams'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Gets teacher's calendar
+      tags:
+      - Calendar
     post:
       consumes:
       - application/json
@@ -392,7 +416,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.CreateCalendarResponse'
+            $ref: '#/definitions/model.CalendarParams'
         "401":
           description: unauthorized - Access token is missing or invalid
           schema:

@@ -4,7 +4,7 @@ type OAUTH2Token struct {
 	Token string `json:"token"`
 }
 
-type CreateCalendarResponse struct {
+type CalendarParams struct {
 	ID         int    `json:"id"`
 	IDInGoogle string `json:"googleid"`
 }

@@ -74,6 +74,40 @@ const docTemplate = `{
             }
         },
         "/calendar": {
+            "get": {
+                "description": "Gets teacher's calendar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Gets teacher's calendar",
+                "operationId": "GetCalendar",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.CalendarParams"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized - Access token is missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error - Request is valid but operation failed at server side",
+                        "schema": {
+                            "$ref": "#/definitions/model.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Creates teacher's calendar",
                 "consumes": [
@@ -91,7 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.CreateCalendarResponse"
+                            "$ref": "#/definitions/model.CalendarParams"
                         }
                     },
                     "401": {
@@ -1319,6 +1353,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.CalendarParams": {
+            "type": "object",
+            "properties": {
+                "googleid": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Chat": {
             "type": "object",
             "properties": {
@@ -1411,17 +1456,6 @@ const docTemplate = `{
             "properties": {
                 "class": {
                     "$ref": "#/definitions/model.ClassInfo"
-                }
-            }
-        },
-        "model.CreateCalendarResponse": {
-            "type": "object",
-            "properties": {
-                "googleid": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 }
             }
         },

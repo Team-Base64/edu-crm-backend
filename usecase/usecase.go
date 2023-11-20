@@ -38,7 +38,8 @@ type UsecaseInterface interface {
 	// CALENDAR
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error
-	CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error)
+	CreateCalendar(teacherID int) (*model.CalendarParams, error)
+	GetCalendar(teacherID int) (*model.CalendarParams, error)
 	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 	GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, error)
 	DeleteCalendarEvent(teacherID int, eventID string) error

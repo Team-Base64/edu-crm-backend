@@ -2,6 +2,7 @@ package repository
 
 import (
 	e "main/domain/errors"
+	"main/domain/model"
 )
 
 func (s *Store) GetTokenDB(id int) (string, error) {
@@ -27,15 +28,15 @@ func (s *Store) CreateCalendarDB(teacherID int, googleID string) (int, error) {
 	return id, nil
 }
 
-func (s *Store) GetCalendarGoogleID(teacherID int) (string, error) {
+func (s *Store) GetCalendarDB(teacherID int) (*model.CalendarParams, error) {
 	// tok, err := s.GetTokenDB(teacherID)
 	// if err != nil {
 	// 	return 0, e.StacktraceError(err)
 	// }
-	var id string
-	row := s.db.QueryRow(`SELECT idInGoogle FROM calendars WHERE teacherID = $1;`, teacherID)
-	if err := row.Scan(&id); err != nil {
-		return "", e.StacktraceError(err)
+	ans := model.CalendarParams{}
+	row := s.db.QueryRow(`SELECT id, idInGoogle FROM calendars WHERE teacherID = $1;`, teacherID)
+	if err := row.Scan(&ans.ID, &ans.IDInGoogle); err != nil {
+		return nil, e.StacktraceError(err)
 	}
-	return id, nil
+	return &ans, nil
 }

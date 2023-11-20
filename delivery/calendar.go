@@ -57,13 +57,36 @@ func (api *Handler) SaveOAUTH2TokenToFile(w http.ResponseWriter, r *http.Request
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Success 200 {object} model.CreateCalendarResponse
+// @Success 200 {object} model.CalendarParams
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar [post]
 func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 	mockTeackerID := 1
 	createdResponse, err := api.usecase.CreateCalendar(mockTeackerID)
+	if err != nil {
+		log.Println("Error ", err)
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
+
+	json.NewEncoder(w).Encode(createdResponse)
+}
+
+// GetCalendar godoc
+// @Summary Gets teacher's calendar
+// @Description Gets teacher's calendar
+// @ID GetCalendar
+// @Accept  json
+// @Produce  json
+// @Tags Calendar
+// @Success 200 {object} model.CalendarParams
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /calendar [get]
+func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
+	mockTeackerID := 1
+	createdResponse, err := api.usecase.GetCalendar(mockTeackerID)
 	if err != nil {
 		log.Println("Error ", err)
 		returnErrorJSON(w, e.ErrServerError500)

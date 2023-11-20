@@ -140,6 +140,7 @@ func main() {
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathChatByID, Handler.GetChat).Methods(http.MethodGet, http.MethodOptions)
 
+	myRouter.HandleFunc(conf.PathCalendar, Handler.GetCalendar).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathCalendar, Handler.CreateCalendar).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathAddEvent, Handler.CreateCalendarEvent).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathGetEvents, Handler.GetCalendarEvents).Methods(http.MethodGet, http.MethodOptions)

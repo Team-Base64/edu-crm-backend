@@ -132,7 +132,11 @@ func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 	return nil
 }
 
-func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error) {
+func (uc *Usecase) GetCalendar(teacherID int) (*model.CalendarParams, error) {
+	return uc.store.GetCalendarDB(teacherID)
+}
+
+func (uc *Usecase) CreateCalendar(teacherID int) (*model.CalendarParams, error) {
 
 	srv, err := uc.getCalendarServicelient()
 	if err != nil {
@@ -160,7 +164,7 @@ func (uc *Usecase) CreateCalendar(teacherID int) (*model.CreateCalendarResponse,
 		return nil, e.StacktraceError(err)
 	}
 
-	return &model.CreateCalendarResponse{ID: innerID, IDInGoogle: cal.Id}, nil
+	return &model.CalendarParams{ID: innerID, IDInGoogle: cal.Id}, nil
 }
 
 func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error {
@@ -183,25 +187,31 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		},
 		Visibility: "public",
 	}
-	calendarID, err := uc.store.GetCalendarGoogleID(teacherID)
+	calendarDB, err := uc.store.GetCalendarDB(teacherID)
 	if err != nil {
 		log.Println("DB err: ", err)
 		return e.StacktraceError(err)
 	}
 
-	event, err = srv.Events.Insert(calendarID, event).Do()
+	event, err = srv.Events.Insert(calendarDB.IDInGoogle, event).Do()
 	if err != nil {
 		log.Println("Unable to create event: ", err)
 		return e.StacktraceError(err)
 	}
 
 	bcMsg := model.ClassBroadcastMessage{
-		ClassID:     req.ClassID,
-		Title:       "Новое событие!" + "\n" + req.Title,
-		Description: req.Description + "\n" + "Начало: " + req.StartDate + "\n" + "Окончание: " + req.EndDate,
-		Attaches:    []string{},
+		ClassID: req.ClassID,
+		Title:   "Новое событие!" + "\n" + req.Title,
+		Description: req.Description + "\n" + "Начало: " + req.StartDate + "\n" + "Окончание: " + req.EndDate + "\n" + "Ссылка на календарь: " +
+			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&showTz=1&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&src=611a7b115cb31d14e41c9909e07db425548dd3b5fa76a145f3c93ae7410bc142@group.calendar.google.com",
+		Attaches: []string{},
 	}
 	if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+		err = uc.DeleteCalendarEvent(teacherID, event.Id)
+		if err != nil {
+			log.Println("Unable to delete event after bc error: ", err)
+			//return e.StacktraceError(err)
+		}
 		return e.StacktraceError(err)
 	}
 	return nil
@@ -213,13 +223,13 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, err
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return nil, e.StacktraceError(err)
 	}
-	calendarID, err := uc.store.GetCalendarGoogleID(teacherID)
+	calendarDB, err := uc.store.GetCalendarDB(teacherID)
 	if err != nil {
 		log.Println("DB err: ", err)
 		return nil, e.StacktraceError(err)
 	}
 	t := time.Now().Format(time.RFC3339)
-	events, err := srv.Events.List(calendarID).ShowDeleted(false).
+	events, err := srv.Events.List(calendarDB.IDInGoogle).ShowDeleted(false).
 		SingleEvents(true).TimeMin(t).MaxResults(100).OrderBy("startTime").Do()
 	if err != nil {
 		log.Println("Unable to retrieve next ten of the user's events: ", err)
@@ -252,12 +262,12 @@ func (uc *Usecase) DeleteCalendarEvent(teacherID int, eventID string) error {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return e.StacktraceError(err)
 	}
-	calendarID, err := uc.store.GetCalendarGoogleID(teacherID)
+	calendarDB, err := uc.store.GetCalendarDB(teacherID)
 	if err != nil {
 		log.Println("DB err: ", err)
 		return e.StacktraceError(err)
 	}
-	err = srv.Events.Delete(calendarID, eventID).Do()
+	err = srv.Events.Delete(calendarDB.IDInGoogle, eventID).Do()
 	if err != nil {
 		log.Println("Unable to delete event: ", err)
 		return e.StacktraceError(err)
@@ -294,13 +304,13 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		},
 		Visibility: "public",
 	}
-	calendarID, err := uc.store.GetCalendarGoogleID(teacherID)
+	calendarDB, err := uc.store.GetCalendarDB(teacherID)
 	if err != nil {
 		log.Println("DB err: ", err)
 		return e.StacktraceError(err)
 	}
 
-	event, err = srv.Events.Update(calendarID, req.ID, event).Do()
+	event, err = srv.Events.Update(calendarDB.IDInGoogle, req.ID, event).Do()
 	if err != nil {
 		log.Println("Unable to update event: ", err)
 		return e.StacktraceError(err)
@@ -313,6 +323,11 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		Attaches:    []string{},
 	}
 	if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+		err = uc.DeleteCalendarEvent(teacherID, event.Id)
+		if err != nil {
+			log.Println("Unable to delete event after bc error: ", err)
+			//return e.StacktraceError(err)
+		}
 		return e.StacktraceError(err)
 	}
 	return nil
