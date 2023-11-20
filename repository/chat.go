@@ -84,3 +84,17 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 	return &model.ChatPreviewList{Chats: chats}, nil
 }
+
+func (s *Store) GetChatIDBySolutionID(solutionID int) (int, error) {
+	var id int
+	if err := s.db.QueryRow(
+		`SELECT c.id FROM chats c
+		 JOIN solutions s ON c.studentID = s.studentID
+		 WHERE s.id = $1`,
+		solutionID,
+	).Scan(&id); err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return id, nil
+}

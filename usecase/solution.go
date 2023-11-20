@@ -48,7 +48,17 @@ func (uc *Usecase) EvaluateSolutionbyID(solutionID int, evaluation *model.Soluti
 		return e.StacktraceError(err)
 	}
 
-	// TODO add send to student msg
+	chatID, err := uc.store.GetChatIDBySolutionID(solutionID)
+	if err != nil {
+		return e.StacktraceError(err) // TODO возрат состояния или оповещение о проблеме с доставкой
+	}
+	if err := uc.chatService.SendMsg(&model.SingleMessage{
+		ChatID:   chatID,
+		Text:     msg,
+		Attaches: []string{},
+	}); err != nil {
+		return e.StacktraceError(err) // TODO возрат состояния или оповещение о проблеме с доставкой
+	}
 
 	return nil
 }
