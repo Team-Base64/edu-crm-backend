@@ -8,6 +8,7 @@ import (
 	uc "main/usecase"
 	"net/http"
 	"os"
+	"sync"
 )
 
 // @title TCRA API
@@ -33,6 +34,8 @@ type Handler struct {
 	usecase         uc.UsecaseInterface
 	filestoragePath string
 	urlDomain       string
+	sessions        map[string]*model.Session
+	mu              sync.RWMutex
 }
 
 func NewHandler(uc uc.UsecaseInterface, fp string, ud string) *Handler {
@@ -46,6 +49,8 @@ func NewHandler(uc uc.UsecaseInterface, fp string, ud string) *Handler {
 		usecase:         uc,
 		filestoragePath: fp,
 		urlDomain:       ud,
+		sessions:        map[string]*model.Session{},
+		mu:              sync.RWMutex{},
 	}
 }
 
