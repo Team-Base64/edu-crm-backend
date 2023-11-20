@@ -21,8 +21,9 @@ func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 
 func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, error) {
 	rows, err := s.db.Query(
-		`SELECT s.id, s.name, s.socialType FROM students s
+		`SELECT s.id, s.name, s.socialType, c.id FROM students s
 		 JOIN classes_students cs ON s.id = cs.studentID
+		 JOIN chats c ON cs.studentID = c.studentID
 		 WHERE cs.classID = $1;`,
 		classID,
 	)
@@ -38,6 +39,7 @@ func (s *Store) GetStudentsFromClass(classID int) (*model.StudentListFromClass, 
 			&tmpStudent.ID,
 			&tmpStudent.Name,
 			&tmpStudent.SocialType,
+			&tmpStudent.ChatID,
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
