@@ -23,7 +23,7 @@ func (uc *Usecase) GetTaskByID(id int) (*model.TaskByID, error) {
 	return task, nil
 }
 
-func (uc *Usecase) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
+func (uc *Usecase) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	tasks, err := uc.store.GetTasksByTeacherID(teacherID)
 	if err != nil {
 		return nil, e.StacktraceError(err)

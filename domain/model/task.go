@@ -2,22 +2,22 @@ package model
 
 type Task struct {
 	ID          int    `json:"id"`
-	Description string `json:"description,omitempty"`
-	Attach      string `json:"attach,omitempty"`
+	Description string `json:"description"`
+	Attach      string `json:"attach"`
 }
 
 type TaskCreate struct {
-	Description string `json:"description,omitempty"`
-	Attach      string `json:"attach,omitempty"`
+	Description string `json:"description"`
+	Attach      string `json:"attach"`
 }
 
 type TaskByID struct {
-	Description string `json:"description,omitempty"`
-	Attach      string `json:"attach,omitempty"`
+	Description string `json:"description"`
+	Attach      string `json:"attach"`
 }
 
 type TaskListByTeacherID struct {
-	Tasks []*Task `json:"tasks,omitempty"`
+	Tasks []Task `json:"tasks"`
 }
 
 type TaskCreateResponse struct {

@@ -189,7 +189,7 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
-	event, err = srv.Events.Insert(calendarID, event).Do()
+	_, err = srv.Events.Insert(calendarID, event).Do()
 	if err != nil {
 		log.Println("Unable to create event: ", err)
 		return e.StacktraceError(err)
@@ -207,7 +207,7 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 	return nil
 }
 
-func (uc *Usecase) GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, error) {
+func (uc *Usecase) GetCalendarEvents(teacherID int) ([]model.CalendarEvent, error) {
 	srv, err := uc.getCalendarServicelient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
@@ -226,7 +226,7 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, err
 		return nil, e.StacktraceError(err)
 	}
 
-	ans := []*model.CalendarEvent{}
+	ans := []model.CalendarEvent{}
 	for _, item := range events.Items {
 		s := strings.Split(item.Summary, " ")
 		classID := 0
@@ -238,7 +238,7 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, err
 			}
 		}
 
-		tmp := &model.CalendarEvent{Title: item.Summary, Description: item.Description,
+		tmp := model.CalendarEvent{Title: item.Summary, Description: item.Description,
 			StartDate: item.Start.DateTime, EndDate: item.End.DateTime, ClassID: classID, ID: item.Id}
 		ans = append(ans, tmp)
 	}
@@ -300,7 +300,7 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
-	event, err = srv.Events.Update(calendarID, req.ID, event).Do()
+	_, err = srv.Events.Update(calendarID, req.ID, event).Do()
 	if err != nil {
 		log.Println("Unable to update event: ", err)
 		return e.StacktraceError(err)

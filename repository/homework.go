@@ -85,7 +85,7 @@ func (s *Store) GetHomeworksByClassID(classID int) ([]model.Homework, error) {
 	}
 	defer rows.Close()
 
-	var hws []model.Homework
+	hws := []model.Homework{}
 	for rows.Next() {
 		var tmpHw model.Homework
 

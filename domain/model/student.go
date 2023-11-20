@@ -8,7 +8,7 @@ type StudentFromClass struct {
 }
 
 type StudentListFromClass struct {
-	Students []*StudentFromClass `json:"students"`
+	Students []StudentFromClass `json:"students"`
 }
 
 type StudentByID struct {

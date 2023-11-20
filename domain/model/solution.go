@@ -6,7 +6,7 @@ type SolutionFromClass struct {
 	ID                int       `json:"id"`
 	HomeworkID        int       `json:"hwID"`
 	StudentID         int       `json:"studentID"`
-	Text              string    `json:"text,omitempty"`
+	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
 	File              string    `json:"file"`
 	Status            string    `json:"status"` // new | approve | reject
@@ -14,13 +14,13 @@ type SolutionFromClass struct {
 }
 
 type SolutionListFromClass struct {
-	Solutions []*SolutionFromClass `json:"solutions"`
+	Solutions []SolutionFromClass `json:"solutions"`
 }
 
 type SolutionForHw struct {
 	ID                int       `json:"id"`
 	StudentID         int       `json:"studentID"`
-	Text              string    `json:"text,omitempty"`
+	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
 	File              string    `json:"file"`
 	Status            string    `json:"status"` // new | approve | reject
@@ -28,13 +28,13 @@ type SolutionForHw struct {
 }
 
 type SolutionListForHw struct {
-	Solutions []*SolutionForHw `json:"solutions"`
+	Solutions []SolutionForHw `json:"solutions"`
 }
 
 type SolutionByID struct {
 	HomeworkID        int       `json:"hwID"`
 	StudentID         int       `json:"studentID"`
-	Text              string    `json:"text,omitempty"`
+	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
 	File              string    `json:"file"`
 	Status            string    `json:"status"` // new | approve | reject

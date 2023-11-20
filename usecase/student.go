@@ -13,7 +13,7 @@ func (uc *Usecase) GetStudentByID(id int) (*model.StudentByID, error) {
 	return student, nil
 }
 
-func (uc *Usecase) GetStudentsFromClass(classID int) (*model.StudentListFromClass, error) {
+func (uc *Usecase) GetStudentsFromClass(classID int) ([]model.StudentFromClass, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}

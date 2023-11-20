@@ -35,7 +35,7 @@ func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	return &sol, nil
 }
 
-func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
+func (s *Store) GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error) {
 	rows, err := s.db.Query(
 		`SELECT s.id, s.homeworkID, s.studentID, s.text, s.createTime, s.file, s.isApproved, s.teacherEvaluation
 		 FROM solutions s
@@ -48,7 +48,7 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 	}
 	defer rows.Close()
 
-	sols := []*model.SolutionFromClass{}
+	sols := []model.SolutionFromClass{}
 	for rows.Next() {
 		var tmpSol model.SolutionFromClass
 		var isApproved sql.NullBool
@@ -62,13 +62,13 @@ func (s *Store) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass
 		}
 		tmpSol.Status = makeStatus(isApproved)
 
-		sols = append(sols, &tmpSol)
+		sols = append(sols, tmpSol)
 	}
 
-	return &model.SolutionListFromClass{Solutions: sols}, nil
+	return sols, nil
 }
 
-func (s *Store) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error) {
+func (s *Store) GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error) {
 	rows, err := s.db.Query(
 		`SELECT id, studentID, text, createTime, file, isApproved, teacherEvaluation FROM solutions WHERE homeworkID = $1;`,
 		homeworkID,
@@ -78,7 +78,7 @@ func (s *Store) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListFor
 	}
 	defer rows.Close()
 
-	sols := []*model.SolutionForHw{}
+	sols := []model.SolutionForHw{}
 	for rows.Next() {
 		var tmpSol model.SolutionForHw
 		var isApproved sql.NullBool
@@ -92,10 +92,10 @@ func (s *Store) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListFor
 		}
 		tmpSol.Status = makeStatus(isApproved)
 
-		sols = append(sols, &tmpSol)
+		sols = append(sols, tmpSol)
 	}
 
-	return &model.SolutionListForHw{Solutions: sols}, nil
+	return sols, nil
 }
 
 func (s *Store) GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.SolutionInfoForEvaluationMsg, error) {

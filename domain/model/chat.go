@@ -14,9 +14,9 @@ type ChatPreview struct {
 }
 
 type ChatPreviewList struct {
-	Chats []*ChatPreview `json:"chats,omitempty"`
+	Chats []ChatPreview `json:"chats"`
 }
 
 type Chat struct {
-	Messages []*Message `json:"messages,omitempty"`
+	Messages []Message `json:"messages"`
 }

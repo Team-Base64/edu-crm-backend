@@ -19,7 +19,7 @@ type CalendarEvent struct {
 }
 
 type CalendarEvents struct {
-	Events []*CalendarEvent `json:"events"`
+	Events []CalendarEvent `json:"events"`
 }
 
 type DeleteEvent struct {

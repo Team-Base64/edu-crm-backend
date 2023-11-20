@@ -29,7 +29,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	}
 	defer rows.Close()
 
-	messages := []*model.Message{}
+	messages := []model.Message{}
 	for rows.Next() {
 		var tmpMsg model.Message
 
@@ -41,12 +41,12 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		messages = append(messages, &tmpMsg)
+		messages = append(messages, tmpMsg)
 	}
 	return &model.Chat{Messages: messages}, nil
 }
 
-func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
+func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) {
 	rows, err := s.db.Query(
 		`SELECT m1.chatID, s.id, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
 		 FROM messages m1
@@ -62,7 +62,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	}
 	defer rows.Close()
 
-	chats := []*model.ChatPreview{}
+	chats := []model.ChatPreview{}
 	for rows.Next() {
 		tmpChat := model.ChatPreview{
 			Img: "mockImg",
@@ -79,10 +79,10 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
-		chats = append(chats, &tmpChat)
+		chats = append(chats, tmpChat)
 	}
 
-	return &model.ChatPreviewList{Chats: chats}, nil
+	return chats, nil
 }
 
 func (s *Store) GetChatIDBySolutionID(solutionID int) (int, error) {

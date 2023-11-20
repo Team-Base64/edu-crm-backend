@@ -35,14 +35,14 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 	return &res, nil
 }
 
-func (uc *Usecase) GetClassFeed(classID int) (*model.Feed, error) {
+func (uc *Usecase) GetClassPosts(classID int) ([]model.Post, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
-	feed, err := uc.store.GetClassFeed(classID)
+	posts, err := uc.store.GetClassPosts(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	return feed, nil
+	return posts, nil
 }

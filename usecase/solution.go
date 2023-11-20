@@ -14,7 +14,7 @@ func (uc *Usecase) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	return sol, nil
 }
 
-func (uc *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error) {
+func (uc *Usecase) GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error) {
 	if err := uc.store.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -26,7 +26,7 @@ func (uc *Usecase) GetSolutionsByClassID(classID int) (*model.SolutionListFromCl
 	return sols, nil
 }
 
-func (uc *Usecase) GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error) {
+func (uc *Usecase) GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error) {
 	if err := uc.store.CheckHomeworkExistence(homeworkID); err != nil {
 		return nil, e.StacktraceError(err)
 	}

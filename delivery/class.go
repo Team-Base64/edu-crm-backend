@@ -28,7 +28,7 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(classes)
+	json.NewEncoder(w).Encode(&model.ClassInfoList{Classes: classes})
 }
 
 // GetClasses godoc

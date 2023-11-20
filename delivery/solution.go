@@ -40,7 +40,7 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.NewEncoder(w).Encode(sols)
+	json.NewEncoder(w).Encode(&model.SolutionListFromClass{Solutions: sols})
 }
 
 // GetSolutionsForHomework godoc
@@ -73,7 +73,7 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	json.NewEncoder(w).Encode(sols)
+	json.NewEncoder(w).Encode(&model.SolutionListForHw{Solutions: sols})
 }
 
 // GetSolution godoc

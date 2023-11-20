@@ -47,7 +47,7 @@ func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	return &class, nil
 }
 
-func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
+func (s *Store) GetClassesByTeacherID(teacherID int) ([]model.ClassInfo, error) {
 	rows, err := s.db.Query(
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
@@ -57,7 +57,7 @@ func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 	}
 	defer rows.Close()
 
-	classes := []*model.ClassInfo{}
+	classes := []model.ClassInfo{}
 	for rows.Next() {
 		var tmpClass model.ClassInfo
 
@@ -67,8 +67,8 @@ func (s *Store) GetClassesByID(teacherID int) (*model.ClassInfoList, error) {
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
-		classes = append(classes, &tmpClass)
+		classes = append(classes, tmpClass)
 	}
 
-	return &model.ClassInfoList{Classes: classes}, nil
+	return classes, nil
 }
