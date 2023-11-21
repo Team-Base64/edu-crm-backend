@@ -49,7 +49,8 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /profile [get]
 func (api *Handler) GetTeacherProfile(w http.ResponseWriter, r *http.Request) {
-	teacher, err := api.usecase.GetTeacherProfile(mockTeacherID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacher, err := api.usecase.GetTeacherProfile(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

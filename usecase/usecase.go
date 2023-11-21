@@ -3,6 +3,7 @@ package usecase
 import (
 	"main/domain/model"
 	"math/rand"
+	"sync"
 
 	ctrl "main/controller"
 	rep "main/repository"
@@ -12,6 +13,11 @@ type UsecaseInterface interface {
 	// TEACHER
 	CreateTeacher(params *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
+	GetTeacherProfileByLogin(login string) (*model.TeacherDB, error)
+	// SESSION
+	CreateSession(teacherLogin string) (*model.Session, error)
+	CheckSession(in string) (string, error)
+	DeleteSession(in string) error
 	// CHAT
 	GetChatByID(id int) (*model.Chat, error)
 	GetChatsByTeacherID(id int) ([]model.ChatPreview, error)
@@ -41,7 +47,8 @@ type UsecaseInterface interface {
 	// CALENDAR
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error
-	CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error)
+	CreateCalendar(teacherID int) (*model.CalendarParams, error)
+	GetCalendar(teacherID int) (*model.CalendarParams, error)
 	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 	GetCalendarEvents(teacherID int) ([]model.CalendarEvent, error)
 	DeleteCalendarEvent(teacherID int, eventID string) error
@@ -56,6 +63,8 @@ type Usecase struct {
 	chatService     ctrl.ChatServiceInterface
 	tokenFile       string
 	credentialsFile string
+	sessions        map[string]string
+	mu              *sync.RWMutex
 }
 
 func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface, tok string, cred string) UsecaseInterface {
@@ -67,6 +76,8 @@ func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatS
 		chatService:     cs,
 		tokenFile:       tok,
 		credentialsFile: cred,
+		sessions:        make(map[string]string),
+		mu:              &sync.RWMutex{},
 	}
 }
 

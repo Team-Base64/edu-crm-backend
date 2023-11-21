@@ -13,6 +13,7 @@ type StoreInterface interface {
 	// TEACHER
 	AddTeacher(in *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
+	GetTeacherProfileByLoginDB(login string) (*model.TeacherDB, error)
 	// CHAT
 	CheckChatExistence(id int) error
 	GetChatByID(id int) (*model.Chat, error)
@@ -52,7 +53,7 @@ type StoreInterface interface {
 	// CALENDAR
 	GetTokenDB(id int) (string, error)
 	CreateCalendarDB(teacherID int, googleID string) (int, error)
-	GetCalendarGoogleID(teacherID int) (string, error)
+	GetCalendarDB(teacherID int) (*model.CalendarParams, error)
 }
 
 type Store struct {

@@ -91,6 +91,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /homeworks [post]
 func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
 	var newHw model.HomeworkCreate
 	if err := decoder.Decode(&newHw); err != nil {
@@ -98,7 +99,7 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hw, err := api.usecase.CreateHomework(mockTeacherID, &newHw)
+	hw, err := api.usecase.CreateHomework(teacherProfile.ID, &newHw)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

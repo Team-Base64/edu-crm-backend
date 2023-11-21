@@ -58,13 +58,36 @@ func (api *Handler) SaveOAUTH2TokenToFile(w http.ResponseWriter, r *http.Request
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Success 200 {object} model.CreateCalendarResponse
+// @Success 200 {object} model.CalendarParams
 // @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar [post]
 func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
-	mockTeackerID := 1
-	createdResponse, err := api.usecase.CreateCalendar(mockTeackerID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	createdResponse, err := api.usecase.CreateCalendar(teacherProfile.ID)
+	if err != nil {
+		log.Println("Error ", err)
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
+
+	json.NewEncoder(w).Encode(createdResponse)
+}
+
+// GetCalendar godoc
+// @Summary Gets teacher's calendar
+// @Description Gets teacher's calendar
+// @ID GetCalendar
+// @Accept  json
+// @Produce  json
+// @Tags Calendar
+// @Success 200 {object} model.CalendarParams
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Router /calendar [get]
+func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	createdResponse, err := api.usecase.GetCalendar(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
@@ -87,11 +110,7 @@ func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/addevent [post]
 func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		return
-	}
-	mockTeackerID := 1
-
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
 	var req model.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
@@ -100,7 +119,7 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err := api.usecase.CreateCalendarEvent(&req, mockTeackerID)
+	err := api.usecase.CreateCalendarEvent(&req, teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
@@ -122,12 +141,8 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/events [get]
 func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		return
-	}
-	mockTeacherID := 1
-
-	events, err := api.usecase.GetCalendarEvents(mockTeacherID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	events, err := api.usecase.GetCalendarEvents(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
@@ -150,11 +165,7 @@ func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/event [delete]
 func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		return
-	}
-	mockTeacherID := 1
-
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
 	var req model.DeleteEvent
 	if err := decoder.Decode(&req); err != nil {
@@ -163,7 +174,7 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err := api.usecase.DeleteCalendarEvent(mockTeacherID, req.ID)
+	err := api.usecase.DeleteCalendarEvent(teacherProfile.ID, req.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
@@ -186,11 +197,7 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/event [post]
 func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		return
-	}
-	mockTeacherID := 1
-
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
 	var req model.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
@@ -204,7 +211,7 @@ func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	err := api.usecase.UpdateCalendarEvent(&req, mockTeacherID)
+	err := api.usecase.UpdateCalendarEvent(&req, teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)

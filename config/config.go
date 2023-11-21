@@ -23,6 +23,8 @@ var PathOAuthSaveToken = BasePath + "/oauth/savetoken"
 
 var PathProfile = BasePath + "/profile"
 var PathSignUp = BasePath + "/register"
+var PathLogin = BasePath + "/login"
+var PathLogout = BasePath + "/logout"
 
 var PathChats = BasePath + "/chats"
 var PathChatByID = BasePath + "/chats/{id}"

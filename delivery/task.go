@@ -22,7 +22,8 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /tasks [get]
 func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, err := api.usecase.GetTasksByTeacherID(mockTeacherID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	tasks, err := api.usecase.GetTasksByTeacher(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

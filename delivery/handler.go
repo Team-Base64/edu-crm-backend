@@ -49,8 +49,6 @@ func NewHandler(uc uc.UsecaseInterface, fp string, ud string) *Handler {
 	}
 }
 
-var mockTeacherID = 1
-
 func returnErrorJSON(w http.ResponseWriter, err error) {
 	errCode, errText := e.CheckError(err)
 	w.WriteHeader(errCode)

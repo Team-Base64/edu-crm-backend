@@ -151,6 +151,8 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathOAuthSetToken, Handler.SetOAUTH2Token).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathOAuthSaveToken, Handler.SaveOAUTH2TokenToFile).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathLogin, Handler.Login).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathLogout, Handler.Logout).Methods(http.MethodDelete, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathSignUp, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacherProfile).Methods(http.MethodGet, http.MethodOptions)
@@ -158,6 +160,7 @@ func main() {
 	myRouter.HandleFunc(conf.PathChats, Handler.GetTeacherChats).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathChatByID, Handler.GetChat).Methods(http.MethodGet, http.MethodOptions)
 
+	myRouter.HandleFunc(conf.PathCalendar, Handler.GetCalendar).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathCalendar, Handler.CreateCalendar).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathAddEvent, Handler.CreateCalendarEvent).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathGetEvents, Handler.GetCalendarEvents).Methods(http.MethodGet, http.MethodOptions)
@@ -188,6 +191,9 @@ func main() {
 
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)
+
+	amw := delivery.NewAuthMiddleware(Usecase)
+	myRouter.Use(amw.CheckAuthMiddleware)
 
 	err = http.ListenAndServe(conf.Port, myRouter)
 	if err != nil {

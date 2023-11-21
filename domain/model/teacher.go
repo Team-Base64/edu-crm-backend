@@ -13,3 +13,20 @@ type TeacherProfile struct {
 type TeacherProfileResponse struct {
 	Teacher TeacherProfile `json:"teacher"`
 }
+
+type TeacherLogin struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+type Session struct {
+	ID string `json:"id"`
+	//UserUUID string `json:"useruuid"`
+}
+
+type TeacherDB struct {
+	ID       int    `json:"-"`
+	Login    string `json:"login"`
+	Name     string `json:"name"`
+	Password string `json:"-"`
+}
