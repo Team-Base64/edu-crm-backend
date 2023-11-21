@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	e "main/domain/errors"
 	"main/domain/model"
@@ -21,7 +22,7 @@ import (
 func (api *Handler) SetOAUTH2Token(w http.ResponseWriter, r *http.Request) {
 	err := api.usecase.SetOAUTH2Token()
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -43,7 +44,7 @@ func (api *Handler) SaveOAUTH2TokenToFile(w http.ResponseWriter, r *http.Request
 	code := r.URL.Query().Get("code")
 	err := api.usecase.SaveOAUTH2Token(code)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -65,7 +66,7 @@ func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 	mockTeackerID := 1
 	createdResponse, err := api.usecase.CreateCalendar(mockTeackerID)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -94,13 +95,14 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 	decoder := json.NewDecoder(r.Body)
 	var req model.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	err := api.usecase.CreateCalendarEvent(&req, mockTeackerID)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -127,7 +129,7 @@ func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
 
 	events, err := api.usecase.GetCalendarEvents(mockTeacherID)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -156,13 +158,14 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 	decoder := json.NewDecoder(r.Body)
 	var req model.DeleteEvent
 	if err := decoder.Decode(&req); err != nil {
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	err := api.usecase.DeleteCalendarEvent(mockTeacherID, req.ID)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
@@ -191,17 +194,19 @@ func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 	decoder := json.NewDecoder(r.Body)
 	var req model.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 	if req.ID == "" {
+		log.Println(e.StacktraceError(errors.New("empty ID")))
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
 
 	err := api.usecase.UpdateCalendarEvent(&req, mockTeacherID)
 	if err != nil {
-		log.Println("Error ", err)
+		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}

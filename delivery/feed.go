@@ -33,14 +33,14 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feed, err := api.usecase.GetClassFeed(chatId)
+	posts, err := api.usecase.GetClassPosts(chatId)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(feed)
+	json.NewEncoder(w).Encode(&model.Feed{Posts: posts})
 }
 
 // CreatePost godoc

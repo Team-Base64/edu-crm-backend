@@ -33,7 +33,7 @@ func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 	return &task, nil
 }
 
-func (s *Store) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
+func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT id, description, attach FROM tasks WHERE teacherID = $1;`,
 		teacherID,
@@ -43,7 +43,7 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
 	}
 	defer rows.Close()
 
-	tasks := []*model.Task{}
+	tasks := []model.Task{}
 	for rows.Next() {
 		var task model.Task
 		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
@@ -51,13 +51,13 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]*model.Task, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		tasks = append(tasks, &task)
+		tasks = append(tasks, task)
 	}
 
 	return tasks, nil
 }
 
-func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]*model.Task, error) {
+func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT t.id, t.description, t.attach
 		 FROM tasks
@@ -71,7 +71,7 @@ func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]*model.Task, error) {
 	}
 	defer rows.Close()
 
-	tasks := []*model.Task{}
+	tasks := []model.Task{}
 	for rows.Next() {
 		var task model.Task
 		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
@@ -79,7 +79,7 @@ func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]*model.Task, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		tasks = append(tasks, &task)
+		tasks = append(tasks, task)
 	}
 
 	return tasks, nil
@@ -97,7 +97,7 @@ func (s *Store) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
 	}
 	defer rows.Close()
 
-	var tasks []int
+	tasks := []int{}
 	for rows.Next() {
 		var taskID int
 		err := rows.Scan(&taskID)
@@ -113,7 +113,7 @@ func (s *Store) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
 
 func (s *Store) AttachTaskToHomework(hwID int, taskID int, taskRank int) error {
 	_, err := s.db.Exec(
-		`INSERT INTO homeworks_tasks (homeworkID, taskID) VALUES ($1, $2, $3)`,
+		`INSERT INTO homeworks_tasks (homeworkID, taskID, rank) VALUES ($1, $2, $3)`,
 		hwID, taskID, taskRank,
 	)
 	if err != nil {

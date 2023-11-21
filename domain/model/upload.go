@@ -1,5 +1,5 @@
 package model
 
 type UploadAttachResponse struct {
-	File string `json:"file,omitempty"`
+	File string `json:"file"`
 }

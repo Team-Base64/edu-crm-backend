@@ -9,6 +9,7 @@ import (
 
 type ChatServiceInterface interface {
 	BroadcastMsg(msg *model.ClassBroadcastMessage) error
+	SendMsg(msg *model.SingleMessage) error
 }
 
 type ChatService struct {
@@ -28,6 +29,20 @@ func (cs *ChatService) BroadcastMsg(msg *model.ClassBroadcastMessage) error {
 			ClassID:        int32(msg.ClassID),
 			Title:          msg.Title,
 			Description:    msg.Description, //+ "\n + Дедлайн: " + msg.DeadlineTime.String(),
+			AttachmentURLs: msg.Attaches,
+		})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cs *ChatService) SendMsg(msg *model.SingleMessage) error {
+	_, err := cs.client.SendMsg(
+		context.Background(),
+		&Message{
+			ChatID:         int32(msg.ChatID),
+			Text:           msg.Text,
 			AttachmentURLs: msg.Attaches,
 		})
 	if err != nil {

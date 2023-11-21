@@ -49,6 +49,7 @@ func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request
 // @ID getHomework
 // @Accept  json
 // @Produce  json
+// @Tags Homework
 // @Param homeworkID path string true "Homework id"
 // @Success 200 {object} model.HomeworkByIDResponse
 // @Failure 400 {object} model.Error "bad request - Problem with the request"

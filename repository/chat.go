@@ -29,7 +29,7 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	}
 	defer rows.Close()
 
-	messages := []*model.Message{}
+	messages := []model.Message{}
 	for rows.Next() {
 		var tmpMsg model.Message
 
@@ -41,14 +41,14 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		messages = append(messages, &tmpMsg)
+		messages = append(messages, tmpMsg)
 	}
 	return &model.Chat{Messages: messages}, nil
 }
 
-func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, error) {
+func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) {
 	rows, err := s.db.Query(
-		`SELECT m1.chatID, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
+		`SELECT m1.chatID, s.id, s.name, s.socialType, m1.text, m1.createTime, m1.isRead
 		 FROM messages m1
 		 LEFT JOIN messages m2
 		 ON m1.chatId = m2.chatId AND m1.createTime < m2.createTime
@@ -62,7 +62,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 	}
 	defer rows.Close()
 
-	chats := []*model.ChatPreview{}
+	chats := []model.ChatPreview{}
 	for rows.Next() {
 		tmpChat := model.ChatPreview{
 			Img: "mockImg",
@@ -70,7 +70,8 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 
 		if err = rows.Scan(
 			&tmpChat.ChatID,
-			&tmpChat.Name,
+			&tmpChat.StudentID,
+			&tmpChat.StudentName,
 			&tmpChat.SocialType,
 			&tmpChat.LastMessageText,
 			&tmpChat.LastMessageDate,
@@ -78,8 +79,22 @@ func (s *Store) GetChatsByTeacherID(teacherID int) (*model.ChatPreviewList, erro
 		); err != nil {
 			return nil, e.StacktraceError(err)
 		}
-		chats = append(chats, &tmpChat)
+		chats = append(chats, tmpChat)
 	}
 
-	return &model.ChatPreviewList{Chats: chats}, nil
+	return chats, nil
+}
+
+func (s *Store) GetChatIDBySolutionID(solutionID int) (int, error) {
+	var id int
+	if err := s.db.QueryRow(
+		`SELECT c.id FROM chats c
+		 JOIN solutions s ON c.studentID = s.studentID
+		 WHERE s.id = $1`,
+		solutionID,
+	).Scan(&id); err != nil {
+		return 0, e.StacktraceError(err)
+	}
+
+	return id, nil
 }

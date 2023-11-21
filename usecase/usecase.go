@@ -14,34 +14,36 @@ type UsecaseInterface interface {
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	// CHAT
 	GetChatByID(id int) (*model.Chat, error)
-	GetChatsByTeacherID(id int) (*model.ChatPreviewList, error)
+	GetChatsByTeacherID(id int) ([]model.ChatPreview, error)
 	// CLASS
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
-	GetClassesByTeacherID(id int) (*model.ClassInfoList, error)
+	GetClassesByTeacherID(id int) ([]model.ClassInfo, error)
 	// STUDENT
 	GetStudentByID(id int) (*model.StudentByID, error)
-	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
+	GetStudentsFromClass(classID int) ([]model.StudentFromClass, error)
 	// FEED
 	CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error)
-	GetClassFeed(classID int) (*model.Feed, error)
+	GetClassPosts(classID int) ([]model.Post, error)
 	// HOMEWORK
 	CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error)
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
 	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
 	// TASKS
 	CreateTask(teacherID int, newTask *model.TaskCreate) (*model.TaskCreateResponse, error)
-	GetTasksByTeacherID(teacherID int) ([]*model.Task, error)
+	GetTaskByID(id int) (*model.TaskByID, error)
+	GetTasksByTeacherID(teacherID int) ([]model.Task, error)
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
-	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
-	GetSolutionsByHomeworkID(homeworkID int) (*model.SolutionListForHw, error)
+	GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error)
+	GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error)
+	EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error
 	// CALENDAR
 	SetOAUTH2Token() error
 	SaveOAUTH2Token(authCode string) error
 	CreateCalendar(teacherID int) (*model.CreateCalendarResponse, error)
 	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
-	GetCalendarEvents(teacherID int) ([]*model.CalendarEvent, error)
+	GetCalendarEvents(teacherID int) ([]model.CalendarEvent, error)
 	DeleteCalendarEvent(teacherID int, eventID string) error
 	UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 }

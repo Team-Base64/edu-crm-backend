@@ -73,5 +73,5 @@ func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	json.NewEncoder(w).Encode(students)
+	json.NewEncoder(w).Encode(&model.StudentListFromClass{Students: students})
 }

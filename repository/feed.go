@@ -35,7 +35,7 @@ func (s *Store) DeletePost(id int) error {
 	return nil
 }
 
-func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
+func (s *Store) GetClassPosts(classID int) ([]model.Post, error) {
 	rows, err := s.db.Query(
 		`SELECT id, text, attaches, createTime FROM posts WHERE classID = $1;`,
 		classID,
@@ -45,7 +45,7 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 	}
 	defer rows.Close()
 
-	posts := []*model.Post{}
+	posts := []model.Post{}
 	for rows.Next() {
 		var tmpPost model.Post
 
@@ -56,8 +56,8 @@ func (s *Store) GetClassFeed(classID int) (*model.Feed, error) {
 			return nil, e.StacktraceError(err)
 		}
 
-		posts = append(posts, &tmpPost)
+		posts = append(posts, tmpPost)
 	}
 
-	return &model.Feed{Posts: posts}, nil
+	return posts, nil
 }
