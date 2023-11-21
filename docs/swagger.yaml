@@ -313,6 +313,13 @@ definitions:
           $ref: '#/definitions/model.Task'
         type: array
     type: object
+  model.TeacherLogin:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   model.TeacherProfile:
     properties:
       name:
@@ -1034,6 +1041,67 @@ paths:
       summary: Get solutions for homework
       tags:
       - Solution
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Log in user
+      operationId: login
+      parameters:
+      - description: Teacher params
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/model.TeacherLogin'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Logs in and returns the authentication  cookie
+      tags:
+      - Teacher
+  /logout:
+    delete:
+      consumes:
+      - application/json
+      description: Logs out user
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Logs out user
+      tags:
+      - Teacher
   /oauth:
     post:
       consumes:

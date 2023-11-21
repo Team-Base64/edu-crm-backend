@@ -133,6 +133,8 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathOAuthSetToken, Handler.SetOAUTH2Token).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathOAuthSaveToken, Handler.SaveOAUTH2TokenToFile).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathLogin, Handler.Login).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathLogout, Handler.Logout).Methods(http.MethodDelete, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathSignUp, Handler.CreateTeacher).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathProfile, Handler.GetTeacherProfile).Methods(http.MethodGet, http.MethodOptions)

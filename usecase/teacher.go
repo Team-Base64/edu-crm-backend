@@ -16,3 +16,11 @@ func (uc *Usecase) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 	}
 	return chat, nil
 }
+
+func (uc *Usecase) GetTeacherProfileByLogin(login string) (*model.TeacherDB, error) {
+	chat, err := uc.store.GetTeacherProfileByLoginDB(login)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return chat, nil
+}

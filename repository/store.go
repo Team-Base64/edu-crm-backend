@@ -13,6 +13,7 @@ type StoreInterface interface {
 	// TEACHER
 	AddTeacher(in *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
+	GetTeacherProfileByLoginDB(login string) (*model.TeacherDB, error)
 	// CHAT
 	CheckChatExistence(id int) error
 	GetChatByID(id int) (*model.Chat, error)

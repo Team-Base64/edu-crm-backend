@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	e "main/domain/errors"
 	"main/domain/model"
 )
@@ -26,5 +27,22 @@ func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 		return nil, e.StacktraceError(err)
 	}
 
+	return &teacher, nil
+}
+
+func (s *Store) GetTeacherProfileByLoginDB(login string) (*model.TeacherDB, error) {
+	var teacher model.TeacherDB
+	rows, err := s.db.Query(`SELECT id, password, name FROM teachers WHERE login = $1;`, login)
+	defer rows.Close()
+	if err == sql.ErrNoRows {
+		return nil, e.StacktraceError(e.ErrUnauthorized401)
+	}
+	for rows.Next() {
+		err := rows.Scan(&teacher.ID, &teacher.Password, &teacher.Name)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+	}
+	teacher.Login = login
 	return &teacher, nil
 }

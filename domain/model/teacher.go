@@ -20,6 +20,13 @@ type TeacherLogin struct {
 }
 
 type Session struct {
-	ID       int    `json:"id"`
-	UserUUID string `json:"useruuid"`
+	ID string `json:"id"`
+	//UserUUID string `json:"useruuid"`
+}
+
+type TeacherDB struct {
+	ID       int    `json:"-"`
+	Login    string `json:"login"`
+	Name     string `json:"name"`
+	Password string `json:"-"`
 }
