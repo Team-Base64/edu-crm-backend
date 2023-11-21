@@ -71,11 +71,11 @@ func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) (*model.ClassBroadcas
 			return nil, err
 		}
 
-		msg.Description += "\n" + "Задание №" + strconv.Itoa(id) + "\n" + task.Description
+		msg.Description += "\n" + "Задание №" + strconv.Itoa(id+1) + "\n" + task.Description
 		msg.Attaches = append(msg.Attaches, task.Attach)
 	}
 
-	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.String()
+	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.Format("15:4 02.01.2006")
 
 	return &msg, nil
 }

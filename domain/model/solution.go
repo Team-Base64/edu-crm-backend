@@ -32,6 +32,7 @@ type SolutionListForHw struct {
 }
 
 type SolutionByID struct {
+	ID                int       `json:"id"`
 	HomeworkID        int       `json:"hwID"`
 	StudentID         int       `json:"studentID"`
 	Text              string    `json:"text"`

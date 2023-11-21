@@ -23,7 +23,7 @@ import (
 // @Router /tasks [get]
 func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
 	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
-	tasks, err := api.usecase.GetTasksByTeacher(teacherProfile.ID)
+	tasks, err := api.usecase.GetTasksByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
@@ -53,7 +53,8 @@ func (api *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := api.usecase.CreateTask(mockTeacherID, &req)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	task, err := api.usecase.CreateTask(teacherProfile.ID, &req)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

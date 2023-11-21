@@ -9,7 +9,7 @@ import (
 
 type ChatServiceInterface interface {
 	BroadcastMsg(msg *model.ClassBroadcastMessage) error
-	SendMsg(msg *model.SingleMessage) error
+	SendNotification(msg *model.SingleMessage) error
 }
 
 type ChatService struct {
@@ -37,8 +37,8 @@ func (cs *ChatService) BroadcastMsg(msg *model.ClassBroadcastMessage) error {
 	return nil
 }
 
-func (cs *ChatService) SendMsg(msg *model.SingleMessage) error {
-	_, err := cs.client.SendMsg(
+func (cs *ChatService) SendNotification(msg *model.SingleMessage) error {
+	_, err := cs.client.SendNotification(
 		context.Background(),
 		&Message{
 			ChatID:         int32(msg.ChatID),

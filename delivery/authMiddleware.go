@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"errors"
 	"log"
 	conf "main/config"
 	e "main/domain/errors"
@@ -45,21 +46,23 @@ func (amw *AuthMiddleware) CheckAuthMiddleware(next http.Handler) http.Handler {
 			}
 			// session, err := r.Cookie("session_id")
 			// if err == http.ErrNoCookie {
-			// 	log.Println("no session")
+			// 	log.Println(e.StacktraceError(err))
 			// 	returnErrorJSON(w, e.ErrUnauthorized401)
 			// 	return
 			// }
 			// usLogin, err := amw.usecase.CheckSession(session.Value)
 			// if err != nil {
-			// 	log.Println("no session2")
+			// 	log.Println(e.StacktraceError(err))
 			// 	returnErrorJSON(w, e.ErrUnauthorized401)
 			// 	return
 			// }
 
-			//user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
-			user, err := amw.usecase.GetTeacherProfileByLogin("testing1")
+			// user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
+			usLogin := "test1"
+			user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
 			if user.Name == "" {
 				log.Println("no user in db")
+				log.Println(e.StacktraceError(errors.New("no user: " + usLogin)))
 				returnErrorJSON(w, e.ErrUnauthorized401)
 				return
 			}

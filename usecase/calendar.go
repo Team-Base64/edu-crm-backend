@@ -275,7 +275,7 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]model.CalendarEvent, erro
 			log.Println("Error while parsing date :", err)
 			return nil, e.StacktraceError(err)
 		}
-		tmp := &model.CalendarEvent{Title: item.Summary, Description: item.Description,
+		tmp := model.CalendarEvent{Title: item.Summary, Description: item.Description,
 			StartDate: time1, EndDate: time2, ClassID: classID, ID: item.Id}
 
 		ans = append(ans, tmp)

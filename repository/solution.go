@@ -22,10 +22,10 @@ func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	var isApproved sql.NullBool
 
 	if err := s.db.QueryRow(
-		`SELECT homeworkID, studentID, text, createTime, file, isApproved, teacherEvaluation FROM solutions WHERE id = $1;`,
+		`SELECT id, homeworkID, studentID, text, createTime, file, isApproved, teacherEvaluation FROM solutions WHERE id = $1;`,
 		id,
 	).Scan(
-		&sol.HomeworkID, &sol.StudentID,
+		&sol.ID, &sol.HomeworkID, &sol.StudentID,
 		&sol.Text, &sol.CreateTime, &sol.File, &isApproved, &sol.TeacherEvaluation,
 	); err != nil {
 		return nil, e.StacktraceError(err)

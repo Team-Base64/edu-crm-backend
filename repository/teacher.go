@@ -33,6 +33,9 @@ func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 func (s *Store) GetTeacherProfileByLoginDB(login string) (*model.TeacherDB, error) {
 	var teacher model.TeacherDB
 	rows, err := s.db.Query(`SELECT id, password, name FROM teachers WHERE login = $1;`, login)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
 	defer rows.Close()
 	if err == sql.ErrNoRows {
 		return nil, e.StacktraceError(e.ErrUnauthorized401)

@@ -22,9 +22,8 @@ func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 func (s *Store) GetStudentsFromClass(classID int) ([]model.StudentFromClass, error) {
 	rows, err := s.db.Query(
 		`SELECT s.id, s.name, s.socialType, c.id FROM students s
-		 JOIN classes_students cs ON s.id = cs.studentID
-		 JOIN chats c ON cs.studentID = c.studentID
-		 WHERE cs.classID = $1;`,
+		 JOIN chats c ON s.id = c.studentID
+		 WHERE c.classID = $1;`,
 		classID,
 	)
 	if err != nil {
