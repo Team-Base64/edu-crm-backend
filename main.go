@@ -52,10 +52,28 @@ func init() {
 		log.Fatalln("could not get chat grpc url from env")
 	}
 
-	urlDB, exist = os.LookupEnv(conf.UrlDB)
-	if !exist || len(urlDB) == 0 {
-		log.Fatalln("could not get database url from env")
+	pgUser, exist := os.LookupEnv(conf.PG_USER)
+	if !exist || len(pgUser) == 0 {
+		log.Fatalln("could not get database host from env")
 	}
+	pgPwd, exist := os.LookupEnv(conf.PG_PWD)
+	if !exist || len(pgPwd) == 0 {
+		log.Fatalln("could not get database password from env")
+	}
+	pgHost, exist := os.LookupEnv(conf.PG_HOST)
+	if !exist || len(pgHost) == 0 {
+		log.Fatalln("could not get database host from env")
+	}
+	pgPort, exist := os.LookupEnv(conf.PG_PORT)
+	if !exist || len(pgPort) == 0 {
+		log.Fatalln("could not get database port from env")
+	}
+	pgDB, exist := os.LookupEnv(conf.PG_DB)
+	if !exist || len(pgDB) == 0 {
+		log.Fatalln("could not get database name from env")
+	}
+
+	urlDB = "postgres://" + pgUser + ":" + pgPwd + "@" + pgHost + ":" + pgPort + "/" + pgDB
 
 	tokenLen, err = strconv.Atoi(os.Getenv(conf.TokenLenght))
 	if err != nil {
@@ -162,7 +180,12 @@ func main() {
 	myRouter.HandleFunc(conf.PathHomework, Handler.CreateHomework).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathHomeworkSolutions, Handler.GetSolutionsForHomework).Methods(http.MethodGet, http.MethodOptions)
 
+	myRouter.HandleFunc(conf.PathTasks, Handler.GetTeacherTasks).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathTasks, Handler.CreateTask).Methods(http.MethodPost, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathTaskByID, Handler.GetTaskByID).Methods(http.MethodGet, http.MethodOptions)
+
 	myRouter.HandleFunc(conf.PathSolution, Handler.GetSolution).Methods(http.MethodGet, http.MethodOptions)
+	myRouter.HandleFunc(conf.PathSolution, Handler.AddEvaluationForSolution).Methods(http.MethodPut, http.MethodOptions)
 
 	myRouter.HandleFunc(conf.PathStudent, Handler.GetStudent).Methods(http.MethodGet, http.MethodOptions)
 

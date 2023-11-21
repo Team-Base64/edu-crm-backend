@@ -6,3 +6,9 @@ type ClassBroadcastMessage struct {
 	Description string
 	Attaches    []string
 }
+
+type SingleMessage struct {
+	ChatID   int
+	Text     string
+	Attaches []string
+}

@@ -23,8 +23,8 @@ func (uc *Usecase) CreateClass(teacherID int, newClass *model.ClassCreate) (*mod
 	return &res, nil
 }
 
-func (uc *Usecase) GetClassesByTeacherID(id int) (*model.ClassInfoList, error) {
-	classes, err := uc.store.GetClassesByID(id)
+func (uc *Usecase) GetClassesByTeacherID(id int) ([]model.ClassInfo, error) {
+	classes, err := uc.store.GetClassesByTeacherID(id)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}

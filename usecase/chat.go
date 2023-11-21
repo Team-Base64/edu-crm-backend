@@ -17,11 +17,11 @@ func (uc *Usecase) GetChatByID(id int) (*model.Chat, error) {
 	return chat, nil
 }
 
-func (uc *Usecase) GetChatsByTeacherID(id int) (*model.ChatPreviewList, error) {
-	chat, err := uc.store.GetChatsByTeacherID(id)
+func (uc *Usecase) GetChatsByTeacherID(id int) ([]model.ChatPreview, error) {
+	chats, err := uc.store.GetChatsByTeacherID(id)
 	if err != nil {
 
 		return nil, e.StacktraceError(err)
 	}
-	return chat, nil
+	return chats, nil
 }

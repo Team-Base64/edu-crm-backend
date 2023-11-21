@@ -30,7 +30,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(chats)
+	json.NewEncoder(w).Encode(&model.ChatPreviewList{Chats: chats})
 }
 
 // GetChat godoc
@@ -57,12 +57,12 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msgs, err := api.usecase.GetChatByID(id)
+	chat, err := api.usecase.GetChatByID(id)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
 		return
 	}
 
-	json.NewEncoder(w).Encode(msgs)
+	json.NewEncoder(w).Encode(chat)
 }

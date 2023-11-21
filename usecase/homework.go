@@ -3,11 +3,12 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+	"strconv"
 	"time"
 )
 
-func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (res *model.Homework, err error) {
-	if err = uc.store.CheckClassExistence(newHw.ClassID); err != nil {
+func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error) {
+	if err := uc.store.CheckClassExistence(newHw.ClassID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
@@ -16,31 +17,25 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (r
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	defer func() {
-		if res == nil {
-			uc.store.DeleteHomework(id)
-		}
-	}()
 
-	bcMsg := model.ClassBroadcastMessage{
-		ClassID:     newHw.ClassID,
-		Title:       "Внимание! Выдано домашнее задание: " + newHw.Title,
-		Description: newHw.Description + "\n" + "Срок выполнения: " + newHw.DeadlineTime.String(),
-		Attaches:    []string{newHw.Tasks[0].Attach},
-	}
-	if err = uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+	msg, err := uc.genHomeworkMsg(newHw)
+	if err != nil {
 		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 
-	res = &model.Homework{
+	if err = uc.chatService.BroadcastMsg(msg); err != nil {
+		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
+	}
+
+	res := &model.Homework{
 		ID:           id,
 		Title:        newHw.Title,
 		Description:  newHw.Description,
 		DeadlineTime: newHw.DeadlineTime,
 		CreateTime:   createTime,
-		File:         newHw.Tasks[0].Attach,
+		Tasks:        newHw.Tasks,
 	}
-	return
+	return res, nil
 }
 
 func (uc *Usecase) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
@@ -60,5 +55,27 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
-	return hws, nil
+	return &model.HomeworkList{Homeworks: hws}, nil
+}
+
+func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) (*model.ClassBroadcastMessage, error) {
+	msg := model.ClassBroadcastMessage{
+		ClassID:     hw.ClassID,
+		Title:       "Внимание! Выдано домашнее задание: " + hw.Title,
+		Description: hw.Description,
+	}
+
+	for id, taskID := range hw.Tasks {
+		task, err := uc.store.GetTaskByID(taskID)
+		if err != nil {
+			return nil, err
+		}
+
+		msg.Description += "\n" + "Задание №" + strconv.Itoa(id) + "\n" + task.Description
+		msg.Attaches = append(msg.Attaches, task.Attach)
+	}
+
+	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.String()
+
+	return &msg, nil
 }

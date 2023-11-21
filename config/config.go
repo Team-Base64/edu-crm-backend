@@ -1,6 +1,10 @@
 package BaseConfig
 
-var UrlDB = "URL_DB"
+var PG_USER = "POSTGRES_USER"
+var PG_HOST = "POSTGRES_HOST"
+var PG_PWD = "POSTGRES_PASSWORD"
+var PG_PORT = "POSTGRES_PORT"
+var PG_DB = "POSTGRES_DB"
 var TokenLetters = "TOKEN_LETTERS"
 var TokenLenght = "TOKEN_LENGTH"
 var ChatGrpcUrl = "CHAT_GRPC_URL"
@@ -40,6 +44,9 @@ var PathClassSolutions = BasePath + "/classes/{id}/solutions"
 var PathHomework = BasePath + "/homeworks"
 var PathHomeworkByID = BasePath + "/homeworks/{id}"
 var PathHomeworkSolutions = BasePath + "/homeworks/{id}/solutions"
+
+var PathTasks = BasePath + "/tasks"
+var PathTaskByID = BasePath + "/tasks/{id}"
 
 var PathSolution = BasePath + "/solutions/{id}"
 

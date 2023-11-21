@@ -18,29 +18,23 @@ func (s *Store) CheckHomeworkExistence(id int) error {
 }
 
 func (s *Store) AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
-	var id int
+	var hwID int
 	if err := s.db.QueryRow(
 		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime)
 		 VALUES ($1, $2, $3, $4, $5)
 		 RETURNING id;`,
 		newHw.ClassID, newHw.Title, newHw.Description, createTime, newHw.DeadlineTime,
-	).Scan(&id); err != nil {
+	).Scan(&hwID); err != nil {
 		return 0, e.StacktraceError(err)
 	}
 
-	for _, task := range newHw.Tasks {
-		if task.ID < 0 {
-			_, err := s.AddTask(teacherID, &model.TaskCreate{
-				Description: task.Description,
-				Attach:      task.Attach,
-			})
-			if err != nil {
-				return 0, e.StacktraceError(err)
-			}
+	for rank, taskID := range newHw.Tasks {
+		if err := s.AttachTaskToHomework(hwID, taskID, rank); err != nil {
+			return 0, e.StacktraceError(err, s.DeleteHomework(hwID))
 		}
 	}
 
-	return int(id), nil
+	return hwID, nil
 }
 
 func (s *Store) DeleteHomework(id int) error {
@@ -59,21 +53,27 @@ func (s *Store) DeleteHomework(id int) error {
 func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	var hw model.HomeworkByID
 	if err := s.db.QueryRow(
-		`SELECT classID, title, description, createTime, deadlineTime, file
+		`SELECT classID, title, description, createTime, deadlineTime
 		 FROM homeworks
 		 WHERE id = $1;`,
 		id,
 	).Scan(
 		&hw.ClassID, &hw.Title, &hw.Description,
-		&hw.CreateTime, &hw.DeadlineTime, &hw.File,
+		&hw.CreateTime, &hw.DeadlineTime,
 	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
+	tasks, err := s.GetTasksIDByHomeworkID(id)
+	if err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	hw.Tasks = tasks
+
 	return &hw, nil
 }
 
-func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) {
+func (s *Store) GetHomeworksByClassID(classID int) ([]model.Homework, error) {
 	rows, err := s.db.Query(
 		`SELECT id, title, description, createTime, deadlineTime
 		 FROM homeworks
@@ -85,7 +85,7 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) 
 	}
 	defer rows.Close()
 
-	hws := []*model.Homework{}
+	hws := []model.Homework{}
 	for rows.Next() {
 		var tmpHw model.Homework
 
@@ -96,8 +96,14 @@ func (s *Store) GetHomeworksByClassID(classID int) (*model.HomeworkList, error) 
 			return nil, e.StacktraceError(err)
 		}
 
-		hws = append(hws, &tmpHw)
+		tasks, err := s.GetTasksIDByHomeworkID(tmpHw.ID)
+		if err != nil {
+			return nil, e.StacktraceError(err)
+		}
+		tmpHw.Tasks = tasks
+
+		hws = append(hws, tmpHw)
 	}
 
-	return &model.HomeworkList{Homeworks: hws}, nil
+	return hws, nil
 }

@@ -7,6 +7,12 @@ syntax = "proto3";
 package chat;
 option go_package = "./chat";
 
+message Message {
+    int32 chatID = 1;
+    string text = 2;
+    repeated string attachmentURLs = 3;
+}
+
 message Nothing {}
 
 message BroadcastMessage {
@@ -18,4 +24,5 @@ message BroadcastMessage {
 
 service BotChat {
     rpc BroadcastMsg(BroadcastMessage) returns (Nothing);
+    rpc SendMsg(Message) returns (Nothing);
 }

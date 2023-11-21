@@ -17,33 +17,39 @@ type StoreInterface interface {
 	// CHAT
 	CheckChatExistence(id int) error
 	GetChatByID(id int) (*model.Chat, error)
-	GetChatsByTeacherID(idTeacher int) (*model.ChatPreviewList, error)
+	GetChatsByTeacherID(idTeacher int) ([]model.ChatPreview, error)
+	GetChatIDBySolutionID(solutionID int) (int, error)
 	// CLASS
 	CheckClassExistence(id int) error
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
 	GetClassByID(id int) (*model.ClassInfo, error)
-	GetClassesByID(teacherID int) (*model.ClassInfoList, error)
+	GetClassesByTeacherID(teacherID int) ([]model.ClassInfo, error)
 	// STUDENT
 	GetStudentByID(id int) (*model.StudentByID, error)
-	GetStudentsFromClass(classID int) (*model.StudentListFromClass, error)
+	GetStudentsFromClass(classID int) ([]model.StudentFromClass, error)
 	// FEED
 	AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error)
 	DeletePost(id int) error
-	GetClassFeed(classID int) (*model.Feed, error)
+	GetClassPosts(classID int) ([]model.Post, error)
 	// HOMEWORK
 	CheckHomeworkExistence(id int) error
 	AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error)
 	DeleteHomework(id int) error
 	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
+	GetHomeworksByClassID(classID int) ([]model.Homework, error)
 	// TASK
 	AddTask(teacherID int, newTask *model.TaskCreate) (int, error)
 	GetTaskByID(id int) (*model.TaskByID, error)
-	GetTasksByTeacher(teacherID int) (*model.TaskListByTeacherID, error)
+	GetTasksByTeacherID(teacherID int) ([]model.Task, error)
+	GetTasksByHomeworkID(homeworkID int) ([]model.Task, error)
+	GetTasksIDByHomeworkID(homeworkID int) ([]int, error)
+	AttachTaskToHomework(hwID int, taskID int, taskRank int) error
 	// SOLUTION
 	GetSolutionByID(id int) (*model.SolutionByID, error)
-	GetSolutionsByClassID(classID int) (*model.SolutionListFromClass, error)
-	GetSolutionsByHwID(hwID int) (*model.SolutionListForHw, error)
+	GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error)
+	GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error)
+	GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.SolutionInfoForEvaluationMsg, error)
+	AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error
 	// CALENDAR
 	GetTokenDB(id int) (string, error)
 	CreateCalendarDB(teacherID int, googleID string) (int, error)
