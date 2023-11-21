@@ -32,7 +32,9 @@ func getClient(tokFile string, config *oauth2.Config) (*http.Client, error) {
 		return nil, e.StacktraceError(err)
 	}
 	if newToken.AccessToken != tok.AccessToken {
-		saveToken(tokFile, newToken)
+		if err := saveToken(tokFile, newToken); err != nil {
+			return nil, e.StacktraceError(err)
+		}
 		log.Println("Saved new token:", newToken.AccessToken)
 	}
 	return config.Client(context.Background(), tok), nil
@@ -42,23 +44,31 @@ func getClient(tokFile string, config *oauth2.Config) (*http.Client, error) {
 func tokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open(file)
 	if err != nil {
-		return nil, err
+		return nil, e.StacktraceError(err)
 	}
 	defer f.Close()
 	tok := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(tok)
-	return tok, err
+	if err := json.NewDecoder(f).Decode(tok); err != nil {
+		return nil, e.StacktraceError(err)
+	}
+	return tok, nil
 }
 
 // Saves a token to a file path.
-func saveToken(path string, token *oauth2.Token) {
+func saveToken(path string, token *oauth2.Token) error {
 	log.Println("Saving credential file to: ", path)
+
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Println("Unable to cache oauth token: ", err)
+		return e.StacktraceError(err)
 	}
 	defer f.Close()
-	json.NewEncoder(f).Encode(token)
+
+	if err := json.NewEncoder(f).Encode(token); err != nil {
+		return e.StacktraceError(err)
+	}
+
+	return nil
 }
 
 func (uc *Usecase) getCalendarServicelient() (*calendar.Service, error) {
@@ -128,7 +138,10 @@ func (uc *Usecase) SaveOAUTH2Token(authCode string) error {
 		return e.StacktraceError(err)
 	}
 
-	saveToken(uc.tokenFile, token)
+	if err := saveToken(uc.tokenFile, token); err != nil {
+		return e.StacktraceError(err)
+	}
+
 	return nil
 }
 
