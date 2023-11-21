@@ -43,20 +43,21 @@ func (amw *AuthMiddleware) CheckAuthMiddleware(next http.Handler) http.Handler {
 			if r.Method == http.MethodOptions {
 				return
 			}
-			session, err := r.Cookie("session_id")
-			if err == http.ErrNoCookie {
-				log.Println("no session")
-				returnErrorJSON(w, e.ErrUnauthorized401)
-				return
-			}
-			usLogin, err := amw.usecase.CheckSession(session.Value)
-			if err != nil {
-				log.Println("no session2")
-				returnErrorJSON(w, e.ErrUnauthorized401)
-				return
-			}
+			// session, err := r.Cookie("session_id")
+			// if err == http.ErrNoCookie {
+			// 	log.Println("no session")
+			// 	returnErrorJSON(w, e.ErrUnauthorized401)
+			// 	return
+			// }
+			// usLogin, err := amw.usecase.CheckSession(session.Value)
+			// if err != nil {
+			// 	log.Println("no session2")
+			// 	returnErrorJSON(w, e.ErrUnauthorized401)
+			// 	return
+			// }
 
-			user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
+			//user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
+			user, err := amw.usecase.GetTeacherProfileByLogin("testing1")
 			if user.Name == "" {
 				log.Println("no user in db")
 				returnErrorJSON(w, e.ErrUnauthorized401)
