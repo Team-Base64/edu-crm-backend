@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	e "main/domain/errors"
+	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,7 +22,8 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /chats [get]
 func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
-	chats, err := api.usecase.GetChatsByTeacherID(mockTeacherID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	chats, err := api.usecase.GetChatsByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

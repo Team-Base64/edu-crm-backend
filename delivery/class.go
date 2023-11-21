@@ -22,7 +22,8 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [get]
 func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
-	classes, err := api.usecase.GetClassesByTeacherID(mockTeacherID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	classes, err := api.usecase.GetClassesByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
@@ -77,6 +78,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [post]
 func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
 	var newClass model.ClassCreate
 	if err := decoder.Decode(&newClass); err != nil {
@@ -84,7 +86,7 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	class, err := api.usecase.CreateClass(mockTeacherID, &newClass)
+	class, err := api.usecase.CreateClass(teacherProfile.ID, &newClass)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)

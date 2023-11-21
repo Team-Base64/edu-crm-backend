@@ -169,6 +169,9 @@ func main() {
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)
 
+	amw := delivery.NewAuthMiddleware(Usecase)
+	myRouter.Use(amw.CheckAuthMiddleware)
+
 	err = http.ListenAndServe(conf.Port, myRouter)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
