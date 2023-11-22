@@ -44,24 +44,23 @@ func (amw *AuthMiddleware) CheckAuthMiddleware(next http.Handler) http.Handler {
 			if r.Method == http.MethodOptions {
 				return
 			}
-			// session, err := r.Cookie("session_id")
-			// if err == http.ErrNoCookie {
-			// 	log.Println(e.StacktraceError(err))
-			// 	returnErrorJSON(w, e.ErrUnauthorized401)
-			// 	return
-			// }
-			// usLogin, err := amw.usecase.CheckSession(session.Value)
-			// if err != nil {
-			// 	log.Println(e.StacktraceError(err))
-			// 	returnErrorJSON(w, e.ErrUnauthorized401)
-			// 	return
-			// }
+			session, err := r.Cookie("session_id")
+			if err == http.ErrNoCookie {
+				log.Println(e.StacktraceError(err))
+				returnErrorJSON(w, e.ErrUnauthorized401)
+				return
+			}
+			usLogin, err := amw.usecase.CheckSession(session.Value)
+			if err != nil {
+				log.Println(e.StacktraceError(err))
+				returnErrorJSON(w, e.ErrUnauthorized401)
+				return
+			}
 
-			// user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
-			usLogin := "test1"
 			user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
+			// usLogin := "test1"
+			// user, err := amw.usecase.GetTeacherProfileByLogin(usLogin)
 			if user.Name == "" {
-				log.Println("no user in db")
 				log.Println(e.StacktraceError(errors.New("no user: " + usLogin)))
 				returnErrorJSON(w, e.ErrUnauthorized401)
 				return

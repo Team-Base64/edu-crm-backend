@@ -1,7 +1,9 @@
 package delivery
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	e "main/domain/errors"
 	"main/domain/model"
@@ -35,8 +37,8 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := api.usecase.GetTeacherProfileByLogin(req.Login)
-	if user.Name == "" {
-		log.Println("no user in db")
+	if errors.Is(err, sql.ErrNoRows) {
+		log.Println(e.StacktraceError(err, errors.New("no user: "+req.Login)))
 		returnErrorJSON(w, e.ErrUnauthorized401)
 		return
 	}
@@ -46,7 +48,7 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if user.Password != req.Password {
-		log.Println("wrong password")
+		log.Println(e.StacktraceError(errors.New("wrong password")))
 		returnErrorJSON(w, e.ErrUnauthorized401)
 		return
 	}
@@ -64,6 +66,7 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(10 * time.Hour),
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	http.SetCookie(w, cookie)
@@ -107,5 +110,31 @@ func (api *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, session)
+	json.NewEncoder(w).Encode(&model.Response{})
+}
+
+// Auth godoc
+// @Summary Check user auth
+// @Description Check user auth
+// @ID auth
+// @Accept  json
+// @Produce  json
+// @Tags Teacher
+// @Success 200 {object} model.Response "OK"
+// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Router /auth [get]
+func (api *Handler) CheckAuth(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	_, err := r.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrUnauthorized401)
+		return
+	}
+
 	json.NewEncoder(w).Encode(&model.Response{})
 }

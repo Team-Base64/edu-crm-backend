@@ -25,6 +25,7 @@ var PathProfile = BasePath + "/profile"
 var PathSignUp = BasePath + "/register"
 var PathLogin = BasePath + "/login"
 var PathLogout = BasePath + "/logout"
+var PathAuth = BasePath + "/auth"
 
 var PathChats = BasePath + "/chats"
 var PathChatByID = BasePath + "/chats/{id}"
