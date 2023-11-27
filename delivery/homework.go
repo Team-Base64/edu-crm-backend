@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // GetHomeworksFromClass godoc
@@ -98,7 +100,9 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
+	sanitizer := bluemonday.UGCPolicy()
+	newHw.Title = sanitizer.Sanitize(newHw.Title)
+	newHw.Description = sanitizer.Sanitize(newHw.Description)
 	hw, err := api.usecase.CreateHomework(teacherProfile.ID, &newHw)
 	if err != nil {
 		log.Println(e.StacktraceError(err))

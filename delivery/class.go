@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // GetClasses godoc
@@ -85,7 +87,9 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
+	sanitizer := bluemonday.UGCPolicy()
+	newClass.Title = sanitizer.Sanitize(newClass.Title)
+	newClass.Description = sanitizer.Sanitize(newClass.Description)
 	class, err := api.usecase.CreateClass(teacherProfile.ID, &newClass)
 	if err != nil {
 		log.Println(e.StacktraceError(err))

@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // GetClassFeed godoc
@@ -73,7 +75,8 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
+	sanitizer := bluemonday.UGCPolicy()
+	newPost.Text = sanitizer.Sanitize(newPost.Text)
 	post, err := api.usecase.CreatePost(classID, &newPost)
 	if err != nil {
 		log.Println(e.StacktraceError(err))

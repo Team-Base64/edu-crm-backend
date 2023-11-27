@@ -6,6 +6,8 @@ import (
 	e "main/domain/errors"
 	"main/domain/model"
 	"net/http"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // CreateTeacher godoc
@@ -27,7 +29,9 @@ func (api *Handler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
+	sanitizer := bluemonday.UGCPolicy()
+	req.Login = sanitizer.Sanitize(req.Login)
+	req.Name = sanitizer.Sanitize(req.Name)
 	if err := api.usecase.CreateTeacher(&req); err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
