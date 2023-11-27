@@ -121,7 +121,7 @@ func main() {
 		log.Fatalln("could not connect to database")
 	}
 	defer db.Close()
-	log.Println(urlDB)
+	//log.Println(urlDB)
 	if err := db.Ping(); err != nil {
 		log.Fatalln("unable to reach database ", err)
 	}
