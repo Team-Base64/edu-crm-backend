@@ -7,6 +7,8 @@ import (
 	e "main/domain/errors"
 	"main/domain/model"
 	"net/http"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // SetOAUTH2Token godoc
@@ -118,7 +120,9 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
+	sanitizer := bluemonday.UGCPolicy()
+	req.Title = sanitizer.Sanitize(req.Title)
+	req.Description = sanitizer.Sanitize(req.Description)
 	err := api.usecase.CreateCalendarEvent(&req, teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -211,6 +215,9 @@ func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	sanitizer := bluemonday.UGCPolicy()
+	req.Title = sanitizer.Sanitize(req.Title)
+	req.Description = sanitizer.Sanitize(req.Description)
 	err := api.usecase.UpdateCalendarEvent(&req, teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))

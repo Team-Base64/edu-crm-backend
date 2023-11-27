@@ -72,8 +72,13 @@ func init() {
 	if !exist || len(pgDB) == 0 {
 		log.Fatalln("could not get database name from env")
 	}
-
 	urlDB = "postgres://" + pgUser + ":" + pgPwd + "@" + pgHost + ":" + pgPort + "/" + pgDB
+
+	// urlDBs, exist := os.LookupEnv(conf.URL_DB)
+	// if !exist || len(urlDBs) == 0 {
+	// 	log.Fatalln("could not get database name from env")
+	// }
+	// urlDB = urlDBs
 
 	tokenLen, err = strconv.Atoi(os.Getenv(conf.TokenLenght))
 	if err != nil {
@@ -116,7 +121,7 @@ func main() {
 		log.Fatalln("could not connect to database")
 	}
 	defer db.Close()
-
+	log.Println(urlDB)
 	if err := db.Ping(); err != nil {
 		log.Fatalln("unable to reach database ", err)
 	}

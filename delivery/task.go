@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // GetTeacherTasks godoc
@@ -52,6 +54,8 @@ func (api *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
+	sanitizer := bluemonday.UGCPolicy()
+	req.Description = sanitizer.Sanitize(req.Description)
 
 	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
 	task, err := api.usecase.CreateTask(teacherProfile.ID, &req)
