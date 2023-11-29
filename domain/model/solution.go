@@ -8,7 +8,7 @@ type SolutionFromClass struct {
 	StudentID         int       `json:"studentID"`
 	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
-	File              string    `json:"file"`
+	Files             []string  `json:"files"`
 	Status            string    `json:"status"` // new | approve | reject
 	TeacherEvaluation string    `json:"teacherEvaluation"`
 }
@@ -22,7 +22,7 @@ type SolutionForHw struct {
 	StudentID         int       `json:"studentID"`
 	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
-	File              string    `json:"file"`
+	Files             []string  `json:"files"`
 	Status            string    `json:"status"` // new | approve | reject
 	TeacherEvaluation string    `json:"teacherEvaluation"`
 }
@@ -37,7 +37,7 @@ type SolutionByID struct {
 	StudentID         int       `json:"studentID"`
 	Text              string    `json:"text"`
 	CreateTime        time.Time `json:"createTime"`
-	File              string    `json:"file"`
+	Files             []string  `json:"files"`
 	Status            string    `json:"status"` // new | approve | reject
 	TeacherEvaluation string    `json:"teacherEvaluation"`
 }
