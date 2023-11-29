@@ -65,7 +65,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) 
 	chats := []model.ChatPreview{}
 	for rows.Next() {
 		tmpChat := model.ChatPreview{
-			Img: "mockImg",
+			Img: "https://educrm.us.to/filestorage/mock-avatar.png",
 		}
 
 		if err = rows.Scan(
