@@ -72,10 +72,8 @@ func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) (*model.ClassBroadcas
 		}
 
 		msg.Description += "\n" + "Задание №" + strconv.Itoa(id+1) + "\n" + task.Description
-		if len(task.Attach) == 0 {
-			continue
-		}
-		msg.Attaches = append(msg.Attaches, task.Attach)
+
+		msg.Attaches = append(msg.Attaches, task.Attaches...)
 	}
 
 	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.Format("15:4 02.01.2006")
