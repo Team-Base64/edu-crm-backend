@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	conf "main/config"
@@ -51,9 +52,14 @@ func (amw *AuthMiddleware) CheckAuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 			usLogin, err := amw.usecase.CheckSession(session.Value)
+			if errors.Is(err, sql.ErrNoRows) {
+				log.Println(e.StacktraceError(err, errors.New("no sess: ")))
+				returnErrorJSON(w, e.ErrUnauthorized401)
+				return
+			}
 			if err != nil {
 				log.Println(e.StacktraceError(err))
-				returnErrorJSON(w, e.ErrUnauthorized401)
+				returnErrorJSON(w, e.ErrServerError500)
 				return
 			}
 

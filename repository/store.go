@@ -54,6 +54,10 @@ type StoreInterface interface {
 	GetTokenDB(id int) (string, error)
 	CreateCalendarDB(teacherID int, googleID string) (int, error)
 	GetCalendarDB(teacherID int) (*model.CalendarParams, error)
+	// SESSIONS
+	CreateSession(teacherLogin string) (*model.Session, error)
+	CheckSession(in string) (string, error)
+	DeleteSession(in string) error
 }
 
 type Store struct {

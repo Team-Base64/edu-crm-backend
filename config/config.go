@@ -6,7 +6,7 @@ var PG_PWD = "POSTGRES_PASSWORD"
 var PG_PORT = "POSTGRES_PORT"
 var PG_DB = "POSTGRES_DB"
 
-//var URL_DB = "URL_DB"
+var URL_DB = "URL_DB"
 
 var TokenLetters = "TOKEN_LETTERS"
 var TokenLenght = "TOKEN_LENGTH"
