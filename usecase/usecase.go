@@ -3,7 +3,6 @@ package usecase
 import (
 	"main/domain/model"
 	"math/rand"
-	"sync"
 
 	ctrl "main/controller"
 	rep "main/repository"
@@ -63,8 +62,6 @@ type Usecase struct {
 	chatService     ctrl.ChatServiceInterface
 	tokenFile       string
 	credentialsFile string
-	sessions        map[string]string
-	mu              *sync.RWMutex
 }
 
 func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface, tok string, cred string) UsecaseInterface {
@@ -76,8 +73,6 @@ func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatS
 		chatService:     cs,
 		tokenFile:       tok,
 		credentialsFile: cred,
-		sessions:        make(map[string]string),
-		mu:              &sync.RWMutex{},
 	}
 }
 

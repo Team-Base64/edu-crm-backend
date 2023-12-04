@@ -9,7 +9,6 @@ import (
 
 func (s *Store) CreateSession(teacherLogin string) (*model.Session, error) {
 	newUUID := uuid.New()
-	//id := newUUID.String()
 	sess := &model.Session{
 		ID: newUUID.String(),
 	}
