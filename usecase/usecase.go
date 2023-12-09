@@ -20,6 +20,7 @@ type UsecaseInterface interface {
 	// CHAT
 	GetChatByID(id int) (*model.Chat, error)
 	GetChatsByTeacherID(id int) ([]model.ChatPreview, error)
+	ReadChatByID(id int, teacherID int) error
 	// CLASS
 	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error)
 	GetClassByID(id int) (*model.ClassInfo, error)

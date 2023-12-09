@@ -25,3 +25,11 @@ func (uc *Usecase) GetChatsByTeacherID(id int) ([]model.ChatPreview, error) {
 	}
 	return chats, nil
 }
+
+func (uc *Usecase) ReadChatByID(id int, teacherID int) error {
+	err := uc.store.ReadChatByID(id, teacherID)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}

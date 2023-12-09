@@ -19,6 +19,7 @@ type StoreInterface interface {
 	GetChatByID(id int) (*model.Chat, error)
 	GetChatsByTeacherID(idTeacher int) ([]model.ChatPreview, error)
 	GetChatIDBySolutionID(solutionID int) (int, error)
+	ReadChatByID(id int, teacherID int) error
 	// CLASS
 	CheckClassExistence(id int) error
 	AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error)
