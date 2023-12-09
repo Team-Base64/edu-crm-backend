@@ -8,10 +8,10 @@ import (
 func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 	var stud model.StudentByID
 	if err := s.db.QueryRow(
-		`SELECT name, socialType FROM students WHERE id = $1;`,
+		`SELECT name, socialType, avatar FROM students WHERE id = $1;`,
 		id,
 	).Scan(
-		&stud.Name, &stud.SocialType,
+		&stud.Name, &stud.SocialType, &stud.Avatar,
 	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -21,7 +21,7 @@ func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 
 func (s *Store) GetStudentsFromClass(classID int) ([]model.StudentFromClass, error) {
 	rows, err := s.db.Query(
-		`SELECT s.id, s.name, s.socialType, c.id FROM students s
+		`SELECT s.id, s.name, s.socialType, s.avatar, c.id FROM students s
 		 JOIN chats c ON s.id = c.studentID
 		 WHERE c.classID = $1;`,
 		classID,
@@ -38,6 +38,7 @@ func (s *Store) GetStudentsFromClass(classID int) ([]model.StudentFromClass, err
 			&tmpStudent.ID,
 			&tmpStudent.Name,
 			&tmpStudent.SocialType,
+			&tmpStudent.Avatar,
 			&tmpStudent.ChatID,
 		); err != nil {
 			return nil, e.StacktraceError(err)

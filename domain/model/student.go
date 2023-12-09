@@ -5,6 +5,7 @@ type StudentFromClass struct {
 	Name       string `json:"name"`
 	SocialType string `json:"socialType"`
 	ChatID     int    `json:"chatID"`
+	Avatar     string `json:"avatar"`
 }
 
 type StudentListFromClass struct {
@@ -14,6 +15,7 @@ type StudentListFromClass struct {
 type StudentByID struct {
 	Name       string `json:"name"`
 	SocialType string `json:"socialType"`
+	Avatar     string `json:"avatar"`
 }
 
 type StudentByIDResponse struct {
