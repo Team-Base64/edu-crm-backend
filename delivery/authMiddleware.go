@@ -39,7 +39,7 @@ func WithUser(ctx context.Context, user *model.TeacherDB) context.Context {
 func (amw *AuthMiddleware) CheckAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RequestURI)
-		if r.RequestURI == conf.PathLogin || strings.Contains(r.RequestURI, conf.PathDocs) {
+		if r.RequestURI == conf.PathLogin || r.RequestURI == conf.PathSignUp || strings.Contains(r.RequestURI, conf.PathDocs) {
 			next.ServeHTTP(w, r)
 		} else {
 			if r.Method == http.MethodOptions {

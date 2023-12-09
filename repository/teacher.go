@@ -6,12 +6,24 @@ import (
 )
 
 func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
-	_, err := s.db.Exec(
-		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3);`,
+	maxCount := 0
+	if err := s.db.QueryRow(
+		`SELECT count(*) FROM calendars;`).Scan(&maxCount); err != nil {
+		return e.StacktraceError(err)
+	}
+	id := 0
+	err := s.db.QueryRow(
+		`INSERT INTO teachers (login, name, password) VALUES ($1, $2, $3) Returning id;`,
 		in.Login, in.Name, in.Password,
-	)
+	).Scan(&id)
 	if err != nil {
 		return e.StacktraceError(err)
+	}
+	if id > maxCount {
+		if _, err := s.db.Exec(`DELETE FROM teachers WHERE id = $1;`, id); err != nil {
+			return e.StacktraceError(err)
+		}
+		return e.StacktraceError(e.ErrServerError503)
 	}
 
 	return nil

@@ -46,6 +46,25 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	return &model.Chat{Messages: messages}, nil
 }
 
+func (s *Store) ReadChatByID(id int, teacherID int) error {
+	var tID int
+	if err := s.db.QueryRow(
+		`SELECT teacherID FROM chats WHERE id = $1;`,
+		id,
+	).Scan(&tID); err != nil {
+		return e.StacktraceError(err)
+	}
+	if tID != teacherID {
+		return e.StacktraceError(e.ErrForbidden403)
+	}
+	_, err := s.db.Exec(
+		`UPDATE messages set isRead = TRUE WHERE chatID = $1;`, id)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}
+
 func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) {
 	rows, err := s.db.Query(
 		`SELECT m1.chatID, s.id, s.name, s.socialType, s.avatar, m1.text, m1.createTime, m1.isRead

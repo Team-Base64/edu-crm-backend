@@ -24,3 +24,11 @@ func (uc *Usecase) GetTeacherProfileByLogin(login string) (*model.TeacherDB, err
 	}
 	return chat, nil
 }
+
+func (uc *Usecase) SignUpTeacher(req *model.TeacherSignUp) error {
+	err := uc.store.AddTeacher(req)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}

@@ -31,7 +31,7 @@ definitions:
     type: object
   model.ChatPreview:
     properties:
-      chatid:
+      chatID:
         type: integer
       cover:
         type: string
@@ -39,9 +39,11 @@ definitions:
         type: string
       isread:
         type: boolean
-      name:
-        type: string
       socialType:
+        type: string
+      studentID:
+        type: integer
+      studentName:
         type: string
       text:
         type: string
@@ -107,10 +109,12 @@ definitions:
         type: string
       description:
         type: string
-      file:
-        type: string
       id:
         type: integer
+      tasks:
+        items:
+          type: integer
+        type: array
       title:
         type: string
     type: object
@@ -124,8 +128,10 @@ definitions:
         type: string
       description:
         type: string
-      file:
-        type: string
+      tasks:
+        items:
+          type: integer
+        type: array
       title:
         type: string
     type: object
@@ -144,7 +150,7 @@ definitions:
         type: string
       tasks:
         items:
-          $ref: '#/definitions/model.Task'
+          type: integer
         type: array
       title:
         type: string
@@ -213,12 +219,21 @@ definitions:
     properties:
       createTime:
         type: string
-      file:
-        type: string
+      files:
+        items:
+          type: string
+        type: array
       hwID:
         type: integer
+      id:
+        type: integer
+      status:
+        description: new | approve | reject
+        type: string
       studentID:
         type: integer
+      teacherEvaluation:
+        type: string
       text:
         type: string
     type: object
@@ -227,16 +242,32 @@ definitions:
       solution:
         $ref: '#/definitions/model.SolutionByID'
     type: object
+  model.SolutionEvaluation:
+    properties:
+      isApproved:
+        type: boolean
+      tasks:
+        items:
+          $ref: '#/definitions/model.TaskEvaluation'
+        type: array
+    type: object
   model.SolutionForHw:
     properties:
       createTime:
         type: string
-      file:
-        type: string
+      files:
+        items:
+          type: string
+        type: array
       id:
         type: integer
+      status:
+        description: new | approve | reject
+        type: string
       studentID:
         type: integer
+      teacherEvaluation:
+        type: string
       text:
         type: string
     type: object
@@ -244,14 +275,21 @@ definitions:
     properties:
       createTime:
         type: string
-      file:
-        type: string
+      files:
+        items:
+          type: string
+        type: array
       hwID:
         type: integer
       id:
         type: integer
+      status:
+        description: new | approve | reject
+        type: string
       studentID:
         type: integer
+      teacherEvaluation:
+        type: string
       text:
         type: string
     type: object
@@ -283,6 +321,8 @@ definitions:
     type: object
   model.StudentFromClass:
     properties:
+      chatID:
+        type: integer
       id:
         type: integer
       name:
@@ -302,6 +342,37 @@ definitions:
       attach:
         type: string
       description:
+        type: string
+      id:
+        type: integer
+    type: object
+  model.TaskByID:
+    properties:
+      attach:
+        type: string
+      description:
+        type: string
+    type: object
+  model.TaskByIDResponse:
+    properties:
+      task:
+        $ref: '#/definitions/model.TaskByID'
+    type: object
+  model.TaskCreate:
+    properties:
+      attach:
+        type: string
+      description:
+        type: string
+    type: object
+  model.TaskCreateResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  model.TaskEvaluation:
+    properties:
+      evaluation:
         type: string
       id:
         type: integer
@@ -387,6 +458,31 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Upload attach
+  /auth:
+    get:
+      consumes:
+      - application/json
+      description: Check user auth
+      operationId: auth
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Check user auth
+      tags:
+      - Teacher
   /calendar:
     get:
       consumes:
@@ -618,6 +714,44 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get chat messages by id
+      tags:
+      - Chats
+    post:
+      consumes:
+      - application/json
+      description: Read chats messages by chat id
+      operationId: readChat
+      parameters:
+      - description: Chat id
+        in: path
+        name: chatID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Read chat messages by id
       tags:
       - Chats
   /classes:
@@ -963,7 +1097,7 @@ paths:
       summary: Create homework
       tags:
       - Homework
-  /homeworks/{hwID}:
+  /homeworks/{homeworkID}:
     get:
       consumes:
       - application/json
@@ -972,7 +1106,7 @@ paths:
       parameters:
       - description: Homework id
         in: path
-        name: hwID
+        name: homeworkID
         required: true
         type: string
       produces:
@@ -1002,7 +1136,7 @@ paths:
       summary: Get homework
       tags:
       - Homework
-  /homeworks/{hwID}/solutions:
+  /homeworks/{homeworkID}/solutions:
     get:
       consumes:
       - application/json
@@ -1011,7 +1145,7 @@ paths:
       parameters:
       - description: Homework id
         in: path
-        name: hwID
+        name: homeworkID
         required: true
         type: string
       produces:
@@ -1179,6 +1313,46 @@ paths:
     post:
       consumes:
       - application/json
+      description: Sign Up user
+      operationId: signup
+      parameters:
+      - description: Teacher params
+        in: body
+        name: teacher
+        required: true
+        schema:
+          $ref: '#/definitions/model.TeacherSignUp'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "409":
+          description: conflict - UserDB already exists
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal Server Error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+        "503":
+          description: service unavailable
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Sign Up and returns the authentication  cookie
+      tags:
+      - Teacher
+  /register2:
+    post:
+      consumes:
+      - application/json
       description: Create teacher
       operationId: createTeacher
       parameters:
@@ -1246,6 +1420,50 @@ paths:
       summary: Get solution
       tags:
       - Solution
+    put:
+      consumes:
+      - application/json
+      description: Add evaluation for solution by solution id
+      operationId: addEvaluationForSolution
+      parameters:
+      - description: Solution id
+        in: path
+        name: solID
+        required: true
+        type: string
+      - description: Evaluation for adding
+        in: body
+        name: put
+        required: true
+        schema:
+          $ref: '#/definitions/model.SolutionEvaluation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: bad request - Problem with the request
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: not found - Requested entity is not found in database
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Add evaluation for solution
+      tags:
+      - Solution
   /students/{studentID}:
     get:
       consumes:
@@ -1308,6 +1526,68 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get teacher's tasks
+      tags:
+      - Tasks
+    post:
+      consumes:
+      - application/json
+      description: create task by teacher
+      operationId: createTasks
+      parameters:
+      - description: Task for creating
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/model.TaskCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TaskCreateResponse'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Create task by teacher
+      tags:
+      - Tasks
+  /tasks/{taskID}:
+    get:
+      consumes:
+      - application/json
+      description: get task by its ID
+      operationId: getTaskByID
+      parameters:
+      - description: Task id
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TaskByIDResponse'
+        "401":
+          description: unauthorized - Access token is missing or invalid
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: internal server error - Request is valid but operation failed
+            at server side
+          schema:
+            $ref: '#/definitions/model.Error'
+      summary: Get task by ID
       tags:
       - Tasks
 swagger: "2.0"

@@ -9,7 +9,74 @@ import (
 	"main/domain/model"
 	"net/http"
 	"time"
+
+	"github.com/microcosm-cc/bluemonday"
 )
+
+// SignUp godoc
+// @Summary Sign Up and returns the authentication  cookie
+// @Description Sign Up user
+// @ID signup
+// @Accept  json
+// @Produce  json
+// @Tags Teacher
+// @Param teacher body model.TeacherSignUp true "Teacher params"
+// @Success 201 {object} model.Response "OK"
+// @Failure 400 {object} model.Error "bad request - Problem with the request"
+// @Failure 409 {object} model.Error "conflict - UserDB already exists"
+// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Failure 503 {object} model.Error "service unavailable"
+// @Router /signup [post]
+func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var req model.TeacherSignUp
+	if err := decoder.Decode(&req); err != nil {
+		returnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+
+	sanitizer := bluemonday.UGCPolicy()
+	req.Login = sanitizer.Sanitize(req.Login)
+	req.Name = sanitizer.Sanitize(req.Name)
+
+	user, err := api.usecase.GetTeacherProfileByLogin(req.Login)
+	if user != nil && user.Login != "" {
+		returnErrorJSON(w, e.ErrConflict409)
+		return
+	}
+
+	err = api.usecase.SignUpTeacher(&req)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, err)
+		return
+	}
+
+	sess, err := api.usecase.CreateSession(req.Login)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
+
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		Value:    sess.ID,
+		Expires:  time.Now().Add(10 * time.Hour),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+
+	http.SetCookie(w, cookie)
+	w.WriteHeader(201)
+
+	json.NewEncoder(w).Encode(&model.Response{})
+}
 
 // LogIn godoc
 // @Summary Logs in and returns the authentication  cookie
@@ -128,13 +195,11 @@ func (api *Handler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
-
 	_, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrUnauthorized401)
 		return
 	}
-
 	json.NewEncoder(w).Encode(&model.Response{})
 }
