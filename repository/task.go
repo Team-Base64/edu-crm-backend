@@ -3,15 +3,17 @@ package repository
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+
+	"github.com/lib/pq"
 )
 
 func (s *Store) AddTask(teacherID int, newTask *model.TaskCreate) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
-		`INSERT INTO tasks (teacherID, description, attach)
+		`INSERT INTO tasks (teacherID, description, attaches)
 		 VALUES ($1, $2, $3)
 		 RETURNING id;`,
-		teacherID, newTask.Description, newTask.Attach,
+		teacherID, newTask.Description, (*pq.StringArray)(&newTask.Attaches),
 	).Scan(&id); err != nil {
 		return 0, e.StacktraceError(err)
 	}
@@ -22,10 +24,10 @@ func (s *Store) AddTask(teacherID int, newTask *model.TaskCreate) (int, error) {
 func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 	var task model.TaskByID
 	if err := s.db.QueryRow(
-		`SELECT description, attach FROM tasks WHERE id = $1;`,
+		`SELECT description, attaches FROM tasks WHERE id = $1;`,
 		id,
 	).Scan(
-		&task.Description, &task.Attach,
+		&task.Description, (*pq.StringArray)(&task.Attaches),
 	); err != nil {
 		return nil, e.StacktraceError(err)
 	}
@@ -35,7 +37,7 @@ func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 
 func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	rows, err := s.db.Query(
-		`SELECT id, description, attach FROM tasks WHERE teacherID = $1;`,
+		`SELECT id, description, attaches FROM tasks WHERE teacherID = $1;`,
 		teacherID,
 	)
 	if err != nil {
@@ -46,7 +48,7 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	tasks := []model.Task{}
 	for rows.Next() {
 		var task model.Task
-		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
+		err := rows.Scan(&task.ID, &task.Description, (*pq.StringArray)(&task.Attaches))
 		if err != nil {
 			return nil, e.StacktraceError(err)
 		}
@@ -59,8 +61,8 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 
 func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	rows, err := s.db.Query(
-		`SELECT t.id, t.description, t.attach
-		 FROM tasks
+		`SELECT t.id, t.description, t.attaches
+		 FROM tasks t
 		 JOIN homeworks_tasks ht ON t.id = ht.taskID
 		 WHERE ht.homeworkID = $1
 		 ORDER BY ht.rank;`,
@@ -74,7 +76,7 @@ func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	tasks := []model.Task{}
 	for rows.Next() {
 		var task model.Task
-		err := rows.Scan(&task.ID, &task.Description, &task.Attach)
+		err := rows.Scan(&task.ID, &task.Description, (*pq.StringArray)(&task.Attaches))
 		if err != nil {
 			return nil, e.StacktraceError(err)
 		}

@@ -1,19 +1,19 @@
 package model
 
 type Task struct {
-	ID          int    `json:"id"`
-	Description string `json:"description"`
-	Attach      string `json:"attach"`
+	ID          int      `json:"id"`
+	Description string   `json:"description"`
+	Attaches    []string `json:"attaches"`
 }
 
 type TaskCreate struct {
-	Description string `json:"description"`
-	Attach      string `json:"attach"`
+	Description string   `json:"description"`
+	Attaches    []string `json:"attaches"`
 }
 
 type TaskByID struct {
-	Description string `json:"description"`
-	Attach      string `json:"attach"`
+	Description string   `json:"description"`
+	Attaches    []string `json:"attaches"`
 }
 
 type TaskListByTeacherID struct {

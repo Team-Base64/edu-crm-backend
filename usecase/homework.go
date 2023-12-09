@@ -18,13 +18,15 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*
 		return nil, e.StacktraceError(err)
 	}
 
-	msg, err := uc.genHomeworkMsg(newHw)
+	msgs, err := uc.genHomeworkMsg(newHw)
 	if err != nil {
 		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 
-	if err = uc.chatService.BroadcastMsg(msg); err != nil {
-		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
+	for _, msg := range msgs {
+		if err = uc.chatService.BroadcastMsg(&msg); err != nil {
+			return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
+		}
 	}
 
 	res := &model.Homework{
@@ -58,24 +60,32 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 	return &model.HomeworkList{Homeworks: hws}, nil
 }
 
-func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) (*model.ClassBroadcastMessage, error) {
-	msg := model.ClassBroadcastMessage{
+func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) ([]model.ClassBroadcastMessage, error) {
+	// msg := model.ClassBroadcastMessage{
+	// 	ClassID:     hw.ClassID,
+	// 	Title:       "Внимание! Выдано домашнее задание: " + hw.Title,
+	// 	Description: hw.Description,
+	// }
+	msgs := []model.ClassBroadcastMessage{}
+	msgs = append(msgs, model.ClassBroadcastMessage{
 		ClassID:     hw.ClassID,
-		Title:       "Внимание! Выдано домашнее задание: " + hw.Title,
+		Title:       "Внимание! Выдано домашнее задание: " + hw.Title + "\n" + "Срок выполнения: " + hw.DeadlineTime.Format("15:4 02.01.2006"),
 		Description: hw.Description,
-	}
+	})
 
 	for id, taskID := range hw.Tasks {
 		task, err := uc.store.GetTaskByID(taskID)
 		if err != nil {
 			return nil, err
 		}
-
-		msg.Description += "\n" + "Задание №" + strconv.Itoa(id+1) + "\n" + task.Description
-		msg.Attaches = append(msg.Attaches, task.Attach)
+		msg := model.ClassBroadcastMessage{
+			ClassID:     hw.ClassID,
+			Title:       "Задание №" + strconv.Itoa(id+1),
+			Description: task.Description,
+			Attaches:    task.Attaches,
+		}
+		msgs = append(msgs, msg)
 	}
 
-	msg.Description += "\n" + "Срок выполнения: " + hw.DeadlineTime.Format("15:4 02.01.2006")
-
-	return &msg, nil
+	return msgs, nil
 }
