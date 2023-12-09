@@ -25,7 +25,7 @@ var PathOAuthSetToken = BasePath + "/oauth"
 var PathOAuthSaveToken = BasePath + "/oauth/savetoken"
 
 var PathProfile = BasePath + "/profile"
-var PathSignUp = BasePath + "/register"
+var PathSignUp = BasePath + "/signup"
 var PathLogin = BasePath + "/login"
 var PathLogout = BasePath + "/logout"
 var PathAuth = BasePath + "/auth"

@@ -26,7 +26,7 @@ import (
 // @Failure 409 {object} model.Error "conflict - UserDB already exists"
 // @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
 // @Failure 503 {object} model.Error "service unavailable"
-// @Router /register [post]
+// @Router /signup [post]
 func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
