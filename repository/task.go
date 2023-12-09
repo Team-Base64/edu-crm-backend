@@ -62,7 +62,7 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT t.id, t.description, t.attaches
-		 FROM tasks
+		 FROM tasks t
 		 JOIN homeworks_tasks ht ON t.id = ht.taskID
 		 WHERE ht.homeworkID = $1
 		 ORDER BY ht.rank;`,
