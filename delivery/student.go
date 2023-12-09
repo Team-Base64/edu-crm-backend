@@ -72,6 +72,6 @@ func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request)
 		returnErrorJSON(w, err)
 		return
 	}
-
+	log.Println(students)
 	json.NewEncoder(w).Encode(&model.StudentListFromClass{Students: students})
 }
