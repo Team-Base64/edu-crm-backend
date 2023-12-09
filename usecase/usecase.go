@@ -10,6 +10,7 @@ import (
 
 type UsecaseInterface interface {
 	// TEACHER
+	SignUpTeacher(req *model.TeacherSignUp) error
 	CreateTeacher(params *model.TeacherSignUp) error
 	GetTeacherProfile(id int) (*model.TeacherProfile, error)
 	GetTeacherProfileByLogin(login string) (*model.TeacherDB, error)

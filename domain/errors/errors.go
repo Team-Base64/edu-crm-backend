@@ -13,6 +13,7 @@ var ErrForbidden403 = errors.New("forbidden")
 var ErrNotFound404 = errors.New("not found - Requested entity is not found in database")
 var ErrConflict409 = errors.New("conflict - UserDB already exists")
 var ErrServerError500 = errors.New("internal server error - Request is valid but operation failed at server side")
+var ErrServerError503 = errors.New("service unavailable")
 
 func StacktraceError(errs ...error) error {
 	_, file, line, ok := runtime.Caller(1)
@@ -49,6 +50,10 @@ func CheckError(err error) (int, string) {
 
 	if errors.Is(err, ErrBadRequest400) {
 		return 400, ErrBadRequest400.Error()
+	}
+
+	if errors.Is(err, ErrServerError503) {
+		return 503, ErrServerError503.Error()
 	}
 
 	return 500, ErrServerError500.Error()
