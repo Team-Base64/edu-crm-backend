@@ -218,7 +218,7 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID: req.ClassID,
 		Title:   "Новое событие!" + "\n" + req.Title,
-		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format(time.RFC1123) + "\n" + "Окончание: " + req.EndDate.Format(time.RFC1123) + "\n" + "Ссылка на календарь: " +
+		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format("15:4 02.01.2006") + "\n" + "Окончание: " + req.EndDate.Format("15:4 02.01.2006") + "\n" + "Ссылка на календарь: " +
 			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
 		Attaches: []string{},
 	}
@@ -348,7 +348,7 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID: req.ClassID,
 		Title:   "Событие обновлено!" + "\n" + req.Title,
-		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format(time.RFC1123) + "\n" + "Окончание: " + req.EndDate.Format(time.RFC1123) + "\n" + "Ссылка на календарь: " +
+		Description: req.Description + "\n" + "Начало: " + req.StartDate.Format("15:4 02.01.2006") + "\n" + "Окончание: " + req.EndDate.Format("15:4 02.01.2006") + "\n" + "Ссылка на календарь: " +
 			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
 		Attaches: []string{},
 	}
