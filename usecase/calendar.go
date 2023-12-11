@@ -71,7 +71,7 @@ func saveToken(path string, token *oauth2.Token) error {
 	return nil
 }
 
-func (uc *Usecase) getCalendarServicelient() (*calendar.Service, error) {
+func (uc *Usecase) getCalendarServiceClient() (*calendar.Service, error) {
 	ctx := context.Background()
 	b, err := os.ReadFile(uc.credentialsFile)
 	if err != nil {
@@ -151,7 +151,7 @@ func (uc *Usecase) GetCalendar(teacherID int) (*model.CalendarParams, error) {
 
 func (uc *Usecase) CreateCalendar(teacherID int) (*model.CalendarParams, error) {
 
-	srv, err := uc.getCalendarServicelient()
+	srv, err := uc.getCalendarServiceClient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return nil, e.StacktraceError(err)
@@ -181,7 +181,7 @@ func (uc *Usecase) CreateCalendar(teacherID int) (*model.CalendarParams, error) 
 }
 
 func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error {
-	srv, err := uc.getCalendarServicelient()
+	srv, err := uc.getCalendarServiceClient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return e.StacktraceError(err)
@@ -234,7 +234,7 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 }
 
 func (uc *Usecase) GetCalendarEvents(teacherID int) ([]model.CalendarEvent, error) {
-	srv, err := uc.getCalendarServicelient()
+	srv, err := uc.getCalendarServiceClient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return nil, e.StacktraceError(err)
@@ -285,7 +285,7 @@ func (uc *Usecase) GetCalendarEvents(teacherID int) ([]model.CalendarEvent, erro
 }
 
 func (uc *Usecase) DeleteCalendarEvent(teacherID int, eventID string) error {
-	srv, err := uc.getCalendarServicelient()
+	srv, err := uc.getCalendarServiceClient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return e.StacktraceError(err)
@@ -305,7 +305,7 @@ func (uc *Usecase) DeleteCalendarEvent(teacherID int, eventID string) error {
 }
 
 func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error {
-	srv, err := uc.getCalendarServicelient()
+	srv, err := uc.getCalendarServiceClient()
 	if err != nil {
 		log.Println("Unable to retrieve calendar Client: ", err)
 		return e.StacktraceError(err)
