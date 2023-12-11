@@ -40,3 +40,19 @@ func (s *Store) GetCalendarDB(teacherID int) (*model.CalendarParams, error) {
 	}
 	return &ans, nil
 }
+
+func (s *Store) CreateEventDB(in *model.CalendarEvent) error {
+	_, err := s.db.Exec(`INSERT INTO events (id, classID, title, description, startDate, endDate) VALUES ($1, $2, $3, $4, $5, $6)`, in.ID, in.ClassID, in.Title, in.Description, in.StartDate, in.EndDate)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}
+
+func (s *Store) DeleteEventDB(id string) error {
+	_, err := s.db.Exec(`DELETE FROM events WHERE id = $1;`, id)
+	if err != nil {
+		return e.StacktraceError(err)
+	}
+	return nil
+}

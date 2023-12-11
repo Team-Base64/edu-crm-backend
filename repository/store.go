@@ -55,6 +55,8 @@ type StoreInterface interface {
 	GetTokenDB(id int) (string, error)
 	CreateCalendarDB(teacherID int, googleID string) (int, error)
 	GetCalendarDB(teacherID int) (*model.CalendarParams, error)
+	CreateEventDB(in *model.CalendarEvent) error
+	DeleteEventDB(id string) error
 	// SESSIONS
 	CreateSession(teacherLogin string) (*model.Session, error)
 	CheckSession(in string) (string, error)

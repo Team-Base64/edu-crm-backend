@@ -1,13 +1,11 @@
 module main
 
-go 1.21
-
-toolchain go1.21.4
+go 1.20
 
 require (
-github.com/golang/protobuf v1.5.3 // indirect
-github.com/swaggo/http-swagger v1.3.4
-github.com/swaggo/swag v1.16.2
+	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/swaggo/http-swagger v1.3.4
+	github.com/swaggo/swag v1.16.2
 )
 
 require (
