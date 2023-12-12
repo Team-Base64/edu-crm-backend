@@ -7,6 +7,7 @@ import (
 	"log"
 	e "main/domain/errors"
 	"main/domain/model"
+	"main/domain/utils"
 	"net/http"
 	"os"
 	"os/exec"
@@ -213,15 +214,12 @@ func (uc *Usecase) CreateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		return e.StacktraceError(err)
 	}
 
-	//s := req.StartDate.Format("2006-01-02 15:04:05")
-	loc, _ := time.LoadLocation("Europe/Moscow")
-
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID: req.ClassID,
 		Title:   "Новое событие!" + "\n" + req.Title,
 		Description: req.Description + "\n" +
-			"Начало: " + req.StartDate.In(loc).Format("15:4 02.01.2006") + "\n" +
-			"Окончание: " + req.EndDate.In(loc).Format("15:4 02.01.2006") + "\n" +
+			"Начало: " + utils.TimeToString(req.StartDate) + "\n" +
+			"Окончание: " + utils.TimeToString(req.EndDate) + "\n" +
 			"Ссылка на календарь: " +
 			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
 		Attaches: []string{},
@@ -348,13 +346,12 @@ func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) 
 		log.Println("Unable to update event: ", err)
 		return e.StacktraceError(err)
 	}
-	loc, _ := time.LoadLocation("Europe/Moscow")
 	bcMsg := model.ClassBroadcastMessage{
 		ClassID: req.ClassID,
 		Title:   "Событие обновлено!" + "\n" + req.Title,
 		Description: req.Description + "\n" +
-			"Начало: " + req.StartDate.In(loc).Format("15:4 02.01.2006") + " по МСК" + "\n" +
-			"Окончание: " + req.EndDate.In(loc).Format("15:4 02.01.2006") + " по МСК" + "\n" +
+			"Начало: " + utils.TimeToString(req.StartDate) + "\n" +
+			"Окончание: " + utils.TimeToString(req.EndDate) + "\n" +
 			"Ссылка на календарь: " +
 			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
 		Attaches: []string{},

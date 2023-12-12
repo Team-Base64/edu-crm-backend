@@ -3,6 +3,7 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+	"main/domain/utils"
 	"strconv"
 )
 
@@ -71,7 +72,7 @@ func (uc *Usecase) genEvaluationMsg(solutionID int, evaluation *model.SolutionEv
 
 	var msg string
 	msg += "Преподаватель проверил ваше решение от " +
-		info.SolutionCreateTime.Format("15:4 02.01.2006") +
+		utils.TimeToString(info.SolutionCreateTime) +
 		" для домашнего задания: " + info.HomeworkTitle + "\n"
 
 	for id, taskEval := range evaluation.Tasks {

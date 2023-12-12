@@ -3,8 +3,11 @@ package usecase
 import (
 	e "main/domain/errors"
 	"main/domain/model"
+	"main/domain/utils"
 	"strconv"
 	"time"
+
+	"log"
 )
 
 func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error) {
@@ -55,12 +58,12 @@ func (uc *Usecase) GetHomeworksByClassID(classID int) (*model.HomeworkList, erro
 }
 
 func (uc Usecase) genHomeworkMsg(hw *model.HomeworkCreate) model.ClassBroadcastMessage {
-	loc, _ := time.LoadLocation("Europe/Moscow")
+	log.Println(hw.DeadlineTime)
 	msg := model.ClassBroadcastMessage{
 		ClassID: hw.ClassID,
 		Title:   "Внимание! Выдано домашнее задание: " + hw.Title,
 		Description: "Задач в д/з: " + strconv.Itoa(len(hw.Tasks)) + "\n" +
-			"Срок выполнения: " + hw.DeadlineTime.In(loc).Format("15:4 02.01.2006") + " по МСК",
+			"Срок выполнения: " + utils.TimeToString(hw.DeadlineTime),
 	}
 
 	return msg
