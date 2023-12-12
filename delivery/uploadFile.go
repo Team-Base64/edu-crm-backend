@@ -87,7 +87,6 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
 	}
-
 	attachNum := uuid.New().String()
 
 	fileName := filePath + "/" + attachNum + fileExt
