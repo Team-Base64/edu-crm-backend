@@ -8,10 +8,12 @@ import (
 func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 	var stud model.StudentByID
 	if err := s.db.QueryRow(
-		`SELECT name, socialType, avatar FROM students WHERE id = $1;`,
+		`SELECT s.name, s.socialType, s.avatar, c.id FROM students s
+		 JOIN chats c ON s.id = c.studentID
+		 WHERE s.id = $1;`,
 		id,
 	).Scan(
-		&stud.Name, &stud.SocialType, &stud.Avatar,
+		&stud.Name, &stud.SocialType, &stud.Avatar, &stud.ChatID,
 	); err != nil {
 		return nil, e.StacktraceError(err)
 	}

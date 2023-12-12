@@ -16,6 +16,7 @@ type StudentByID struct {
 	Name       string `json:"name"`
 	SocialType string `json:"socialType"`
 	Avatar     string `json:"avatar"`
+	ChatID     string `json:"chatID"`
 }
 
 type StudentByIDResponse struct {
