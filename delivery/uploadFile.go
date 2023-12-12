@@ -74,6 +74,14 @@ func (api *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		fileExt = ".png"
 	case "application/pdf":
 		fileExt = ".pdf"
+	case "application/vnd.rar":
+		fileExt = ".rar"
+	case "application/x-rar-compressed":
+		fileExt = ".rar"
+	case "application/zip":
+		fileExt = ".zip"
+	case "application/x-zip-compressed":
+		fileExt = ".zip"
 	default:
 		log.Println("error not allowed file extension")
 		returnErrorJSON(w, e.ErrBadRequest400)
