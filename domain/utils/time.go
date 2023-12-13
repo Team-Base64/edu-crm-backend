@@ -16,5 +16,5 @@ func init() {
 }
 
 func TimeToString(t time.Time) string {
-	return t.In(loc).Format("15:4 02.01.2006") + " по МСК"
+	return t.In(loc).Format("15:04 02.01.2006") + " по МСК"
 }
