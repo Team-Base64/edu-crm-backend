@@ -25,6 +25,7 @@ import (
 
 var urlDB string
 var chatGrpcUrl string
+var calendarGrpcUrl string
 var tokenLen int
 var tokenLetters string
 var tokenFile string
@@ -50,6 +51,11 @@ func init() {
 	chatGrpcUrl, exist = os.LookupEnv(conf.ChatGrpcUrl)
 	if !exist || len(chatGrpcUrl) == 0 {
 		log.Fatalln("could not get chat grpc url from env")
+	}
+
+	calendarGrpcUrl, exist = os.LookupEnv(conf.CalendarGrpcUrl)
+	if !exist || len(calendarGrpcUrl) == 0 {
+		log.Fatalln("could not get calendar grpc url from env")
 	}
 
 	pgUser, exist := os.LookupEnv(conf.PG_USER)
@@ -139,13 +145,23 @@ func main() {
 	log.Println("connecter to grpc chat service is created")
 	defer grcpConnChat.Close()
 
-	ChatService := ctrl.NewChatService(ctrl.NewBotChatClient(grcpConnChat))
+	grcpConnCalendar, err := grpc.Dial(
+		calendarGrpcUrl,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Fatalln("cant create connecter to grpc calendar")
+	}
+	log.Println("connecter to grpc calendar service is created")
+	defer grcpConnCalendar.Close()
+
+	CtrlService := ctrl.NewCtrlService(ctrl.NewChatControllerClient(grcpConnChat), ctrl.NewCalendarControllerClient(grcpConnCalendar))
 
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
 		tokenLen,
-		ChatService,
+		CtrlService,
 		tokenFile,
 		credentialsFile,
 	)
@@ -154,8 +170,6 @@ func main() {
 
 	myRouter.HandleFunc(conf.PathAttach, Handler.UploadFile).Methods(http.MethodPost, http.MethodOptions)
 
-	myRouter.HandleFunc(conf.PathOAuthSetToken, Handler.SetOAUTH2Token).Methods(http.MethodPost, http.MethodOptions)
-	myRouter.HandleFunc(conf.PathOAuthSaveToken, Handler.SaveOAUTH2TokenToFile).Methods(http.MethodGet, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathLogin, Handler.Login).Methods(http.MethodPost, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathLogout, Handler.Logout).Methods(http.MethodDelete, http.MethodOptions)
 	myRouter.HandleFunc(conf.PathAuth, Handler.CheckAuth).Methods(http.MethodGet, http.MethodOptions)

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// export PATH="$PATH:$(go env GOPATH)/bin"
+// go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+// protoc --go_out=. --go-grpc_out=. --go-grpc_opt=paths=source_relative --go_opt=paths=source_relative controller/ctrl.proto
+
+package ctrl;
+option go_package = "./ctrl";
+
+message Message {
+    int32 chatID = 1;
+    string text = 2;
+    repeated string attachmentURLs = 3;
+}
+
+message Nothing {}
+
+message BroadcastMessage {
+    int32 classID = 1;
+    string title = 2;
+    string description = 3;
+    repeated string attachmentURLs = 4;
+}
+
+message EventData {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    string startDate = 4;
+    string endDate = 5;
+    int32 classID = 6;
+}
+
+message GetEventsRequest {
+    int32 teacherID = 1;
+}
+
+message GetEventsResponse {
+    repeated EventData events = 1;
+}
+
+message DeleteEventRequest {
+    string id = 1;
+}
+
+
+service ChatController {
+    rpc BroadcastMsg(BroadcastMessage) returns (Nothing);
+    rpc SendNotification(Message) returns (Nothing);
+}
+
+service CalendarController {
+    rpc GetEvents(GetEventsRequest) returns (GetEventsResponse);
+    rpc CreateEvent(EventData) returns (Nothing);
+    rpc UpdateEvent(EventData) returns (Nothing);
+    rpc DeleteEvent(DeleteEventRequest) returns (Nothing);
+}

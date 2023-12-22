@@ -22,7 +22,7 @@ func (uc *Usecase) CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*
 	}
 
 	msg := uc.genHomeworkMsg(newHw)
-	if err = uc.chatService.BroadcastMsg(&msg); err != nil {
+	if err = uc.ctrlService.BroadcastMsg(&msg); err != nil {
 		return nil, e.StacktraceError(err, uc.store.DeleteHomework(id))
 	}
 

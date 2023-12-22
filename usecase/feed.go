@@ -22,7 +22,7 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 		Description: newPost.Text,
 		Attaches:    newPost.Attaches,
 	}
-	if err := uc.chatService.BroadcastMsg(&bcMsg); err != nil {
+	if err := uc.ctrlService.BroadcastMsg(&bcMsg); err != nil {
 		return nil, e.StacktraceError(err, uc.store.DeletePost(id))
 	}
 

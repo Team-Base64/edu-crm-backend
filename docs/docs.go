@@ -1206,75 +1206,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/oauth": {
-            "post": {
-                "description": "Sets teacher's OAUTH2Token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Calendar"
-                ],
-                "summary": "Sets teacher's OAUTH2Token",
-                "operationId": "SetOAUTH2Token",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/oauth/savetoken": {
-            "get": {
-                "description": "Saves teacher's OAUTH2Token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Calendar"
-                ],
-                "summary": "Saves teacher's OAUTH2Token",
-                "operationId": "SaveOAUTH2TokenToFile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "code",
-                        "name": "code",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error - Request is valid but operation failed at server side",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/profile": {
             "get": {
                 "description": "gets teacher's info",
@@ -1311,7 +1242,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/signup": {
             "post": {
                 "description": "Sign Up user",
                 "consumes": [
@@ -1363,53 +1294,6 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "service unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/register2": {
-            "post": {
-                "description": "Create teacher",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Teacher"
-                ],
-                "summary": "Create teacher",
-                "operationId": "createTeacher",
-                "parameters": [
-                    {
-                        "description": "Teacher params",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.TeacherSignUp"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "unauthorized - Access token is missing or invalid",
-                        "schema": {
-                            "$ref": "#/definitions/model.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error - Request is valid but operation failed at server side",
                         "schema": {
                             "$ref": "#/definitions/model.Error"
                         }
@@ -1784,6 +1668,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "socialType": {
+                    "type": "string"
+                },
+                "studentAvatar": {
                     "type": "string"
                 },
                 "studentID": {
@@ -2199,6 +2086,9 @@ const docTemplate = `{
         "model.StudentByID": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -2218,6 +2108,9 @@ const docTemplate = `{
         "model.StudentFromClass": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "type": "string"
+                },
                 "chatID": {
                     "type": "integer"
                 },
@@ -2246,8 +2139,11 @@ const docTemplate = `{
         "model.Task": {
             "type": "object",
             "properties": {
-                "attach": {
-                    "type": "string"
+                "attaches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "description": {
                     "type": "string"
@@ -2260,8 +2156,11 @@ const docTemplate = `{
         "model.TaskByID": {
             "type": "object",
             "properties": {
-                "attach": {
-                    "type": "string"
+                "attaches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "description": {
                     "type": "string"
@@ -2279,8 +2178,11 @@ const docTemplate = `{
         "model.TaskCreate": {
             "type": "object",
             "properties": {
-                "attach": {
-                    "type": "string"
+                "attaches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "description": {
                     "type": "string"

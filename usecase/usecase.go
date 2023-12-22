@@ -46,14 +46,12 @@ type UsecaseInterface interface {
 	GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error)
 	EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error
 	// CALENDAR
-	SetOAUTH2Token() error
-	SaveOAUTH2Token(authCode string) error
-	CreateCalendar(teacherID int) (*model.CalendarParams, error)
+	// CreateCalendar(teacherID int) (*model.CalendarParams, error)
 	GetCalendar(teacherID int) (*model.CalendarParams, error)
-	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
-	GetCalendarEvents(teacherID int) ([]model.CalendarEvent, error)
-	DeleteCalendarEvent(teacherID int, eventID string) error
-	UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
+	// CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
+	GetCalendarEvents(teacherID int) (model.CalendarEvents, error)
+	// DeleteCalendarEvent(teacherID int, eventID string) error
+	// UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 }
 
 type Usecase struct {
@@ -61,18 +59,18 @@ type Usecase struct {
 	letters         []rune
 	tokenLen        int
 	bufToken        []rune
-	chatService     ctrl.ChatServiceInterface
+	ctrlService     ctrl.CtrlServiceInterface
 	tokenFile       string
 	credentialsFile string
 }
 
-func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.ChatServiceInterface, tok string, cred string) UsecaseInterface {
+func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.CtrlServiceInterface, tok string, cred string) UsecaseInterface {
 	return &Usecase{
 		store:           s,
 		letters:         []rune(lettes),
 		tokenLen:        tokenLen,
 		bufToken:        make([]rune, tokenLen),
-		chatService:     cs,
+		ctrlService:     cs,
 		tokenFile:       tok,
 		credentialsFile: cred,
 	}

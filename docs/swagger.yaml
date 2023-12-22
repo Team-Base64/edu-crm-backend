@@ -41,6 +41,8 @@ definitions:
         type: boolean
       socialType:
         type: string
+      studentAvatar:
+        type: string
       studentID:
         type: integer
       studentName:
@@ -309,6 +311,8 @@ definitions:
     type: object
   model.StudentByID:
     properties:
+      avatar:
+        type: string
       name:
         type: string
       socialType:
@@ -321,6 +325,8 @@ definitions:
     type: object
   model.StudentFromClass:
     properties:
+      avatar:
+        type: string
       chatID:
         type: integer
       id:
@@ -339,8 +345,10 @@ definitions:
     type: object
   model.Task:
     properties:
-      attach:
-        type: string
+      attaches:
+        items:
+          type: string
+        type: array
       description:
         type: string
       id:
@@ -348,8 +356,10 @@ definitions:
     type: object
   model.TaskByID:
     properties:
-      attach:
-        type: string
+      attaches:
+        items:
+          type: string
+        type: array
       description:
         type: string
     type: object
@@ -360,8 +370,10 @@ definitions:
     type: object
   model.TaskCreate:
     properties:
-      attach:
-        type: string
+      attaches:
+        items:
+          type: string
+        type: array
       description:
         type: string
     type: object
@@ -1236,54 +1248,6 @@ paths:
       summary: Logs out user
       tags:
       - Teacher
-  /oauth:
-    post:
-      consumes:
-      - application/json
-      description: Sets teacher's OAUTH2Token
-      operationId: SetOAUTH2Token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "500":
-          description: internal server error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Sets teacher's OAUTH2Token
-      tags:
-      - Calendar
-  /oauth/savetoken:
-    get:
-      consumes:
-      - application/json
-      description: Saves teacher's OAUTH2Token
-      operationId: SaveOAUTH2TokenToFile
-      parameters:
-      - description: code
-        in: query
-        name: code
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "500":
-          description: internal server error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Saves teacher's OAUTH2Token
-      tags:
-      - Calendar
   /profile:
     get:
       consumes:
@@ -1309,7 +1273,7 @@ paths:
       summary: Get teacher's info
       tags:
       - Teacher
-  /register:
+  /signup:
     post:
       consumes:
       - application/json
@@ -1347,38 +1311,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Sign Up and returns the authentication  cookie
-      tags:
-      - Teacher
-  /register2:
-    post:
-      consumes:
-      - application/json
-      description: Create teacher
-      operationId: createTeacher
-      parameters:
-      - description: Teacher params
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.TeacherSignUp'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "401":
-          description: unauthorized - Access token is missing or invalid
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: internal server error - Request is valid but operation failed
-            at server side
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Create teacher
       tags:
       - Teacher
   /solutions/{solID}:
