@@ -60,9 +60,9 @@ func (cs *CtrlService) SendNotification(msg *model.SingleMessage) error {
 }
 
 func (cs *CtrlService) GetEvents(teacherID int) (model.CalendarEvents, error) {
-	events, err := cs.calendarClient.GetEvents(
+	events, err := cs.calendarClient.GetEventsCalendar(
 		context.Background(),
-		&GetEventsRequest{TeacherID: int32(teacherID)})
+		&GetEventsRequestCalendar{TeacherID: int32(teacherID)})
 	if err != nil {
 		return model.CalendarEvents{}, err
 	}

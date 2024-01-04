@@ -150,17 +150,17 @@ var ChatController_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	CalendarController_GetEvents_FullMethodName   = "/ctrl.CalendarController/GetEvents"
-	CalendarController_CreateEvent_FullMethodName = "/ctrl.CalendarController/CreateEvent"
-	CalendarController_UpdateEvent_FullMethodName = "/ctrl.CalendarController/UpdateEvent"
-	CalendarController_DeleteEvent_FullMethodName = "/ctrl.CalendarController/DeleteEvent"
+	CalendarController_GetEventsCalendar_FullMethodName = "/ctrl.CalendarController/GetEventsCalendar"
+	CalendarController_CreateEvent_FullMethodName       = "/ctrl.CalendarController/CreateEvent"
+	CalendarController_UpdateEvent_FullMethodName       = "/ctrl.CalendarController/UpdateEvent"
+	CalendarController_DeleteEvent_FullMethodName       = "/ctrl.CalendarController/DeleteEvent"
 )
 
 // CalendarControllerClient is the client API for CalendarController service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CalendarControllerClient interface {
-	GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*GetEventsResponse, error)
+	GetEventsCalendar(ctx context.Context, in *GetEventsRequestCalendar, opts ...grpc.CallOption) (*GetEventsResponse, error)
 	CreateEvent(ctx context.Context, in *EventData, opts ...grpc.CallOption) (*Nothing, error)
 	UpdateEvent(ctx context.Context, in *EventData, opts ...grpc.CallOption) (*Nothing, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Nothing, error)
@@ -174,9 +174,9 @@ func NewCalendarControllerClient(cc grpc.ClientConnInterface) CalendarController
 	return &calendarControllerClient{cc}
 }
 
-func (c *calendarControllerClient) GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*GetEventsResponse, error) {
+func (c *calendarControllerClient) GetEventsCalendar(ctx context.Context, in *GetEventsRequestCalendar, opts ...grpc.CallOption) (*GetEventsResponse, error) {
 	out := new(GetEventsResponse)
-	err := c.cc.Invoke(ctx, CalendarController_GetEvents_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, CalendarController_GetEventsCalendar_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (c *calendarControllerClient) DeleteEvent(ctx context.Context, in *DeleteEv
 // All implementations must embed UnimplementedCalendarControllerServer
 // for forward compatibility
 type CalendarControllerServer interface {
-	GetEvents(context.Context, *GetEventsRequest) (*GetEventsResponse, error)
+	GetEventsCalendar(context.Context, *GetEventsRequestCalendar) (*GetEventsResponse, error)
 	CreateEvent(context.Context, *EventData) (*Nothing, error)
 	UpdateEvent(context.Context, *EventData) (*Nothing, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*Nothing, error)
@@ -225,8 +225,8 @@ type CalendarControllerServer interface {
 type UnimplementedCalendarControllerServer struct {
 }
 
-func (UnimplementedCalendarControllerServer) GetEvents(context.Context, *GetEventsRequest) (*GetEventsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEvents not implemented")
+func (UnimplementedCalendarControllerServer) GetEventsCalendar(context.Context, *GetEventsRequestCalendar) (*GetEventsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventsCalendar not implemented")
 }
 func (UnimplementedCalendarControllerServer) CreateEvent(context.Context, *EventData) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
@@ -250,20 +250,20 @@ func RegisterCalendarControllerServer(s grpc.ServiceRegistrar, srv CalendarContr
 	s.RegisterService(&CalendarController_ServiceDesc, srv)
 }
 
-func _CalendarController_GetEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetEventsRequest)
+func _CalendarController_GetEventsCalendar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEventsRequestCalendar)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CalendarControllerServer).GetEvents(ctx, in)
+		return srv.(CalendarControllerServer).GetEventsCalendar(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CalendarController_GetEvents_FullMethodName,
+		FullMethod: CalendarController_GetEventsCalendar_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CalendarControllerServer).GetEvents(ctx, req.(*GetEventsRequest))
+		return srv.(CalendarControllerServer).GetEventsCalendar(ctx, req.(*GetEventsRequestCalendar))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -330,8 +330,8 @@ var CalendarController_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CalendarControllerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetEvents",
-			Handler:    _CalendarController_GetEvents_Handler,
+			MethodName: "GetEventsCalendar",
+			Handler:    _CalendarController_GetEventsCalendar_Handler,
 		},
 		{
 			MethodName: "CreateEvent",
