@@ -11,7 +11,7 @@ type ChatInterface interface {
 
 type CalendarInterface interface {
 	GetEvents(teacherID int) (m.CalendarEvents, error)
-	// CreateEvent(EventData) error
+	CreateEvent(in m.CreateEvent) error
 	// UpdateEvent(EventData) error
-	// DeleteEvent(DeleteEventRequest) error
+	DeleteEvent(calendarDB, eventID string) error
 }

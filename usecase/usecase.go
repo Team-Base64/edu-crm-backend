@@ -48,9 +48,9 @@ type UsecaseInterface interface {
 	// CALENDAR
 	// CreateCalendar(teacherID int) (*model.CalendarParams, error)
 	GetCalendar(teacherID int) (*model.CalendarParams, error)
-	// CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
+	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 	GetCalendarEvents(teacherID int) (model.CalendarEvents, error)
-	// DeleteCalendarEvent(teacherID int, eventID string) error
+	DeleteCalendarEvent(teacherID int, eventID string) error
 	// UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 }
 

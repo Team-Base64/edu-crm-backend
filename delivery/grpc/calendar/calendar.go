@@ -50,3 +50,21 @@ func (cs *CalendarService) GetEvents(teacherID int) (m.CalendarEvents, error) {
 	}
 	return ans, nil
 }
+
+func (cs *CalendarService) CreateEvent(req m.CreateEvent) error {
+	_, err := cs.client.CreateEvent(
+		context.Background(), &proto.CreateEventRequest{CalendarID: req.CalendarID,
+			Event: &proto.EventData{Title: req.Event.Title,
+				Description: req.Event.Description,
+				StartDate:   req.Event.StartDate.Format(time.RFC3339Nano),
+				EndDate:     req.Event.EndDate.Format(time.RFC3339Nano),
+				Id:          req.Event.ID,
+				ClassID:     int32(req.Event.ClassID)}})
+	return err
+}
+
+func (cs *CalendarService) DeleteEvent(calendarDB, eventID string) error {
+	_, err := cs.client.DeleteEvent(
+		context.Background(), &proto.DeleteEventRequest{Id: eventID, CalendarID: calendarDB})
+	return err
+}

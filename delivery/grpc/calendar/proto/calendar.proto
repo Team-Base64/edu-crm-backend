@@ -26,13 +26,19 @@ message GetEventsResponse {
     repeated EventData events = 1;
 }
 
+message CreateEventRequest {
+    string calendarID = 1;
+    EventData event = 2;
+}
+
 message DeleteEventRequest {
     string id = 1;
+    string calendarID = 2;
 }
 
 service CalendarController {
     rpc GetEventsCalendar(GetEventsRequestCalendar) returns (GetEventsResponse);
-    rpc CreateEvent(EventData) returns (Nothing);
+    rpc CreateEvent(CreateEventRequest) returns (Nothing);
     rpc UpdateEvent(EventData) returns (Nothing);
     rpc DeleteEvent(DeleteEventRequest) returns (Nothing);
 }

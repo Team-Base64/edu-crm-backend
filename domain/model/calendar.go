@@ -20,6 +20,11 @@ type CalendarEvent struct {
 	ID          string    `json:"id,omitempty"`
 }
 
+type CreateEvent struct {
+	CalendarID string         `json:"calendarid"`
+	Event      *CalendarEvent `json:"event"`
+}
+
 type CalendarEvents struct {
 	Events []CalendarEvent `json:"events"`
 }
