@@ -4,7 +4,7 @@ import (
 	"main/domain/model"
 	"math/rand"
 
-	ctrl "main/controller"
+	d "main/delivery"
 	rep "main/repository"
 )
 
@@ -59,18 +59,28 @@ type Usecase struct {
 	letters         []rune
 	tokenLen        int
 	bufToken        []rune
-	ctrlService     ctrl.CtrlServiceInterface
+	chat            d.ChatInterface
+	calendar        d.CalendarInterface
 	tokenFile       string
 	credentialsFile string
 }
 
-func NewUsecase(s rep.StoreInterface, lettes string, tokenLen int, cs ctrl.CtrlServiceInterface, tok string, cred string) UsecaseInterface {
+func NewUsecase(
+	s rep.StoreInterface,
+	lettes string,
+	tokenLen int,
+	chat d.ChatInterface,
+	calendar d.CalendarInterface,
+	tok string,
+	cred string,
+) UsecaseInterface {
 	return &Usecase{
 		store:           s,
 		letters:         []rune(lettes),
 		tokenLen:        tokenLen,
 		bufToken:        make([]rune, tokenLen),
-		ctrlService:     cs,
+		chat:            chat,
+		calendar:        calendar,
 		tokenFile:       tok,
 		credentialsFile: cred,
 	}

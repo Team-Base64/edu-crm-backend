@@ -7,8 +7,11 @@ import (
 	"os"
 	"strconv"
 
-	ctrl "main/controller"
-	"main/delivery"
+	grpcCalendar "main/delivery/grpc/calendar"
+	protoCalendar "main/delivery/grpc/calendar/proto"
+	grpcChat "main/delivery/grpc/chat"
+	protoChat "main/delivery/grpc/chat/proto"
+	handler "main/delivery/http"
 	"main/repository"
 	"main/usecase"
 
@@ -155,18 +158,20 @@ func main() {
 	log.Println("connecter to grpc calendar service is created")
 	defer grcpConnCalendar.Close()
 
-	CtrlService := ctrl.NewCtrlService(ctrl.NewChatControllerClient(grcpConnChat), ctrl.NewCalendarControllerClient(grcpConnCalendar))
+	chatService := grpcChat.NewChatService(protoChat.NewChatControllerClient(grcpConnChat))
+	calendarService := grpcCalendar.NewCalendarService(protoCalendar.NewCalendarControllerClient(grcpConnCalendar))
 
 	Usecase := usecase.NewUsecase(
 		Store,
 		tokenLetters,
 		tokenLen,
-		CtrlService,
+		chatService,
+		calendarService,
 		tokenFile,
 		credentialsFile,
 	)
 
-	Handler := delivery.NewHandler(Usecase, filestoragePath, urlDomain)
+	Handler := handler.NewHandler(Usecase, filestoragePath, urlDomain)
 
 	myRouter.HandleFunc(conf.PathAttach, Handler.UploadFile).Methods(http.MethodPost, http.MethodOptions)
 
@@ -213,7 +218,7 @@ func main() {
 	myRouter.PathPrefix(conf.PathDocs).Handler(httpSwagger.WrapHandler)
 	myRouter.Use(loggingAndCORSHeadersMiddleware)
 
-	amw := delivery.NewAuthMiddleware(Usecase)
+	amw := handler.NewAuthMiddleware(Usecase)
 	myRouter.Use(amw.CheckAuthMiddleware)
 
 	err = http.ListenAndServe(conf.Port, myRouter)

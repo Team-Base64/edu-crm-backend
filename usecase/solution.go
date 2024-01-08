@@ -53,7 +53,7 @@ func (uc *Usecase) EvaluateSolutionbyID(solutionID int, evaluation *model.Soluti
 	if err != nil {
 		return e.StacktraceError(err) // TODO возрат состояния или оповещение о проблеме с доставкой
 	}
-	if err := uc.ctrlService.SendNotification(&model.SingleMessage{
+	if err := uc.chat.SendNotification(&model.SingleMessage{
 		ChatID:   chatID,
 		Text:     msg,
 		Attaches: []string{},

@@ -94,7 +94,7 @@ func (uc *Usecase) GetCalendar(teacherID int) (*model.CalendarParams, error) {
 // }
 
 func (uc *Usecase) GetCalendarEvents(teacherID int) (model.CalendarEvents, error) {
-	return uc.ctrlService.GetEvents(teacherID)
+	return uc.calendar.GetEvents(teacherID)
 }
 
 // func (uc *Usecase) DeleteCalendarEvent(teacherID int, eventID string) error {
