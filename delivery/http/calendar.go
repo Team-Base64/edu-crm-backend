@@ -23,13 +23,13 @@ import (
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar [post]
 func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
-	// teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
-	// createdResponse, err := api.usecase.CreateCalendar(teacherProfile.ID)
-	// if err != nil {
-	// 	log.Println("Error ", err)
-	// 	returnErrorJSON(w, e.ErrServerError500)
-	// 	return
-	// }
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	err := api.usecase.CreateCalendar(teacherProfile.ID)
+	if err != nil {
+		log.Println("Error ", err)
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
 
 	//json.NewEncoder(w).Encode(createdResponse)
 	json.NewEncoder(w).Encode(&model.Response{})

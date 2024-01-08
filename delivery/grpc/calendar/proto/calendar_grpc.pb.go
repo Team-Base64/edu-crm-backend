@@ -27,6 +27,7 @@ const (
 	CalendarController_CreateEvent_FullMethodName       = "/calendar.CalendarController/CreateEvent"
 	CalendarController_UpdateEvent_FullMethodName       = "/calendar.CalendarController/UpdateEvent"
 	CalendarController_DeleteEvent_FullMethodName       = "/calendar.CalendarController/DeleteEvent"
+	CalendarController_CreateCalendar_FullMethodName    = "/calendar.CalendarController/CreateCalendar"
 )
 
 // CalendarControllerClient is the client API for CalendarController service.
@@ -37,6 +38,7 @@ type CalendarControllerClient interface {
 	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*CreateEventResponse, error)
 	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Nothing, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Nothing, error)
+	CreateCalendar(ctx context.Context, in *CreateCalendarRequest, opts ...grpc.CallOption) (*Nothing, error)
 }
 
 type calendarControllerClient struct {
@@ -83,6 +85,15 @@ func (c *calendarControllerClient) DeleteEvent(ctx context.Context, in *DeleteEv
 	return out, nil
 }
 
+func (c *calendarControllerClient) CreateCalendar(ctx context.Context, in *CreateCalendarRequest, opts ...grpc.CallOption) (*Nothing, error) {
+	out := new(Nothing)
+	err := c.cc.Invoke(ctx, CalendarController_CreateCalendar_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CalendarControllerServer is the server API for CalendarController service.
 // All implementations must embed UnimplementedCalendarControllerServer
 // for forward compatibility
@@ -91,6 +102,7 @@ type CalendarControllerServer interface {
 	CreateEvent(context.Context, *CreateEventRequest) (*CreateEventResponse, error)
 	UpdateEvent(context.Context, *UpdateEventRequest) (*Nothing, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*Nothing, error)
+	CreateCalendar(context.Context, *CreateCalendarRequest) (*Nothing, error)
 	mustEmbedUnimplementedCalendarControllerServer()
 }
 
@@ -109,6 +121,9 @@ func (UnimplementedCalendarControllerServer) UpdateEvent(context.Context, *Updat
 }
 func (UnimplementedCalendarControllerServer) DeleteEvent(context.Context, *DeleteEventRequest) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
+}
+func (UnimplementedCalendarControllerServer) CreateCalendar(context.Context, *CreateCalendarRequest) (*Nothing, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCalendar not implemented")
 }
 func (UnimplementedCalendarControllerServer) mustEmbedUnimplementedCalendarControllerServer() {}
 
@@ -195,6 +210,24 @@ func _CalendarController_DeleteEvent_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CalendarController_CreateCalendar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCalendarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CalendarControllerServer).CreateCalendar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CalendarController_CreateCalendar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CalendarControllerServer).CreateCalendar(ctx, req.(*CreateCalendarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CalendarController_ServiceDesc is the grpc.ServiceDesc for CalendarController service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -217,6 +250,10 @@ var CalendarController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteEvent",
 			Handler:    _CalendarController_DeleteEvent_Handler,
+		},
+		{
+			MethodName: "CreateCalendar",
+			Handler:    _CalendarController_CreateCalendar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

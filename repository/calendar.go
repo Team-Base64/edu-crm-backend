@@ -15,19 +15,6 @@ func (s *Store) GetTokenDB(id int) (string, error) {
 	return tok, nil
 }
 
-func (s *Store) CreateCalendarDB(teacherID int, googleID string) (int, error) {
-	// tok, err := s.GetTokenDB(teacherID)
-	// if err != nil {
-	// 	return 0, e.StacktraceError(err)
-	// }
-	id := 1
-	err := s.db.QueryRow(`INSERT INTO calendars (teacherID, idInGoogle) VALUES ($1, $2) RETURNING id;`, teacherID, googleID).Scan(&id)
-	if err != nil {
-		return 0, e.StacktraceError(err)
-	}
-	return id, nil
-}
-
 func (s *Store) GetCalendarDB(teacherID int) (*model.CalendarParams, error) {
 	// tok, err := s.GetTokenDB(teacherID)
 	// if err != nil {

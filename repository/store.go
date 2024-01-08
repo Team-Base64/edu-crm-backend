@@ -53,7 +53,7 @@ type StoreInterface interface {
 	AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error
 	// CALENDAR
 	GetTokenDB(id int) (string, error)
-	CreateCalendarDB(teacherID int, googleID string) (int, error)
+	//CreateCalendarDB(teacherID int, googleID string) (int, error)
 	GetCalendarDB(teacherID int) (*model.CalendarParams, error)
 	// SESSIONS
 	CreateSession(teacherLogin string) (*model.Session, error)

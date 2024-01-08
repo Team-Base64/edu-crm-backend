@@ -46,7 +46,7 @@ type UsecaseInterface interface {
 	GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error)
 	EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error
 	// CALENDAR
-	// CreateCalendar(teacherID int) (*model.CalendarParams, error)
+	CreateCalendar(teacherID int) error
 	GetCalendar(teacherID int) (*model.CalendarParams, error)
 	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 	GetCalendarEvents(teacherID int) (model.CalendarEvents, error)

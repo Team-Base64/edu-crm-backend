@@ -14,4 +14,5 @@ type CalendarInterface interface {
 	CreateEvent(ev m.CalendarEvent, calendarDB string) (string, error)
 	UpdateEvent(ev m.CalendarEvent, calendarDB string) error
 	DeleteEvent(calendarDB, eventID string) error
+	CreateCalendar(teacherID int) error
 }

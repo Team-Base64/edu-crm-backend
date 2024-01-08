@@ -14,36 +14,9 @@ func (uc *Usecase) GetCalendar(teacherID int) (*m.CalendarParams, error) {
 	return uc.store.GetCalendarDB(teacherID)
 }
 
-// func (uc *Usecase) CreateCalendar(teacherID int) (*model.CalendarParams, error) {
-
-// 	srv, err := uc.getCalendarServiceClient()
-// 	if err != nil {
-// 		log.Println("Unable to retrieve calendar Client: ", err)
-// 		return nil, e.StacktraceError(err)
-// 	}
-
-// 	newCal := &calendar.Calendar{TimeZone: "Europe/Moscow", Summary: "EDUCRM Calendar"}
-// 	cal, err := srv.Calendars.Insert(newCal).Do()
-// 	if err != nil {
-// 		log.Println("Unable to create calendar: ", err)
-// 		return nil, e.StacktraceError(err)
-// 	}
-
-// 	Acl := &calendar.AclRule{Scope: &calendar.AclRuleScope{Type: "default"}, Role: "reader"}
-// 	_, err = srv.Acl.Insert(cal.Id, Acl).Do()
-// 	if err != nil {
-// 		log.Println("Unable to create ACL: ", err)
-// 		return nil, e.StacktraceError(err)
-// 	}
-
-// 	innerID, err := uc.store.CreateCalendarDB(teacherID, cal.Id)
-// 	if err != nil {
-// 		log.Println("DB err: ", err)
-// 		return nil, e.StacktraceError(err)
-// 	}
-
-// 	return &model.CalendarParams{ID: innerID, IDInGoogle: cal.Id}, nil
-// }
+func (uc *Usecase) CreateCalendar(teacherID int) error {
+	return uc.calendar.CreateCalendar(teacherID)
+}
 
 func (uc *Usecase) CreateCalendarEvent(req *m.CalendarEvent, teacherID int) error {
 	calendarDB, err := uc.store.GetCalendarDB(teacherID)

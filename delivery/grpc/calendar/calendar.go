@@ -80,3 +80,9 @@ func (cs *CalendarService) UpdateEvent(ev m.CalendarEvent, calID string) error {
 				ClassID:     int32(ev.ClassID)}})
 	return err
 }
+
+func (cs *CalendarService) CreateCalendar(teacherID int) error {
+	_, err := cs.client.CreateCalendar(
+		context.Background(), &proto.CreateCalendarRequest{TeacherID: int32(teacherID)})
+	return err
+}
