@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	e "main/domain/errors"
 	"main/domain/model"
@@ -160,29 +161,29 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 // @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/event [post]
 func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	// teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
-	// decoder := json.NewDecoder(r.Body)
-	// var req model.CalendarEvent
-	// if err := decoder.Decode(&req); err != nil {
-	// 	log.Println(e.StacktraceError(err))
-	// 	returnErrorJSON(w, e.ErrBadRequest400)
-	// 	return
-	// }
-	// if req.ID == "" {
-	// 	log.Println(e.StacktraceError(errors.New("empty ID")))
-	// 	returnErrorJSON(w, e.ErrBadRequest400)
-	// 	return
-	// }
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	decoder := json.NewDecoder(r.Body)
+	var req model.CalendarEvent
+	if err := decoder.Decode(&req); err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
+	if req.ID == "" {
+		log.Println(e.StacktraceError(errors.New("empty ID")))
+		returnErrorJSON(w, e.ErrBadRequest400)
+		return
+	}
 
-	// sanitizer := bluemonday.UGCPolicy()
-	// req.Title = sanitizer.Sanitize(req.Title)
-	// req.Description = sanitizer.Sanitize(req.Description)
-	// err := api.usecase.UpdateCalendarEvent(&req, teacherProfile.ID)
-	// if err != nil {
-	// 	log.Println(e.StacktraceError(err))
-	// 	returnErrorJSON(w, e.ErrServerError500)
-	// 	return
-	// }
+	sanitizer := bluemonday.UGCPolicy()
+	req.Title = sanitizer.Sanitize(req.Title)
+	req.Description = sanitizer.Sanitize(req.Description)
+	err := api.usecase.UpdateCalendarEvent(&req, teacherProfile.ID)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
 
 	json.NewEncoder(w).Encode(&model.Response{})
 }

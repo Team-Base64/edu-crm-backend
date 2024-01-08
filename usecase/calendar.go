@@ -1,11 +1,13 @@
 package usecase
 
 import (
+	"fmt"
 	"log"
 	e "main/domain/errors"
 	"main/domain/model"
 	m "main/domain/model"
 	"main/domain/utils"
+	"strings"
 )
 
 func (uc *Usecase) GetCalendar(teacherID int) (*m.CalendarParams, error) {
@@ -49,7 +51,7 @@ func (uc *Usecase) CreateCalendarEvent(req *m.CalendarEvent, teacherID int) erro
 		log.Println("DB err: ", err)
 		return e.StacktraceError(err)
 	}
-	err = uc.calendar.CreateEvent(m.CreateEvent{Event: req, CalendarID: calendarDB.IDInGoogle})
+	eventID, err := uc.calendar.CreateEvent(*req, calendarDB.IDInGoogle)
 	if err != nil {
 		log.Println("Unable to create event: ", err)
 		return e.StacktraceError(err)
@@ -66,11 +68,10 @@ func (uc *Usecase) CreateCalendarEvent(req *m.CalendarEvent, teacherID int) erro
 		Attaches: []string{},
 	}
 	if err := uc.chat.BroadcastMsg(&bcMsg); err != nil {
-		// err = uc.calendar.DeleteCalendarEvent(teacherID, event.Id)
-		// if err != nil {
-		// 	log.Println("Unable to delete event after bc error: ", err)
-		// 	//return e.StacktraceError(err)
-		// }
+		err = uc.calendar.DeleteEvent(calendarDB.IDInGoogle, eventID)
+		if err != nil {
+			log.Println("Unable to delete event after bc error: ", err)
+		}
 		log.Println("Unable to broadcast msg: ", err)
 		return e.StacktraceError(err)
 	}
@@ -88,78 +89,46 @@ func (uc *Usecase) DeleteCalendarEvent(teacherID int, eventID string) error {
 		return e.StacktraceError(err)
 	}
 	return uc.calendar.DeleteEvent(calendarDB.IDInGoogle, eventID)
-	// srv, err := uc.getCalendarServiceClient()
-	// if err != nil {
-	// 	log.Println("Unable to retrieve calendar Client: ", err)
-	// 	return e.StacktraceError(err)
-	// }
-
-	// err = srv.Events.Delete(calendarDB.IDInGoogle, eventID).Do()
-	// if err != nil {
-	// 	log.Println("Unable to delete event: ", err)
-	// 	return e.StacktraceError(err)
-	// }
-
-	// return nil
 }
 
-// func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error {
-// 	srv, err := uc.getCalendarServiceClient()
-// 	if err != nil {
-// 		log.Println("Unable to retrieve calendar Client: ", err)
-// 		return e.StacktraceError(err)
-// 	}
-// 	s := strings.Split(req.Title, " ")
-// 	//log.Println(s)
-// 	newTitle := ""
-// 	if len(s) > 2 && s[len(s)-2] == "Class" {
-// 		newTitle = strings.Join(s[:len(s)-2], " ")
-// 	} else {
-// 		newTitle = req.Title
-// 	}
+func (uc *Usecase) UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error {
+	s := strings.Split(req.Title, " ")
+	newTitle := ""
+	if len(s) > 2 && s[len(s)-2] == "Class" {
+		newTitle = strings.Join(s[:len(s)-2], " ")
+	} else {
+		newTitle = req.Title
+	}
+	req.Title = newTitle + " Class " + fmt.Sprintf("%d", req.ClassID)
 
-// 	event := &calendar.Event{
-// 		Summary:     newTitle + " Class " + fmt.Sprintf("%d", req.ClassID),
-// 		Description: req.Description,
-// 		Start: &calendar.EventDateTime{
-// 			DateTime: req.StartDate.Format(time.RFC3339Nano),
-// 			//TimeZone: "Europe/Moscow",
-// 		},
-// 		End: &calendar.EventDateTime{
-// 			DateTime: req.EndDate.Format(time.RFC3339Nano),
-// 			//TimeZone: "Europe/Moscow",
-// 		},
-// 		Visibility: "public",
-// 	}
-// 	calendarDB, err := uc.store.GetCalendarDB(teacherID)
-// 	if err != nil {
-// 		log.Println("DB err: ", err)
-// 		return e.StacktraceError(err)
-// 	}
+	calendarDB, err := uc.store.GetCalendarDB(teacherID)
+	if err != nil {
+		log.Println("DB err: ", err)
+		return e.StacktraceError(err)
+	}
+	err = uc.calendar.UpdateEvent(*req, calendarDB.IDInGoogle)
+	if err != nil {
+		log.Println("Unable to create event: ", err)
+		return e.StacktraceError(err)
+	}
 
-// 	event, err = srv.Events.Update(calendarDB.IDInGoogle, req.ID, event).Do()
-
-// 	if err != nil {
-// 		log.Println("Unable to update event: ", err)
-// 		return e.StacktraceError(err)
-// 	}
-// 	bcMsg := model.ClassBroadcastMessage{
-// 		ClassID: req.ClassID,
-// 		Title:   "Событие обновлено!" + "\n" + req.Title,
-// 		Description: req.Description + "\n" +
-// 			"Начало: " + utils.TimeToString(req.StartDate) + "\n" +
-// 			"Окончание: " + utils.TimeToString(req.EndDate) + "\n" +
-// 			"Ссылка на календарь: " +
-// 			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
-// 		Attaches: []string{},
-// 	}
-// 	if err := uc.ctrlService.BroadcastMsg(&bcMsg); err != nil {
-// 		err = uc.DeleteCalendarEvent(teacherID, event.Id)
-// 		if err != nil {
-// 			log.Println("Unable to delete event after bc error: ", err)
-// 			//return e.StacktraceError(err)
-// 		}
-// 		return e.StacktraceError(err)
-// 	}
-// 	return nil
-// }
+	bcMsg := model.ClassBroadcastMessage{
+		ClassID: req.ClassID,
+		Title:   "Событие обновлено!" + "\n" + req.Title,
+		Description: req.Description + "\n" +
+			"Начало: " + utils.TimeToString(req.StartDate) + "\n" +
+			"Окончание: " + utils.TimeToString(req.EndDate) + "\n" +
+			"Ссылка на календарь: " +
+			"https://calendar.google.com/calendar/embed?ctz=Europe%2FMoscow&hl=ru&src=" + calendarDB.IDInGoogle,
+		Attaches: []string{},
+	}
+	if err := uc.chat.BroadcastMsg(&bcMsg); err != nil {
+		err = uc.calendar.DeleteEvent(calendarDB.IDInGoogle, req.ID)
+		if err != nil {
+			log.Println("Unable to delete event after bc error: ", err)
+		}
+		log.Println("Unable to broadcast msg: ", err)
+		return e.StacktraceError(err)
+	}
+	return nil
+}

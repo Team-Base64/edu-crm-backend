@@ -51,7 +51,7 @@ type UsecaseInterface interface {
 	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 	GetCalendarEvents(teacherID int) (model.CalendarEvents, error)
 	DeleteCalendarEvent(teacherID int, eventID string) error
-	// UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
+	UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
 }
 
 type Usecase struct {

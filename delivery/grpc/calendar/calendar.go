@@ -51,20 +51,32 @@ func (cs *CalendarService) GetEvents(teacherID int) (m.CalendarEvents, error) {
 	return ans, nil
 }
 
-func (cs *CalendarService) CreateEvent(req m.CreateEvent) error {
-	_, err := cs.client.CreateEvent(
-		context.Background(), &proto.CreateEventRequest{CalendarID: req.CalendarID,
-			Event: &proto.EventData{Title: req.Event.Title,
-				Description: req.Event.Description,
-				StartDate:   req.Event.StartDate.Format(time.RFC3339Nano),
-				EndDate:     req.Event.EndDate.Format(time.RFC3339Nano),
-				Id:          req.Event.ID,
-				ClassID:     int32(req.Event.ClassID)}})
-	return err
+func (cs *CalendarService) CreateEvent(ev m.CalendarEvent, calID string) (string, error) {
+	CreateEventResp, err := cs.client.CreateEvent(
+		context.Background(), &proto.CreateEventRequest{CalendarID: calID,
+			Event: &proto.EventData{Title: ev.Title,
+				Description: ev.Description,
+				StartDate:   ev.StartDate.Format(time.RFC3339Nano),
+				EndDate:     ev.EndDate.Format(time.RFC3339Nano),
+				Id:          ev.ID,
+				ClassID:     int32(ev.ClassID)}})
+	return CreateEventResp.EventID, err
 }
 
 func (cs *CalendarService) DeleteEvent(calendarDB, eventID string) error {
 	_, err := cs.client.DeleteEvent(
 		context.Background(), &proto.DeleteEventRequest{Id: eventID, CalendarID: calendarDB})
+	return err
+}
+
+func (cs *CalendarService) UpdateEvent(ev m.CalendarEvent, calID string) error {
+	_, err := cs.client.UpdateEvent(
+		context.Background(), &proto.UpdateEventRequest{CalendarID: calID,
+			Event: &proto.EventData{Title: ev.Title,
+				Description: ev.Description,
+				StartDate:   ev.StartDate.Format(time.RFC3339Nano),
+				EndDate:     ev.EndDate.Format(time.RFC3339Nano),
+				Id:          ev.ID,
+				ClassID:     int32(ev.ClassID)}})
 	return err
 }

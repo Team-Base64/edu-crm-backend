@@ -30,6 +30,13 @@ message CreateEventRequest {
     string calendarID = 1;
     EventData event = 2;
 }
+message CreateEventResponse {
+    string eventID = 1;
+}
+message UpdateEventRequest {
+    string calendarID = 1;
+    EventData event = 2;
+}
 
 message DeleteEventRequest {
     string id = 1;
@@ -38,7 +45,7 @@ message DeleteEventRequest {
 
 service CalendarController {
     rpc GetEventsCalendar(GetEventsRequestCalendar) returns (GetEventsResponse);
-    rpc CreateEvent(CreateEventRequest) returns (Nothing);
-    rpc UpdateEvent(EventData) returns (Nothing);
+    rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+    rpc UpdateEvent(UpdateEventRequest) returns (Nothing);
     rpc DeleteEvent(DeleteEventRequest) returns (Nothing);
 }

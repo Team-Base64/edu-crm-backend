@@ -34,8 +34,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CalendarControllerClient interface {
 	GetEventsCalendar(ctx context.Context, in *GetEventsRequestCalendar, opts ...grpc.CallOption) (*GetEventsResponse, error)
-	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*Nothing, error)
-	UpdateEvent(ctx context.Context, in *EventData, opts ...grpc.CallOption) (*Nothing, error)
+	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*CreateEventResponse, error)
+	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Nothing, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Nothing, error)
 }
 
@@ -56,8 +56,8 @@ func (c *calendarControllerClient) GetEventsCalendar(ctx context.Context, in *Ge
 	return out, nil
 }
 
-func (c *calendarControllerClient) CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*Nothing, error) {
-	out := new(Nothing)
+func (c *calendarControllerClient) CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*CreateEventResponse, error) {
+	out := new(CreateEventResponse)
 	err := c.cc.Invoke(ctx, CalendarController_CreateEvent_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (c *calendarControllerClient) CreateEvent(ctx context.Context, in *CreateEv
 	return out, nil
 }
 
-func (c *calendarControllerClient) UpdateEvent(ctx context.Context, in *EventData, opts ...grpc.CallOption) (*Nothing, error) {
+func (c *calendarControllerClient) UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Nothing, error) {
 	out := new(Nothing)
 	err := c.cc.Invoke(ctx, CalendarController_UpdateEvent_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -88,8 +88,8 @@ func (c *calendarControllerClient) DeleteEvent(ctx context.Context, in *DeleteEv
 // for forward compatibility
 type CalendarControllerServer interface {
 	GetEventsCalendar(context.Context, *GetEventsRequestCalendar) (*GetEventsResponse, error)
-	CreateEvent(context.Context, *CreateEventRequest) (*Nothing, error)
-	UpdateEvent(context.Context, *EventData) (*Nothing, error)
+	CreateEvent(context.Context, *CreateEventRequest) (*CreateEventResponse, error)
+	UpdateEvent(context.Context, *UpdateEventRequest) (*Nothing, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*Nothing, error)
 	mustEmbedUnimplementedCalendarControllerServer()
 }
@@ -101,10 +101,10 @@ type UnimplementedCalendarControllerServer struct {
 func (UnimplementedCalendarControllerServer) GetEventsCalendar(context.Context, *GetEventsRequestCalendar) (*GetEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEventsCalendar not implemented")
 }
-func (UnimplementedCalendarControllerServer) CreateEvent(context.Context, *CreateEventRequest) (*Nothing, error) {
+func (UnimplementedCalendarControllerServer) CreateEvent(context.Context, *CreateEventRequest) (*CreateEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
 }
-func (UnimplementedCalendarControllerServer) UpdateEvent(context.Context, *EventData) (*Nothing, error) {
+func (UnimplementedCalendarControllerServer) UpdateEvent(context.Context, *UpdateEventRequest) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEvent not implemented")
 }
 func (UnimplementedCalendarControllerServer) DeleteEvent(context.Context, *DeleteEventRequest) (*Nothing, error) {
@@ -160,7 +160,7 @@ func _CalendarController_CreateEvent_Handler(srv interface{}, ctx context.Contex
 }
 
 func _CalendarController_UpdateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EventData)
+	in := new(UpdateEventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func _CalendarController_UpdateEvent_Handler(srv interface{}, ctx context.Contex
 		FullMethod: CalendarController_UpdateEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CalendarControllerServer).UpdateEvent(ctx, req.(*EventData))
+		return srv.(CalendarControllerServer).UpdateEvent(ctx, req.(*UpdateEventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
