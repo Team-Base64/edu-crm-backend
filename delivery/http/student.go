@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 )
 
 // GetStudent godoc
@@ -18,11 +19,11 @@ import (
 // @Produce  json
 // @Tags Student
 // @Param studentID path string true "StudentID id"
-// @Success 200 {object} model.StudentByIDResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.StudentByIDResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /students/{studentID} [get]
 func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -40,7 +41,7 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.StudentByIDResponse{Student: *student})
+	json.NewEncoder(w).Encode(&m.StudentByIDResponse{Student: *student})
 }
 
 // GetStudentsFromClass godoc
@@ -51,11 +52,11 @@ func (api *Handler) GetStudent(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Student
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.StudentListFromClass
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.StudentListFromClass
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID}/students [get]
 func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -73,5 +74,5 @@ func (api *Handler) GetStudentsFromClass(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.StudentListFromClass{Students: students})
+	json.NewEncoder(w).Encode(&m.StudentListFromClass{Students: students})
 }

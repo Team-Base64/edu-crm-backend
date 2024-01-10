@@ -1,11 +1,11 @@
-package repository
+package pg
 
 import (
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 )
 
-func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
+func (s *PostgreSqlStore) AddTeacher(in *m.TeacherSignUp) error {
 	maxCount := 0
 	if err := s.db.QueryRow(
 		`SELECT count(*) FROM calendars;`).Scan(&maxCount); err != nil {
@@ -29,8 +29,8 @@ func (s *Store) AddTeacher(in *model.TeacherSignUp) error {
 	return nil
 }
 
-func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
-	var teacher model.TeacherProfile
+func (s *PostgreSqlStore) GetTeacherProfile(id int) (*m.TeacherProfile, error) {
+	var teacher m.TeacherProfile
 	if err := s.db.QueryRow(
 		`SELECT name FROM teachers WHERE id = $1;`,
 		id,
@@ -41,8 +41,8 @@ func (s *Store) GetTeacherProfile(id int) (*model.TeacherProfile, error) {
 	return &teacher, nil
 }
 
-func (s *Store) GetTeacherProfileByLoginDB(login string) (*model.TeacherDB, error) {
-	var teacher model.TeacherDB
+func (s *PostgreSqlStore) GetTeacherProfileByLoginDB(login string) (*m.TeacherDB, error) {
+	var teacher m.TeacherDB
 
 	if err := s.db.QueryRow(
 		`SELECT id, password, name FROM teachers WHERE login = $1;`,

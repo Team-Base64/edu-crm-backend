@@ -1,13 +1,13 @@
-package repository
+package pg
 
 import (
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 
 	"github.com/lib/pq"
 )
 
-func (s *Store) CheckChatExistence(id int) error {
+func (s *PostgreSqlStore) CheckChatExistence(id int) error {
 	var tmp int
 	if err := s.db.QueryRow(
 		`SELECT 1 FROM chats WHERE id = $1;`,
@@ -18,7 +18,7 @@ func (s *Store) CheckChatExistence(id int) error {
 	return nil
 }
 
-func (s *Store) GetChatByID(id int) (*model.Chat, error) {
+func (s *PostgreSqlStore) GetChatByID(id int) (*m.Chat, error) {
 	rows, err := s.db.Query(
 		`SELECT id, text, isAuthorTeacher, attaches, createTime, isRead FROM messages
 		 WHERE chatID = $1;`,
@@ -29,9 +29,9 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 	}
 	defer rows.Close()
 
-	messages := []model.Message{}
+	messages := []m.Message{}
 	for rows.Next() {
-		var tmpMsg model.Message
+		var tmpMsg m.Message
 
 		if err := rows.Scan(
 			&tmpMsg.ID, &tmpMsg.Text,
@@ -43,10 +43,10 @@ func (s *Store) GetChatByID(id int) (*model.Chat, error) {
 
 		messages = append(messages, tmpMsg)
 	}
-	return &model.Chat{Messages: messages}, nil
+	return &m.Chat{Messages: messages}, nil
 }
 
-func (s *Store) ReadChatByID(id int, teacherID int) error {
+func (s *PostgreSqlStore) ReadChatByID(id int, teacherID int) error {
 	var tID int
 	if err := s.db.QueryRow(
 		`SELECT teacherID FROM chats WHERE id = $1;`,
@@ -65,7 +65,7 @@ func (s *Store) ReadChatByID(id int, teacherID int) error {
 	return nil
 }
 
-func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) {
+func (s *PostgreSqlStore) GetChatsByTeacherID(teacherID int) ([]m.ChatPreview, error) {
 	rows, err := s.db.Query(
 		`SELECT m1.chatID, s.id, s.name, s.socialType, s.avatar, m1.text, m1.createTime, m1.isRead
 		 FROM messages m1
@@ -81,9 +81,9 @@ func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) 
 	}
 	defer rows.Close()
 
-	chats := []model.ChatPreview{}
+	chats := []m.ChatPreview{}
 	for rows.Next() {
-		tmpChat := model.ChatPreview{
+		tmpChat := m.ChatPreview{
 			Img: "https://educrm.us.to/filestorage/mock-avatar.png",
 		}
 
@@ -105,7 +105,7 @@ func (s *Store) GetChatsByTeacherID(teacherID int) ([]model.ChatPreview, error) 
 	return chats, nil
 }
 
-func (s *Store) GetChatIDBySolutionID(solutionID int) (int, error) {
+func (s *PostgreSqlStore) GetChatIDBySolutionID(solutionID int) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
 		`SELECT c.id FROM chats c

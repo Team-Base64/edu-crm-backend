@@ -5,14 +5,15 @@ import (
 
 	d "main/delivery"
 	proto "main/delivery/grpc/chat/proto"
+	e "main/domain/errors"
 	m "main/domain/model"
 )
 
 type ChatService struct {
-	client proto.ChatControllerClient
+	client proto.ChatClient
 }
 
-func NewChatService(c proto.ChatControllerClient) d.ChatInterface {
+func NewChatService(c proto.ChatClient) d.ChatInterface {
 	return &ChatService{
 		client: c,
 	}
@@ -28,7 +29,7 @@ func (cs *ChatService) BroadcastMsg(msg *m.ClassBroadcastMessage) error {
 			AttachmentURLs: msg.Attaches,
 		})
 	if err != nil {
-		return err
+		return e.StacktraceError(err)
 	}
 	return nil
 }
@@ -42,7 +43,7 @@ func (cs *ChatService) SendNotification(msg *m.SingleMessage) error {
 			AttachmentURLs: msg.Attaches,
 		})
 	if err != nil {
-		return err
+		return e.StacktraceError(err)
 	}
 	return nil
 }

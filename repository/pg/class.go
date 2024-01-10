@@ -1,11 +1,11 @@
-package repository
+package pg
 
 import (
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 )
 
-func (s *Store) CheckClassExistence(id int) error {
+func (s *PostgreSqlStore) CheckClassExistence(id int) error {
 	var tmp int
 	if err := s.db.QueryRow(
 		`SELECT 1 FROM classes WHERE id = $1;`,
@@ -16,7 +16,7 @@ func (s *Store) CheckClassExistence(id int) error {
 	return nil
 }
 
-func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.ClassCreate) (int, error) {
+func (s *PostgreSqlStore) AddClass(teacherID int, inviteToken string, newClass *m.ClassCreate) (int, error) {
 	var id int
 	if err := s.db.QueryRow(
 		`INSERT INTO classes (teacherID, title, description, inviteToken)
@@ -30,8 +30,8 @@ func (s *Store) AddClass(teacherID int, inviteToken string, newClass *model.Clas
 	return int(id), nil
 }
 
-func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
-	var class model.ClassInfo
+func (s *PostgreSqlStore) GetClassByID(id int) (*m.ClassInfo, error) {
+	var class m.ClassInfo
 	if err := s.db.QueryRow(
 		`SELECT title, description, inviteToken FROM classes WHERE id = $1;`,
 		id,
@@ -47,7 +47,7 @@ func (s *Store) GetClassByID(id int) (*model.ClassInfo, error) {
 	return &class, nil
 }
 
-func (s *Store) GetClassesByTeacherID(teacherID int) ([]model.ClassInfo, error) {
+func (s *PostgreSqlStore) GetClassesByTeacherID(teacherID int) ([]m.ClassInfo, error) {
 	rows, err := s.db.Query(
 		`SELECT id, title, description, inviteToken FROM classes WHERE teacherID = $1;`,
 		teacherID,
@@ -57,9 +57,9 @@ func (s *Store) GetClassesByTeacherID(teacherID int) ([]model.ClassInfo, error) 
 	}
 	defer rows.Close()
 
-	classes := []model.ClassInfo{}
+	classes := []m.ClassInfo{}
 	for rows.Next() {
-		var tmpClass model.ClassInfo
+		var tmpClass m.ClassInfo
 
 		if err := rows.Scan(
 			&tmpClass.ID, &tmpClass.Title,

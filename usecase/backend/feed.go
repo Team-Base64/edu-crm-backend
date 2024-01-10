@@ -1,32 +1,33 @@
-package usecase
+package backend
 
 import (
-	e "main/domain/errors"
-	"main/domain/model"
 	"time"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 )
 
-func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error) {
-	if err := uc.store.CheckClassExistence(classID); err != nil {
+func (uc *BackendUsecase) CreatePost(classID int, newPost *m.PostCreate) (*m.Post, error) {
+	if err := uc.dataStore.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 	createTime := time.Now()
-	id, err := uc.store.AddPost(classID, createTime, newPost)
+	id, err := uc.dataStore.AddPost(classID, createTime, newPost)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
-	bcMsg := model.ClassBroadcastMessage{
+	bcMsg := m.ClassBroadcastMessage{
 		ClassID:     classID,
 		Title:       "Внимание! Сообщение от преподавателя.",
 		Description: newPost.Text,
 		Attaches:    newPost.Attaches,
 	}
 	if err := uc.chat.BroadcastMsg(&bcMsg); err != nil {
-		return nil, e.StacktraceError(err, uc.store.DeletePost(id))
+		return nil, e.StacktraceError(err, uc.dataStore.DeletePost(id))
 	}
 
-	res := model.Post{
+	res := m.Post{
 		ID:         id,
 		Text:       newPost.Text,
 		Attaches:   newPost.Attaches,
@@ -35,12 +36,12 @@ func (uc *Usecase) CreatePost(classID int, newPost *model.PostCreate) (*model.Po
 	return &res, nil
 }
 
-func (uc *Usecase) GetClassPosts(classID int) ([]model.Post, error) {
-	if err := uc.store.CheckClassExistence(classID); err != nil {
+func (uc *BackendUsecase) GetClassPosts(classID int) ([]m.Post, error) {
+	if err := uc.dataStore.CheckClassExistence(classID); err != nil {
 		return nil, e.StacktraceError(err)
 	}
 
-	posts, err := uc.store.GetClassPosts(classID)
+	posts, err := uc.dataStore.GetClassPosts(classID)
 	if err != nil {
 		return nil, e.StacktraceError(err)
 	}

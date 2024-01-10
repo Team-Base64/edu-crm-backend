@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	conf "main/config"
-	e "main/domain/errors"
-	"main/domain/model"
-	uc "main/usecase"
 	"net/http"
 	"strings"
+
+	conf "main/config"
+	e "main/domain/errors"
+	m "main/domain/model"
+	uc "main/usecase"
 )
 
 type AuthenticationMiddlewareInterface interface {
@@ -31,7 +32,7 @@ type KeyUserdata struct {
 	key string
 }
 
-func WithUser(ctx context.Context, user *model.TeacherDB) context.Context {
+func WithUser(ctx context.Context, user *m.TeacherDB) context.Context {
 	return context.WithValue(ctx, KeyUserdata{"userdata"}, user)
 
 }

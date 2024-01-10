@@ -2,12 +2,11 @@ package delivery
 
 import (
 	"encoding/json"
-	"log"
-	e "main/domain/errors"
-	"main/domain/model"
-	uc "main/usecase"
 	"net/http"
-	"os"
+
+	e "main/domain/errors"
+	m "main/domain/model"
+	uc "main/usecase"
 )
 
 // @title TCRA API
@@ -25,32 +24,22 @@ import (
 // @host 127.0.0.1:8080
 // @BasePath  /api
 
-var chatFilesPath = "/chat"
-var homeworkFilesPath = "/homework"
-var solutionFilesPath = "/solution"
+// var chatFilesPath = "/chat"
+// var homeworkFilesPath = "/homework"
+// var solutionFilesPath = "/solution"
 
 type Handler struct {
-	usecase         uc.UsecaseInterface
-	filestoragePath string
-	urlDomain       string
+	usecase uc.UsecaseInterface
 }
 
-func NewHandler(uc uc.UsecaseInterface, fp string, ud string) *Handler {
-	for _, path := range []string{chatFilesPath, homeworkFilesPath, solutionFilesPath} {
-		if err := os.MkdirAll(fp+path, os.ModePerm); err != nil {
-			log.Fatalln(e.StacktraceError(err))
-		}
-	}
-
+func NewHandler(uc uc.UsecaseInterface) *Handler {
 	return &Handler{
-		usecase:         uc,
-		filestoragePath: fp,
-		urlDomain:       ud,
+		usecase: uc,
 	}
 }
 
 func returnErrorJSON(w http.ResponseWriter, err error) {
 	errCode, errText := e.CheckError(err)
 	w.WriteHeader(errCode)
-	json.NewEncoder(w).Encode(&model.Error{Error: errText})
+	json.NewEncoder(w).Encode(&m.Error{Error: errText})
 }

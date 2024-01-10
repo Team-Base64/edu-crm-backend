@@ -2,44 +2,42 @@ package ctrl
 
 import (
 	"context"
-	"log"
 	"time"
 
 	d "main/delivery"
 	proto "main/delivery/grpc/calendar/proto"
+	e "main/domain/errors"
 	m "main/domain/model"
 )
 
 type CalendarService struct {
-	client proto.CalendarControllerClient
+	client proto.CalendarClient
 }
 
-func NewCalendarService(c proto.CalendarControllerClient) d.CalendarInterface {
+func NewCalendarService(c proto.CalendarClient) d.CalendarInterface {
 	return &CalendarService{
 		client: c,
 	}
 }
 
-func (cs *CalendarService) GetEvents(teacherID int) (m.CalendarEvents, error) {
+func (cs *CalendarService) GetEvents(teacherID int) ([]m.CalendarEvent, error) {
 	events, err := cs.client.GetEventsCalendar(
 		context.Background(),
 		&proto.GetEventsRequestCalendar{TeacherID: int32(teacherID)})
 	if err != nil {
-		return m.CalendarEvents{}, err
+		return nil, e.StacktraceError(err)
 	}
-	ans := m.CalendarEvents{}
+	ans := []m.CalendarEvent{}
 	for _, ev := range events.Events {
 		t1, err := time.Parse(time.RFC3339, ev.StartDate)
 		if err != nil {
-			log.Println("err converting time")
-			return m.CalendarEvents{}, err
+			return nil, e.StacktraceError(err)
 		}
 		t2, err := time.Parse(time.RFC3339, ev.EndDate)
 		if err != nil {
-			log.Println("err converting time")
-			return m.CalendarEvents{}, err
+			return nil, e.StacktraceError(err)
 		}
-		ans.Events = append(ans.Events, m.CalendarEvent{
+		ans = append(ans, m.CalendarEvent{
 			ID:          ev.Id,
 			Title:       ev.Title,
 			Description: ev.Description,

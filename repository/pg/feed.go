@@ -1,15 +1,20 @@
-package repository
+package pg
 
 import (
-	e "main/domain/errors"
-	"main/domain/model"
 	"time"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/lib/pq"
 )
 
-func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCreate) (int, error) {
+func (s *PostgreSqlStore) AddPost(classID int, createTime time.Time, newPost *m.PostCreate) (int, error) {
 	var id int
+	if newPost.Attaches == nil {
+		newPost.Attaches = []string{}
+	}
+
 	if err := s.db.QueryRow(
 		`INSERT INTO posts (classID, text, attaches, createTime)
 		 VALUES ($1, $2, $3, $4)
@@ -22,7 +27,7 @@ func (s *Store) AddPost(classID int, createTime time.Time, newPost *model.PostCr
 	return int(id), nil
 }
 
-func (s *Store) DeletePost(id int) error {
+func (s *PostgreSqlStore) DeletePost(id int) error {
 	_, err := s.db.Exec(
 		`DELETE FROM posts WHERE id = $1;`,
 		id,
@@ -35,7 +40,7 @@ func (s *Store) DeletePost(id int) error {
 	return nil
 }
 
-func (s *Store) GetClassPosts(classID int) ([]model.Post, error) {
+func (s *PostgreSqlStore) GetClassPosts(classID int) ([]m.Post, error) {
 	rows, err := s.db.Query(
 		`SELECT id, text, attaches, createTime FROM posts WHERE classID = $1;`,
 		classID,
@@ -45,9 +50,9 @@ func (s *Store) GetClassPosts(classID int) ([]model.Post, error) {
 	}
 	defer rows.Close()
 
-	posts := []model.Post{}
+	posts := []m.Post{}
 	for rows.Next() {
-		var tmpPost model.Post
+		var tmpPost m.Post
 
 		if err := rows.Scan(
 			&tmpPost.ID, &tmpPost.Text,

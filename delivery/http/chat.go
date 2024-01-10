@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 )
 
 // GetChats godoc
@@ -17,12 +18,12 @@ import (
 // @Accept  json
 // @Produce  json
 // @Tags Chats
-// @Success 200 {object} model.ChatPreviewList
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.ChatPreviewList
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /chats [get]
 func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	chats, err := api.usecase.GetChatsByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -30,7 +31,7 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.ChatPreviewList{Chats: chats})
+	json.NewEncoder(w).Encode(&m.ChatPreviewList{Chats: chats})
 }
 
 // GetChat godoc
@@ -41,11 +42,11 @@ func (api *Handler) GetTeacherChats(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Chats
 // @Param chatID path string true "Chat id"
-// @Success 200 {object} model.Chat
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.Chat
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /chats/{chatID} [get]
 func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
@@ -75,14 +76,14 @@ func (api *Handler) GetChat(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Chats
 // @Param chatID path string true "Chat id"
-// @Success 200 {object} model.Response "OK"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 403 {object} model.Error "forbidden"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.Response "OK"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 403 {object} m.Error "forbidden"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /chats/{chatID} [post]
 func (api *Handler) ReadChat(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	s := strings.Split(r.URL.Path, "/")
 	idS := s[len(s)-1]
 	id, err := strconv.Atoi(idS)
@@ -99,5 +100,5 @@ func (api *Handler) ReadChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }

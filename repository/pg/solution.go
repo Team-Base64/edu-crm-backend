@@ -1,9 +1,10 @@
-package repository
+package pg
 
 import (
 	"database/sql"
+
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 
 	"github.com/lib/pq"
 )
@@ -19,8 +20,8 @@ func makeStatus(statusFromDB sql.NullBool) string {
 	return "new"
 }
 
-func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
-	var sol model.SolutionByID
+func (s *PostgreSqlStore) GetSolutionByID(id int) (*m.SolutionByID, error) {
+	var sol m.SolutionByID
 	var isApproved sql.NullBool
 
 	if err := s.db.QueryRow(
@@ -37,7 +38,7 @@ func (s *Store) GetSolutionByID(id int) (*model.SolutionByID, error) {
 	return &sol, nil
 }
 
-func (s *Store) GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error) {
+func (s *PostgreSqlStore) GetSolutionsByClassID(classID int) ([]m.SolutionFromClass, error) {
 	rows, err := s.db.Query(
 		`SELECT s.id, s.homeworkID, s.studentID, s.text, s.createTime, s.files, s.isApproved, s.teacherEvaluation
 		 FROM solutions s
@@ -50,9 +51,9 @@ func (s *Store) GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, e
 	}
 	defer rows.Close()
 
-	sols := []model.SolutionFromClass{}
+	sols := []m.SolutionFromClass{}
 	for rows.Next() {
-		var tmpSol model.SolutionFromClass
+		var tmpSol m.SolutionFromClass
 		var isApproved sql.NullBool
 
 		if err := rows.Scan(
@@ -70,7 +71,7 @@ func (s *Store) GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, e
 	return sols, nil
 }
 
-func (s *Store) GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error) {
+func (s *PostgreSqlStore) GetSolutionsByHomeworkID(homeworkID int) ([]m.SolutionForHw, error) {
 	rows, err := s.db.Query(
 		`SELECT id, studentID, text, createTime, files, isApproved, teacherEvaluation FROM solutions WHERE homeworkID = $1;`,
 		homeworkID,
@@ -80,9 +81,9 @@ func (s *Store) GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw,
 	}
 	defer rows.Close()
 
-	sols := []model.SolutionForHw{}
+	sols := []m.SolutionForHw{}
 	for rows.Next() {
-		var tmpSol model.SolutionForHw
+		var tmpSol m.SolutionForHw
 		var isApproved sql.NullBool
 
 		if err := rows.Scan(
@@ -100,8 +101,8 @@ func (s *Store) GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw,
 	return sols, nil
 }
 
-func (s *Store) GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.SolutionInfoForEvaluationMsg, error) {
-	var info model.SolutionInfoForEvaluationMsg
+func (s *PostgreSqlStore) GetInfoForEvaluationMsgBySolutionID(solutionID int) (*m.SolutionInfoForEvaluationMsg, error) {
+	var info m.SolutionInfoForEvaluationMsg
 
 	if err := s.db.QueryRow(
 		`SELECT h.title, s.createTime FROM homeworks h
@@ -115,7 +116,7 @@ func (s *Store) GetInfoForEvaluationMsgBySolutionID(solutionID int) (*model.Solu
 	return &info, nil
 }
 
-func (s *Store) AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error {
+func (s *PostgreSqlStore) AddEvaluationForSolution(solutionID int, isApproved bool, evaluation string) error {
 	if _, err := s.db.Exec(
 		`UPDATE solutions SET isapproved = $1, teacherevaluation = $2 WHERE id = $3;`,
 		isApproved, evaluation, solutionID,

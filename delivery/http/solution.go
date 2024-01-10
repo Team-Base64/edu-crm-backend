@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 )
 
 // GetSolutionsFromClass godoc
@@ -18,11 +19,11 @@ import (
 // @Produce  json
 // @Tags Solution
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.SolutionListFromClass
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.SolutionListFromClass
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID}/solutions [get]
 func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -40,7 +41,7 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.SolutionListFromClass{Solutions: sols})
+	json.NewEncoder(w).Encode(&m.SolutionListFromClass{Solutions: sols})
 }
 
 // GetSolutionsForHomework godoc
@@ -51,11 +52,11 @@ func (api *Handler) GetSolutionsFromClass(w http.ResponseWriter, r *http.Request
 // @Produce  json
 // @Tags Solution
 // @Param homeworkID path string true "Homework id"
-// @Success 200 {object} model.SolutionListForHw
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.SolutionListForHw
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /homeworks/{homeworkID}/solutions [get]
 func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -73,7 +74,7 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.SolutionListForHw{Solutions: sols})
+	json.NewEncoder(w).Encode(&m.SolutionListForHw{Solutions: sols})
 }
 
 // GetSolution godoc
@@ -84,11 +85,11 @@ func (api *Handler) GetSolutionsForHomework(w http.ResponseWriter, r *http.Reque
 // @Produce  json
 // @Tags Solution
 // @Param solID path string true "Solution id"
-// @Success 200 {object} model.SolutionByIDResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.SolutionByIDResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /solutions/{solID} [get]
 func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -106,7 +107,7 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.SolutionByIDResponse{Solution: *sol})
+	json.NewEncoder(w).Encode(&m.SolutionByIDResponse{Solution: *sol})
 }
 
 // AddEvaluationForSolution godoc
@@ -117,12 +118,12 @@ func (api *Handler) GetSolution(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Solution
 // @Param solID path string true "Solution id"
-// @Param put body model.SolutionEvaluation true "Evaluation for adding"
-// @Success 200 {object} model.Response
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param put body m.SolutionEvaluation true "Evaluation for adding"
+// @Success 200 {object} m.Response
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /solutions/{solID} [put]
 func (api *Handler) AddEvaluationForSolution(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -134,7 +135,7 @@ func (api *Handler) AddEvaluationForSolution(w http.ResponseWriter, r *http.Requ
 	}
 
 	d := json.NewDecoder(r.Body)
-	var eval model.SolutionEvaluation
+	var eval m.SolutionEvaluation
 	if err := d.Decode(&eval); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -146,5 +147,5 @@ func (api *Handler) AddEvaluationForSolution(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }

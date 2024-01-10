@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -18,12 +19,12 @@ import (
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Success 200 {object} model.CalendarParams
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.CalendarParams
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar [post]
 func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	err := api.usecase.CreateCalendar(teacherProfile.ID)
 	if err != nil {
 		log.Println("Error ", err)
@@ -32,7 +33,7 @@ func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//json.NewEncoder(w).Encode(createdResponse)
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // GetCalendar godoc
@@ -42,13 +43,13 @@ func (api *Handler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Success 200 {object} model.CalendarParams
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.CalendarParams
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar [get]
 func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
-	createdResponse, err := api.usecase.GetCalendar(teacherProfile.ID)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
+	createdResponse, err := api.usecase.GetCalendarParams(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrServerError500)
@@ -56,7 +57,7 @@ func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(createdResponse)
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // CreateCalendarEvent godoc
@@ -66,15 +67,15 @@ func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Param event body model.CalendarEvent true "Event for creating"
-// @Success 200 {object} model.Response
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param event body m.CalendarEvent true "Event for creating"
+// @Success 200 {object} m.Response
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/addevent [post]
 func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
-	var req model.CalendarEvent
+	var req m.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
@@ -90,7 +91,7 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // GetCalendarEvents godoc
@@ -100,12 +101,12 @@ func (api *Handler) CreateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Success 200 {object} model.CalendarEvent
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.CalendarEvents
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/events [get]
 func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	events, err := api.usecase.GetCalendarEvents(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -113,7 +114,7 @@ func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(events)
+	json.NewEncoder(w).Encode(&m.CalendarEvents{Events: events})
 }
 
 // DeleteCalendarEvent godoc
@@ -123,15 +124,15 @@ func (api *Handler) GetCalendarEvents(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Param event body model.DeleteEvent true "Event for deleting"
-// @Success 200 {object} model.Response
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param event body m.DeleteEvent true "Event for deleting"
+// @Success 200 {object} m.Response
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/event [delete]
 func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
-	var req model.DeleteEvent
+	var req m.DeleteEvent
 	if err := decoder.Decode(&req); err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
@@ -145,7 +146,7 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // UpdateCalendarEvent godoc
@@ -155,15 +156,15 @@ func (api *Handler) DeleteCalendarEvent(w http.ResponseWriter, r *http.Request) 
 // @Accept  json
 // @Produce  json
 // @Tags Calendar
-// @Param event body model.CalendarEvent true "Event for updating"
-// @Success 200 {object} model.Response
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param event body m.CalendarEvent true "Event for updating"
+// @Success 200 {object} m.Response
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /calendar/event [post]
 func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
-	var req model.CalendarEvent
+	var req m.CalendarEvent
 	if err := decoder.Decode(&req); err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, e.ErrBadRequest400)
@@ -185,5 +186,5 @@ func (api *Handler) UpdateCalendarEvent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }

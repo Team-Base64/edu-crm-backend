@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"time"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -20,12 +21,12 @@ import (
 // @Accept  json
 // @Produce  json
 // @Tags Teacher
-// @Param teacher body model.TeacherSignUp true "Teacher params"
-// @Success 201 {object} model.Response "OK"
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 409 {object} model.Error "conflict - UserDB already exists"
-// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
-// @Failure 503 {object} model.Error "service unavailable"
+// @Param teacher body m.TeacherSignUp true "Teacher params"
+// @Success 201 {object} m.Response "OK"
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 409 {object} m.Error "conflict - UserDB already exists"
+// @Failure 500 {object} m.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Failure 503 {object} m.Error "service unavailable"
 // @Router /signup [post]
 func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
@@ -33,7 +34,7 @@ func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var req model.TeacherSignUp
+	var req m.TeacherSignUp
 	if err := decoder.Decode(&req); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -44,6 +45,11 @@ func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	req.Name = sanitizer.Sanitize(req.Name)
 
 	user, err := api.usecase.GetTeacherProfileByLogin(req.Login)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, err)
+		return
+	}
 	if user != nil && user.Login != "" {
 		returnErrorJSON(w, e.ErrConflict409)
 		return
@@ -75,7 +81,7 @@ func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	w.WriteHeader(201)
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // LogIn godoc
@@ -85,11 +91,11 @@ func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Teacher
-// @Param teacher body model.TeacherLogin true "Teacher params"
-// @Success 201 {object} model.Response "OK"
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Param teacher body m.TeacherLogin true "Teacher params"
+// @Success 201 {object} m.Response "OK"
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal Server Error - Request is valid but operation failed at server side"
 // @Router /login [post]
 func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
@@ -97,7 +103,7 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var req model.TeacherLogin
+	var req m.TeacherLogin
 	if err := decoder.Decode(&req); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -139,7 +145,7 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	w.WriteHeader(201)
 
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // LogOut godoc
@@ -149,9 +155,9 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Teacher
-// @Success 200 {object} model.Response "OK"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.Response "OK"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal Server Error - Request is valid but operation failed at server side"
 // @Router /logout [delete]
 func (api *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
@@ -177,7 +183,7 @@ func (api *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, session)
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // Auth godoc
@@ -187,9 +193,9 @@ func (api *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Teacher
-// @Success 200 {object} model.Response "OK"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal Server Error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.Response "OK"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal Server Error - Request is valid but operation failed at server side"
 // @Router /auth [get]
 func (api *Handler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
@@ -201,5 +207,5 @@ func (api *Handler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrUnauthorized401)
 		return
 	}
-	json.NewEncoder(w).Encode(&model.Response{})
+	json.NewEncoder(w).Encode(&m.Response{})
 }

@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -20,11 +21,11 @@ import (
 // @Produce  json
 // @Tags Homework
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.HomeworkList
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.HomeworkList
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID}/homeworks [get]
 func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -53,11 +54,11 @@ func (api *Handler) GetHomeworksFromClass(w http.ResponseWriter, r *http.Request
 // @Produce  json
 // @Tags Homework
 // @Param homeworkID path string true "Homework id"
-// @Success 200 {object} model.HomeworkByIDResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.HomeworkByIDResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /homeworks/{homeworkID} [get]
 func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -75,7 +76,7 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.HomeworkByIDResponse{Homework: *hw})
+	json.NewEncoder(w).Encode(&m.HomeworkByIDResponse{Homework: *hw})
 }
 
 // CreateHomework godoc
@@ -85,17 +86,17 @@ func (api *Handler) GetHomework(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Homework
-// @Param post body model.HomeworkCreate true "Homework for creating"
-// @Success 200 {object} model.HomeworkResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param post body m.HomeworkCreate true "Homework for creating"
+// @Success 200 {object} m.HomeworkResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /homeworks [post]
 func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
-	var newHw model.HomeworkCreate
+	var newHw m.HomeworkCreate
 	if err := decoder.Decode(&newHw); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -110,5 +111,5 @@ func (api *Handler) CreateHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.HomeworkResponse{Homework: *hw})
+	json.NewEncoder(w).Encode(&m.HomeworkResponse{Homework: *hw})
 }

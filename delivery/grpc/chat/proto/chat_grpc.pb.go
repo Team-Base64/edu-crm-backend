@@ -23,126 +23,126 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ChatController_BroadcastMsg_FullMethodName     = "/chat.ChatController/BroadcastMsg"
-	ChatController_SendNotification_FullMethodName = "/chat.ChatController/SendNotification"
+	Chat_BroadcastMsg_FullMethodName     = "/chat.Chat/BroadcastMsg"
+	Chat_SendNotification_FullMethodName = "/chat.Chat/SendNotification"
 )
 
-// ChatControllerClient is the client API for ChatController service.
+// ChatClient is the client API for Chat service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ChatControllerClient interface {
+type ChatClient interface {
 	BroadcastMsg(ctx context.Context, in *BroadcastMessage, opts ...grpc.CallOption) (*Nothing, error)
 	SendNotification(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Nothing, error)
 }
 
-type chatControllerClient struct {
+type chatClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewChatControllerClient(cc grpc.ClientConnInterface) ChatControllerClient {
-	return &chatControllerClient{cc}
+func NewChatClient(cc grpc.ClientConnInterface) ChatClient {
+	return &chatClient{cc}
 }
 
-func (c *chatControllerClient) BroadcastMsg(ctx context.Context, in *BroadcastMessage, opts ...grpc.CallOption) (*Nothing, error) {
+func (c *chatClient) BroadcastMsg(ctx context.Context, in *BroadcastMessage, opts ...grpc.CallOption) (*Nothing, error) {
 	out := new(Nothing)
-	err := c.cc.Invoke(ctx, ChatController_BroadcastMsg_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Chat_BroadcastMsg_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *chatControllerClient) SendNotification(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Nothing, error) {
+func (c *chatClient) SendNotification(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Nothing, error) {
 	out := new(Nothing)
-	err := c.cc.Invoke(ctx, ChatController_SendNotification_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Chat_SendNotification_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ChatControllerServer is the server API for ChatController service.
-// All implementations must embed UnimplementedChatControllerServer
+// ChatServer is the server API for Chat service.
+// All implementations must embed UnimplementedChatServer
 // for forward compatibility
-type ChatControllerServer interface {
+type ChatServer interface {
 	BroadcastMsg(context.Context, *BroadcastMessage) (*Nothing, error)
 	SendNotification(context.Context, *Message) (*Nothing, error)
-	mustEmbedUnimplementedChatControllerServer()
+	mustEmbedUnimplementedChatServer()
 }
 
-// UnimplementedChatControllerServer must be embedded to have forward compatible implementations.
-type UnimplementedChatControllerServer struct {
+// UnimplementedChatServer must be embedded to have forward compatible implementations.
+type UnimplementedChatServer struct {
 }
 
-func (UnimplementedChatControllerServer) BroadcastMsg(context.Context, *BroadcastMessage) (*Nothing, error) {
+func (UnimplementedChatServer) BroadcastMsg(context.Context, *BroadcastMessage) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BroadcastMsg not implemented")
 }
-func (UnimplementedChatControllerServer) SendNotification(context.Context, *Message) (*Nothing, error) {
+func (UnimplementedChatServer) SendNotification(context.Context, *Message) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendNotification not implemented")
 }
-func (UnimplementedChatControllerServer) mustEmbedUnimplementedChatControllerServer() {}
+func (UnimplementedChatServer) mustEmbedUnimplementedChatServer() {}
 
-// UnsafeChatControllerServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ChatControllerServer will
+// UnsafeChatServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ChatServer will
 // result in compilation errors.
-type UnsafeChatControllerServer interface {
-	mustEmbedUnimplementedChatControllerServer()
+type UnsafeChatServer interface {
+	mustEmbedUnimplementedChatServer()
 }
 
-func RegisterChatControllerServer(s grpc.ServiceRegistrar, srv ChatControllerServer) {
-	s.RegisterService(&ChatController_ServiceDesc, srv)
+func RegisterChatServer(s grpc.ServiceRegistrar, srv ChatServer) {
+	s.RegisterService(&Chat_ServiceDesc, srv)
 }
 
-func _ChatController_BroadcastMsg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Chat_BroadcastMsg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BroadcastMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatControllerServer).BroadcastMsg(ctx, in)
+		return srv.(ChatServer).BroadcastMsg(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ChatController_BroadcastMsg_FullMethodName,
+		FullMethod: Chat_BroadcastMsg_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatControllerServer).BroadcastMsg(ctx, req.(*BroadcastMessage))
+		return srv.(ChatServer).BroadcastMsg(ctx, req.(*BroadcastMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ChatController_SendNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Chat_SendNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Message)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatControllerServer).SendNotification(ctx, in)
+		return srv.(ChatServer).SendNotification(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ChatController_SendNotification_FullMethodName,
+		FullMethod: Chat_SendNotification_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatControllerServer).SendNotification(ctx, req.(*Message))
+		return srv.(ChatServer).SendNotification(ctx, req.(*Message))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ChatController_ServiceDesc is the grpc.ServiceDesc for ChatController service.
+// Chat_ServiceDesc is the grpc.ServiceDesc for Chat service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ChatController_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "chat.ChatController",
-	HandlerType: (*ChatControllerServer)(nil),
+var Chat_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "chat.Chat",
+	HandlerType: (*ChatServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "BroadcastMsg",
-			Handler:    _ChatController_BroadcastMsg_Handler,
+			Handler:    _Chat_BroadcastMsg_Handler,
 		},
 		{
 			MethodName: "SendNotification",
-			Handler:    _ChatController_SendNotification_Handler,
+			Handler:    _Chat_SendNotification_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

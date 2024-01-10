@@ -2,13 +2,9 @@ package model
 
 import "time"
 
-type OAUTH2Token struct {
-	Token string `json:"token"`
-}
-
 type CalendarParams struct {
-	ID         int    `json:"id"`
-	IDInGoogle string `json:"googleid"`
+	ID            int    `json:"id"`
+	InternalApiID string `json:"googleid"`
 }
 
 type CalendarEvent struct {

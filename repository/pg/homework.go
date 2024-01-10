@@ -1,12 +1,13 @@
-package repository
+package pg
 
 import (
-	e "main/domain/errors"
-	"main/domain/model"
 	"time"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 )
 
-func (s *Store) CheckHomeworkExistence(id int) error {
+func (s *PostgreSqlStore) CheckHomeworkExistence(id int) error {
 	var tmp int
 	if err := s.db.QueryRow(
 		`SELECT 1 FROM homeworks WHERE id = $1;`,
@@ -17,7 +18,7 @@ func (s *Store) CheckHomeworkExistence(id int) error {
 	return nil
 }
 
-func (s *Store) AddHomework(teacherID int, createTime time.Time, newHw *model.HomeworkCreate) (int, error) {
+func (s *PostgreSqlStore) AddHomework(teacherID int, createTime time.Time, newHw *m.HomeworkCreate) (int, error) {
 	var hwID int
 	if err := s.db.QueryRow(
 		`INSERT INTO homeworks (classID, title, description, createTime, deadlineTime)
@@ -37,7 +38,7 @@ func (s *Store) AddHomework(teacherID int, createTime time.Time, newHw *model.Ho
 	return hwID, nil
 }
 
-func (s *Store) DeleteHomework(id int) error {
+func (s *PostgreSqlStore) DeleteHomework(id int) error {
 	_, err := s.db.Exec(
 		`DELETE FROM homeworks WHERE id = $1;`,
 		id,
@@ -50,8 +51,8 @@ func (s *Store) DeleteHomework(id int) error {
 	return nil
 }
 
-func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
-	var hw model.HomeworkByID
+func (s *PostgreSqlStore) GetHomeworkByID(id int) (*m.HomeworkByID, error) {
+	var hw m.HomeworkByID
 	if err := s.db.QueryRow(
 		`SELECT classID, title, description, createTime, deadlineTime
 		 FROM homeworks
@@ -73,7 +74,7 @@ func (s *Store) GetHomeworkByID(id int) (*model.HomeworkByID, error) {
 	return &hw, nil
 }
 
-func (s *Store) GetHomeworksByClassID(classID int) ([]model.Homework, error) {
+func (s *PostgreSqlStore) GetHomeworksByClassID(classID int) ([]m.Homework, error) {
 	rows, err := s.db.Query(
 		`SELECT id, title, description, createTime, deadlineTime
 		 FROM homeworks
@@ -85,9 +86,9 @@ func (s *Store) GetHomeworksByClassID(classID int) ([]model.Homework, error) {
 	}
 	defer rows.Close()
 
-	hws := []model.Homework{}
+	hws := []m.Homework{}
 	for rows.Next() {
-		var tmpHw model.Homework
+		var tmpHw m.Homework
 
 		if err := rows.Scan(
 			&tmpHw.ID, &tmpHw.Title, &tmpHw.Description,

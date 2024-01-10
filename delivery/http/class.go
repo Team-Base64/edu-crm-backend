@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -19,19 +20,19 @@ import (
 // @Accept  json
 // @Produce  json
 // @Tags Class
-// @Success 200 {object} model.ClassInfoList
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.ClassInfoList
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [get]
 func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	classes, err := api.usecase.GetClassesByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
 		returnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(&model.ClassInfoList{Classes: classes})
+	json.NewEncoder(w).Encode(&m.ClassInfoList{Classes: classes})
 }
 
 // GetClasses godoc
@@ -42,11 +43,11 @@ func (api *Handler) GetTeacherClasses(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Class
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.ClassInfoResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.ClassInfoResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID} [get]
 func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -62,7 +63,7 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, err)
 		return
 	}
-	json.NewEncoder(w).Encode(&model.ClassInfoResponse{Class: *class})
+	json.NewEncoder(w).Encode(&m.ClassInfoResponse{Class: *class})
 }
 
 // CreateClass godoc
@@ -72,17 +73,17 @@ func (api *Handler) GetClass(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Class
-// @Param class body model.ClassCreate true "Class for creating"
-// @Success 200 {object} model.ClassInfoResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param class body m.ClassCreate true "Class for creating"
+// @Success 200 {object} m.ClassInfoResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes [post]
 func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	decoder := json.NewDecoder(r.Body)
-	var newClass model.ClassCreate
+	var newClass m.ClassCreate
 	if err := decoder.Decode(&newClass); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -97,5 +98,5 @@ func (api *Handler) CreateClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.ClassInfoResponse{Class: *class})
+	json.NewEncoder(w).Encode(&m.ClassInfoResponse{Class: *class})
 }

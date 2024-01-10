@@ -22,7 +22,7 @@ message BroadcastMessage {
     repeated string attachmentURLs = 4;
 }
 
-service ChatController {
+service Chat {
     rpc BroadcastMsg(BroadcastMessage) returns (Nothing);
     rpc SendNotification(Message) returns (Nothing);
 }

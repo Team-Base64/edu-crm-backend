@@ -1,14 +1,18 @@
-package repository
+package pg
 
 import (
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 
 	"github.com/lib/pq"
 )
 
-func (s *Store) AddTask(teacherID int, newTask *model.TaskCreate) (int, error) {
+func (s *PostgreSqlStore) AddTask(teacherID int, newTask *m.TaskCreate) (int, error) {
 	var id int
+	if newTask.Attaches == nil {
+		newTask.Attaches = []string{}
+	}
+
 	if err := s.db.QueryRow(
 		`INSERT INTO tasks (teacherID, description, attaches)
 		 VALUES ($1, $2, $3)
@@ -21,8 +25,8 @@ func (s *Store) AddTask(teacherID int, newTask *model.TaskCreate) (int, error) {
 	return int(id), nil
 }
 
-func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
-	var task model.TaskByID
+func (s *PostgreSqlStore) GetTaskByID(id int) (*m.TaskByID, error) {
+	var task m.TaskByID
 	if err := s.db.QueryRow(
 		`SELECT description, attaches FROM tasks WHERE id = $1;`,
 		id,
@@ -35,7 +39,7 @@ func (s *Store) GetTaskByID(id int) (*model.TaskByID, error) {
 	return &task, nil
 }
 
-func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
+func (s *PostgreSqlStore) GetTasksByTeacherID(teacherID int) ([]m.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT id, description, attaches FROM tasks WHERE teacherID = $1;`,
 		teacherID,
@@ -45,9 +49,9 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	}
 	defer rows.Close()
 
-	tasks := []model.Task{}
+	tasks := []m.Task{}
 	for rows.Next() {
-		var task model.Task
+		var task m.Task
 		err := rows.Scan(&task.ID, &task.Description, (*pq.StringArray)(&task.Attaches))
 		if err != nil {
 			return nil, e.StacktraceError(err)
@@ -59,7 +63,7 @@ func (s *Store) GetTasksByTeacherID(teacherID int) ([]model.Task, error) {
 	return tasks, nil
 }
 
-func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
+func (s *PostgreSqlStore) GetTasksByHomeworkID(homeworkID int) ([]m.Task, error) {
 	rows, err := s.db.Query(
 		`SELECT t.id, t.description, t.attaches
 		 FROM tasks t
@@ -73,9 +77,9 @@ func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	}
 	defer rows.Close()
 
-	tasks := []model.Task{}
+	tasks := []m.Task{}
 	for rows.Next() {
-		var task model.Task
+		var task m.Task
 		err := rows.Scan(&task.ID, &task.Description, (*pq.StringArray)(&task.Attaches))
 		if err != nil {
 			return nil, e.StacktraceError(err)
@@ -87,7 +91,7 @@ func (s *Store) GetTasksByHomeworkID(homeworkID int) ([]model.Task, error) {
 	return tasks, nil
 }
 
-func (s *Store) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
+func (s *PostgreSqlStore) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
 	rows, err := s.db.Query(
 		`SELECT taskID FROM homeworks_tasks
 		 WHERE homeworkID = $1
@@ -113,7 +117,7 @@ func (s *Store) GetTasksIDByHomeworkID(homeworkID int) ([]int, error) {
 	return tasks, nil
 }
 
-func (s *Store) AttachTaskToHomework(hwID int, taskID int, taskRank int) error {
+func (s *PostgreSqlStore) AttachTaskToHomework(hwID int, taskID int, taskRank int) error {
 	_, err := s.db.Exec(
 		`INSERT INTO homeworks_tasks (homeworkID, taskID, rank) VALUES ($1, $2, $3)`,
 		hwID, taskID, taskRank,

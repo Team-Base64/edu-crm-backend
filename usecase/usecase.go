@@ -1,94 +1,53 @@
 package usecase
 
 import (
-	"main/domain/model"
-	"math/rand"
-
-	d "main/delivery"
-	rep "main/repository"
+	m "main/domain/model"
 )
 
 type UsecaseInterface interface {
 	// TEACHER
-	SignUpTeacher(req *model.TeacherSignUp) error
-	CreateTeacher(params *model.TeacherSignUp) error
-	GetTeacherProfile(id int) (*model.TeacherProfile, error)
-	GetTeacherProfileByLogin(login string) (*model.TeacherDB, error)
+	SignUpTeacher(req *m.TeacherSignUp) error
+	CreateTeacher(params *m.TeacherSignUp) error
+	GetTeacherProfile(id int) (*m.TeacherProfile, error)
+	GetTeacherProfileByLogin(login string) (*m.TeacherDB, error)
 	// SESSION
-	CreateSession(teacherLogin string) (*model.Session, error)
+	CreateSession(teacherLogin string) (*m.Session, error)
 	CheckSession(in string) (string, error)
 	DeleteSession(in string) error
 	// CHAT
-	GetChatByID(id int) (*model.Chat, error)
-	GetChatsByTeacherID(id int) ([]model.ChatPreview, error)
+	GetChatByID(id int) (*m.Chat, error)
+	GetChatsByTeacherID(id int) ([]m.ChatPreview, error)
 	ReadChatByID(id int, teacherID int) error
 	// CLASS
-	CreateClass(teacherID int, newClass *model.ClassCreate) (*model.ClassInfo, error)
-	GetClassByID(id int) (*model.ClassInfo, error)
-	GetClassesByTeacherID(id int) ([]model.ClassInfo, error)
+	CreateClass(teacherID int, newClass *m.ClassCreate) (*m.ClassInfo, error)
+	GetClassByID(id int) (*m.ClassInfo, error)
+	GetClassesByTeacherID(id int) ([]m.ClassInfo, error)
 	// STUDENT
-	GetStudentByID(id int) (*model.StudentByID, error)
-	GetStudentsFromClass(classID int) ([]model.StudentFromClass, error)
+	GetStudentByID(id int) (*m.StudentByID, error)
+	GetStudentsFromClass(classID int) ([]m.StudentFromClass, error)
 	// FEED
-	CreatePost(classID int, newPost *model.PostCreate) (*model.Post, error)
-	GetClassPosts(classID int) ([]model.Post, error)
+	CreatePost(classID int, newPost *m.PostCreate) (*m.Post, error)
+	GetClassPosts(classID int) ([]m.Post, error)
 	// HOMEWORK
-	CreateHomework(teacherID int, newHw *model.HomeworkCreate) (*model.Homework, error)
-	GetHomeworkByID(id int) (*model.HomeworkByID, error)
-	GetHomeworksByClassID(classID int) (*model.HomeworkList, error)
+	CreateHomework(teacherID int, newHw *m.HomeworkCreate) (*m.Homework, error)
+	GetHomeworkByID(id int) (*m.HomeworkByID, error)
+	GetHomeworksByClassID(classID int) (*m.HomeworkList, error)
 	// TASKS
-	CreateTask(teacherID int, newTask *model.TaskCreate) (*model.TaskCreateResponse, error)
-	GetTaskByID(id int) (*model.TaskByID, error)
-	GetTasksByTeacherID(teacherID int) ([]model.Task, error)
+	CreateTask(teacherID int, newTask *m.TaskCreate) (*m.TaskCreateResponse, error)
+	GetTaskByID(id int) (*m.TaskByID, error)
+	GetTasksByTeacherID(teacherID int) ([]m.Task, error)
 	// SOLUTION
-	GetSolutionByID(id int) (*model.SolutionByID, error)
-	GetSolutionsByClassID(classID int) ([]model.SolutionFromClass, error)
-	GetSolutionsByHomeworkID(homeworkID int) ([]model.SolutionForHw, error)
-	EvaluateSolutionbyID(solutionID int, evaluation *model.SolutionEvaluation) error
+	GetSolutionByID(id int) (*m.SolutionByID, error)
+	GetSolutionsByClassID(classID int) ([]m.SolutionFromClass, error)
+	GetSolutionsByHomeworkID(homeworkID int) ([]m.SolutionForHw, error)
+	EvaluateSolutionbyID(solutionID int, evaluation *m.SolutionEvaluation) error
 	// CALENDAR
 	CreateCalendar(teacherID int) error
-	GetCalendar(teacherID int) (*model.CalendarParams, error)
-	CreateCalendarEvent(req *model.CalendarEvent, teacherID int) error
-	GetCalendarEvents(teacherID int) (model.CalendarEvents, error)
+	GetCalendarParams(teacherID int) (*m.CalendarParams, error)
+	CreateCalendarEvent(req *m.CalendarEvent, teacherID int) error
+	GetCalendarEvents(teacherID int) ([]m.CalendarEvent, error)
 	DeleteCalendarEvent(teacherID int, eventID string) error
-	UpdateCalendarEvent(req *model.CalendarEvent, teacherID int) error
-}
-
-type Usecase struct {
-	store           rep.StoreInterface
-	letters         []rune
-	tokenLen        int
-	bufToken        []rune
-	chat            d.ChatInterface
-	calendar        d.CalendarInterface
-	tokenFile       string
-	credentialsFile string
-}
-
-func NewUsecase(
-	s rep.StoreInterface,
-	lettes string,
-	tokenLen int,
-	chat d.ChatInterface,
-	calendar d.CalendarInterface,
-	tok string,
-	cred string,
-) UsecaseInterface {
-	return &Usecase{
-		store:           s,
-		letters:         []rune(lettes),
-		tokenLen:        tokenLen,
-		bufToken:        make([]rune, tokenLen),
-		chat:            chat,
-		calendar:        calendar,
-		tokenFile:       tok,
-		credentialsFile: cred,
-	}
-}
-
-func (uc Usecase) genRandomToken() string {
-	for i := range uc.bufToken {
-		uc.bufToken[i] = uc.letters[rand.Intn(len(uc.letters))]
-	}
-	return string(uc.bufToken)
+	UpdateCalendarEvent(req *m.CalendarEvent, teacherID int) error
+	// ATTACH
+	SaveAttach(file *m.Attach) (string, error)
 }

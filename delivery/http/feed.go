@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -20,11 +21,11 @@ import (
 // @Produce  json
 // @Tags Feed
 // @Param classID path string true "Class id"
-// @Success 200 {object} model.Feed
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.Feed
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID}/feed [get]
 func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -42,7 +43,7 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.Feed{Posts: posts})
+	json.NewEncoder(w).Encode(&m.Feed{Posts: posts})
 }
 
 // CreatePost godoc
@@ -53,12 +54,12 @@ func (api *Handler) GetClassFeed(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Feed
 // @Param classID path string true "Class id"
-// @Param post body model.PostCreate true "Post for creating"
-// @Success 200 {object} model.PostResponse
-// @Failure 400 {object} model.Error "bad request - Problem with the request"
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 404 {object} model.Error "not found - Requested entity is not found in database"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param post body m.PostCreate true "Post for creating"
+// @Success 200 {object} m.PostResponse
+// @Failure 400 {object} m.Error "bad request - Problem with the request"
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 404 {object} m.Error "not found - Requested entity is not found in database"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /classes/{classID}/feed [post]
 func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -70,7 +71,7 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	var newPost model.PostCreate
+	var newPost m.PostCreate
 	if err := decoder.Decode(&newPost); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -84,5 +85,5 @@ func (api *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.PostResponse{Post: *post})
+	json.NewEncoder(w).Encode(&m.PostResponse{Post: *post})
 }

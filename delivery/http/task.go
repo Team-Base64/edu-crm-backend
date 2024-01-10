@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"log"
-	e "main/domain/errors"
-	"main/domain/model"
 	"net/http"
 	"strconv"
 	"strings"
+
+	e "main/domain/errors"
+	m "main/domain/model"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -19,12 +20,12 @@ import (
 // @Accept  json
 // @Produce  json
 // @Tags Tasks
-// @Success 200 {object} model.TaskListByTeacherID
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.TaskListByTeacherID
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /tasks [get]
 func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	tasks, err := api.usecase.GetTasksByTeacherID(teacherProfile.ID)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -32,7 +33,7 @@ func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(model.TaskListByTeacherID{Tasks: tasks})
+	json.NewEncoder(w).Encode(m.TaskListByTeacherID{Tasks: tasks})
 }
 
 // CreateTasks godoc
@@ -42,14 +43,14 @@ func (api *Handler) GetTeacherTasks(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Tags Tasks
-// @Param post body model.TaskCreate true "Task for creating"
-// @Success 200 {object} model.TaskCreateResponse
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Param post body m.TaskCreate true "Task for creating"
+// @Success 200 {object} m.TaskCreateResponse
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /tasks [post]
 func (api *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var req model.TaskCreate
+	var req m.TaskCreate
 	if err := decoder.Decode(&req); err != nil {
 		returnErrorJSON(w, e.ErrBadRequest400)
 		return
@@ -57,7 +58,7 @@ func (api *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	sanitizer := bluemonday.UGCPolicy()
 	req.Description = sanitizer.Sanitize(req.Description)
 
-	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*model.TeacherDB)
+	teacherProfile := r.Context().Value(KeyUserdata{"userdata"}).(*m.TeacherDB)
 	task, err := api.usecase.CreateTask(teacherProfile.ID, &req)
 	if err != nil {
 		log.Println(e.StacktraceError(err))
@@ -76,9 +77,9 @@ func (api *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Tags Tasks
 // @Param taskID path string true "Task id"
-// @Success 200 {object} model.TaskByIDResponse
-// @Failure 401 {object} model.Error "unauthorized - Access token is missing or invalid"
-// @Failure 500 {object} model.Error "internal server error - Request is valid but operation failed at server side"
+// @Success 200 {object} m.TaskByIDResponse
+// @Failure 401 {object} m.Error "unauthorized - Access token is missing or invalid"
+// @Failure 500 {object} m.Error "internal server error - Request is valid but operation failed at server side"
 // @Router /tasks/{taskID} [get]
 func (api *Handler) GetTaskByID(w http.ResponseWriter, r *http.Request) {
 	path := strings.Split(r.URL.Path, "/")
@@ -96,5 +97,5 @@ func (api *Handler) GetTaskByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(&model.TaskByIDResponse{Task: *task})
+	json.NewEncoder(w).Encode(&m.TaskByIDResponse{Task: *task})
 }

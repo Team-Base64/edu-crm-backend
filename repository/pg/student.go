@@ -1,12 +1,12 @@
-package repository
+package pg
 
 import (
 	e "main/domain/errors"
-	"main/domain/model"
+	m "main/domain/model"
 )
 
-func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
-	var stud model.StudentByID
+func (s *PostgreSqlStore) GetStudentByID(id int) (*m.StudentByID, error) {
+	var stud m.StudentByID
 	if err := s.db.QueryRow(
 		`SELECT name, socialType, avatar FROM students WHERE id = $1;`,
 		id,
@@ -19,7 +19,7 @@ func (s *Store) GetStudentByID(id int) (*model.StudentByID, error) {
 	return &stud, nil
 }
 
-func (s *Store) GetStudentsFromClass(classID int) ([]model.StudentFromClass, error) {
+func (s *PostgreSqlStore) GetStudentsFromClass(classID int) ([]m.StudentFromClass, error) {
 	rows, err := s.db.Query(
 		`SELECT s.id, s.name, s.socialType, s.avatar, c.id FROM students s
 		 JOIN chats c ON s.id = c.studentID
@@ -30,9 +30,9 @@ func (s *Store) GetStudentsFromClass(classID int) ([]model.StudentFromClass, err
 		return nil, e.StacktraceError(err)
 	}
 
-	students := []model.StudentFromClass{}
+	students := []m.StudentFromClass{}
 	for rows.Next() {
-		var tmpStudent model.StudentFromClass
+		var tmpStudent m.StudentFromClass
 
 		if err := rows.Scan(
 			&tmpStudent.ID,
