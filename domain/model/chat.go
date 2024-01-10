@@ -7,7 +7,6 @@ type ChatPreview struct {
 	StudentID       int       `json:"studentID"`
 	StudentName     string    `json:"studentName"`
 	StudentAvatar   string    `json:"studentAvatar"`
-	Img             string    `json:"cover"`
 	SocialType      string    `json:"socialType"`
 	IsRead          bool      `json:"isread"`
 	LastMessageText string    `json:"text"`

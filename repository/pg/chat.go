@@ -83,9 +83,7 @@ func (s *PostgreSqlStore) GetChatsByTeacherID(teacherID int) ([]m.ChatPreview, e
 
 	chats := []m.ChatPreview{}
 	for rows.Next() {
-		tmpChat := m.ChatPreview{
-			Img: "https://educrm.us.to/filestorage/mock-avatar.png",
-		}
+		tmpChat := m.ChatPreview{}
 
 		if err = rows.Scan(
 			&tmpChat.ChatID,
