@@ -85,7 +85,7 @@ func (uc *BackendUsecase) genEvaluationMsg(solutionID int, evaluation *m.Solutio
 	if evaluation.IsApproved {
 		msg += "Зачтено!"
 	} else {
-		msg += "Не зачетно!"
+		msg += "Не зачтено!"
 	}
 
 	return msg, nil
