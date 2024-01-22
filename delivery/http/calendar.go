@@ -57,7 +57,6 @@ func (api *Handler) GetCalendar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(createdResponse)
-	json.NewEncoder(w).Encode(&m.Response{})
 }
 
 // CreateCalendarEvent godoc
