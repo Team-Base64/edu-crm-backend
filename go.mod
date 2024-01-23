@@ -5,7 +5,6 @@ go 1.21
 toolchain go1.21.4
 
 require (
-	github.com/golang/protobuf v1.5.3
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.2
 )
@@ -42,13 +41,14 @@ require (
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/lib/pq v1.10.9
 	github.com/microcosm-cc/bluemonday v1.0.26
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.15.0
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/grpc v1.59.0
 )
 
 require (
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 )
