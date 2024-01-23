@@ -37,6 +37,7 @@ var chatFilesPath string
 var homeworkFilesPath string
 var solutionFilesPath string
 var urlDomain string
+var saltString string
 
 func loggingAndCORSHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -90,6 +91,11 @@ func init() {
 
 	urlDB = "postgres://" + pgUser + ":" + pgPwd + "@" + pgHost + ":" + pgPort + "/" + pgDB
 
+	saltString, exist = os.LookupEnv(conf.SALT_STRING)
+	if !exist || len(saltString) == 0 {
+		log.Fatalln("could not get salt string from env")
+	}
+
 	tokenLen, err = strconv.Atoi(os.Getenv(conf.TOKEN_LENGTH))
 	if err != nil {
 		log.Fatalln("could not get token length from env")
@@ -105,20 +111,20 @@ func init() {
 		log.Fatalln("could not get filestorage path from env")
 	}
 
-	chatFilesPath, exist = os.LookupEnv(conf.CHAT_FILES_PATH)
-	if !exist || len(chatFilesPath) == 0 {
-		log.Fatalln("could not get chat files path from env")
-	}
+	// chatFilesPath, exist = os.LookupEnv(conf.CHAT_FILES_PATH)
+	// if !exist || len(chatFilesPath) == 0 {
+	// 	log.Fatalln("could not get chat files path from env")
+	// }
 
-	homeworkFilesPath, exist = os.LookupEnv(conf.HOMEWORK_FILES_PATH)
-	if !exist || len(homeworkFilesPath) == 0 {
-		log.Fatalln("could not get homework files path from env")
-	}
+	// homeworkFilesPath, exist = os.LookupEnv(conf.HOMEWORK_FILES_PATH)
+	// if !exist || len(homeworkFilesPath) == 0 {
+	// 	log.Fatalln("could not get homework files path from env")
+	// }
 
-	solutionFilesPath, exist = os.LookupEnv(conf.SOLUTION_FILES_PATH)
-	if !exist || len(solutionFilesPath) == 0 {
-		log.Fatalln("could not get solution files path from env")
-	}
+	// solutionFilesPath, exist = os.LookupEnv(conf.SOLUTION_FILES_PATH)
+	// if !exist || len(solutionFilesPath) == 0 {
+	// 	log.Fatalln("could not get solution files path from env")
+	// }
 
 	urlDomain, exist = os.LookupEnv(conf.URL_DOMAIN)
 	if !exist || len(urlDomain) == 0 {
@@ -180,6 +186,7 @@ func main() {
 		calendarService,
 		fileStore,
 		urlDomain,
+		saltString,
 	)
 
 	myRouter := mux.NewRouter()

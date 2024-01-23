@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"log"
@@ -45,15 +46,14 @@ func (api *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	req.Name = sanitizer.Sanitize(req.Name)
 
 	user, err := api.usecase.GetTeacherProfileByLogin(req.Login)
-	if err != nil {
-		log.Println(e.StacktraceError(err))
-		returnErrorJSON(w, err)
-		return
-	}
 	if user != nil && user.Login != "" {
 		returnErrorJSON(w, e.ErrConflict409)
 		return
 	}
+
+	hashedPass := api.usecase.HashPass(req.Password)
+	b64Pass := base64.RawStdEncoding.EncodeToString(hashedPass)
+	req.Password = b64Pass
 
 	err = api.usecase.SignUpTeacher(&req)
 	if err != nil {
@@ -120,11 +120,25 @@ func (api *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		returnErrorJSON(w, e.ErrServerError500)
 		return
 	}
-	if user.Password != req.Password {
+
+	byteUserPass, err := base64.RawStdEncoding.DecodeString(user.Password)
+	if err != nil {
+		log.Println(e.StacktraceError(err))
+		returnErrorJSON(w, e.ErrServerError500)
+		return
+	}
+
+	if !api.usecase.CheckPass(byteUserPass, req.Password) {
 		log.Println(e.StacktraceError(errors.New("wrong password")))
 		returnErrorJSON(w, e.ErrUnauthorized401)
 		return
 	}
+
+	// if user.Password != req.Password {
+	// 	log.Println(e.StacktraceError(errors.New("wrong password")))
+	// 	returnErrorJSON(w, e.ErrUnauthorized401)
+	// 	return
+	// }
 
 	sess, err := api.usecase.CreateSession(user.Login)
 	if err != nil {
