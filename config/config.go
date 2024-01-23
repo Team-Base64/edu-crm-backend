@@ -16,6 +16,8 @@ var HOMEWORK_FILES_PATH = "HOMEWORK_FILES_PATH"
 var SOLUTION_FILES_PATH = "SOLUTION_FILES_PATH"
 var URL_DOMAIN = "URL_DOMAIN"
 
+var SALT_STRING = "SALT_STRING"
+
 var Port = ":8080"
 var BasePath = "/api"
 var PathDocs = BasePath + "/docs"

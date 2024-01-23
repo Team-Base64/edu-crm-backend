@@ -9,14 +9,15 @@ import (
 )
 
 type BackendUsecase struct {
-	dataStore rep.DataStoreInterface
-	letters   []rune
-	tokenLen  int
-	bufToken  []rune
-	chat      d.ChatInterface
-	calendar  d.CalendarInterface
-	fileStore rep.FileStoreInterface
-	urlDomain string
+	dataStore  rep.DataStoreInterface
+	letters    []rune
+	tokenLen   int
+	bufToken   []rune
+	chat       d.ChatInterface
+	calendar   d.CalendarInterface
+	fileStore  rep.FileStoreInterface
+	urlDomain  string
+	saltString string
 }
 
 func NewBackendUsecase(
@@ -27,16 +28,18 @@ func NewBackendUsecase(
 	calendar d.CalendarInterface,
 	fs rep.FileStoreInterface,
 	ud string,
+	saltS string,
 ) uc.UsecaseInterface {
 	return &BackendUsecase{
-		dataStore: ds,
-		letters:   []rune(lettes),
-		tokenLen:  tokenLen,
-		bufToken:  make([]rune, tokenLen),
-		chat:      chat,
-		calendar:  calendar,
-		fileStore: fs,
-		urlDomain: ud,
+		dataStore:  ds,
+		letters:    []rune(lettes),
+		tokenLen:   tokenLen,
+		bufToken:   make([]rune, tokenLen),
+		chat:       chat,
+		calendar:   calendar,
+		fileStore:  fs,
+		urlDomain:  ud,
+		saltString: saltS,
 	}
 }
 

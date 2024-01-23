@@ -1,9 +1,23 @@
 package backend
 
 import (
+	"bytes"
 	e "main/domain/errors"
 	m "main/domain/model"
+
+	"golang.org/x/crypto/argon2"
 )
+
+func (uc *BackendUsecase) HashPass(plainPassword string) []byte {
+	salt := []byte(uc.saltString)
+	hashedPass := argon2.IDKey([]byte(plainPassword), []byte(salt), 1, 64*1024, 4, 32)
+	return append(salt, hashedPass...)
+}
+
+func (uc *BackendUsecase) CheckPass(passHash []byte, plainPassword string) bool {
+	userPassHash := uc.HashPass(plainPassword)
+	return bytes.Equal(userPassHash, passHash)
+}
 
 func (uc *BackendUsecase) CreateTeacher(params *m.TeacherSignUp) error {
 	return uc.dataStore.AddTeacher(params)

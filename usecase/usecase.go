@@ -6,6 +6,8 @@ import (
 
 type UsecaseInterface interface {
 	// TEACHER
+	HashPass(plainPassword string) []byte
+	CheckPass(passHash []byte, plainPassword string) bool
 	SignUpTeacher(req *m.TeacherSignUp) error
 	CreateTeacher(params *m.TeacherSignUp) error
 	GetTeacherProfile(id int) (*m.TeacherProfile, error)
